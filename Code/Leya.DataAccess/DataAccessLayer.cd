@@ -1,0 +1,605 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Leya.DataAccess.UnitOfWork" BaseTypeListCollapsed="true">
+    <Position X="8.75" Y="2.5" Width="27.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAACCAAAAAAAAQAAAAAAAAAAAQAAAAAAAA=</HashCode>
+      <FileName>UnitOfWork.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="13.535" />
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Attributes.IgnoreOnInsertAttribute" Collapsed="true">
+    <Position X="3.25" Y="14.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Common\Attributes\IgnoreOnInsertAttribute.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Configuration.AppConfig" BaseTypeListCollapsed="true">
+    <Position X="15.75" Y="34.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAA=</HashCode>
+      <FileName>Common\Configuration\AppConfig.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Orientation="Right" Position="0.668" />
+  </Class>
+  <Class Name="Leya.DataAccess.Common.IoC.DIContainerConfig">
+    <Position X="4.75" Y="2.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAABAAIAAACAAgAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Common\IoC\DIContainerConfig.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="InternalConstructorFinder" />
+      <Property Name="IRepositoryFactory" />
+      <Property Name="UnitOfWork" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Leya.DataAccess.Common.IoC.InternalConstructorFinder" BaseTypeListCollapsed="true">
+    <Position X="0.75" Y="2.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Common\IoC\InternalConstructorFinder.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Models.Albums.AlbumEntity" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="10" Y="14.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAkAABAAgAEAEAAAAEAAAAAAgAAEAAAAAAAAAAAA=</HashCode>
+      <FileName>Common\Models\Albums\AlbumEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Models.Artists.ArtistEntity" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="20.75" Y="14.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAACAgAAAAABAAAEAAIIAAAAACAgEASAAQAECAAAAEI=</HashCode>
+      <FileName>Common\Models\Artists\ArtistEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Models.Artists.ArtistGenreEntity" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="20.75" Y="15.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAIAEAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Common\Models\Artists\ArtistGenreEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Models.Artists.ArtistTypeEntity" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="20.75" Y="16.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAEAAAAAAAAAAAAQAAAAAAAAA=</HashCode>
+      <FileName>Common\Models\Artists\ArtistTypeEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Models.Artists.BandMemberEntity" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="20.5" Y="17.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAECAAAAAAAAAAAEkAAAEAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Common\Models\Artists\BandMemberEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Models.Episodes.EpisodeActorsEntity" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="31.25" Y="18.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAECAAAAAAAAAAAEkAAAAAQAAAAAAAAAAAAAAAAIAAA=</HashCode>
+      <FileName>Common\Models\Episodes\EpisodeActorsEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Models.Episodes.EpisodeCreditEntity" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="31.25" Y="15.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAFAAAAAAAAAAAAAAAAAAAAAAAIAAA=</HashCode>
+      <FileName>Common\Models\Episodes\EpisodeCreditEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Models.Episodes.EpisodeEntity" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="31.5" Y="14.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gCACAlABBAEAgEQECgoAAAAIAAEAASQAAAIAAAAAAAA=</HashCode>
+      <FileName>Common\Models\Episodes\EpisodeEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Models.Episodes.EpisodeGenreEntity" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="31.25" Y="16.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAEAAIAAAAAAAAAAAAAAAAAAAAIAAA=</HashCode>
+      <FileName>Common\Models\Episodes\EpisodeGenreEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Models.Episodes.EpisodeRatingEntity" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="31.25" Y="17.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>ACACAAAAABAAAAAEAAAAAAQAAAAAAAAAAAAgAAAIAAA=</HashCode>
+      <FileName>Common\Models\Episodes\EpisodeRatingEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Models.Media.MediaTypeEntity" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="12.5" Y="14.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAgEAAAAAAAAABAAAAAABAAAAAAAAAA=</HashCode>
+      <FileName>Common\Models\Media\MediaTypeEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Models.Media.MediaTypeSourceEntity" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="14.75" Y="14.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>QAACCAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Common\Models\Media\MediaTypeSourceEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Models.Movies.AudioEntity" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="26" Y="26.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAACQAAAAAEAAAAAAAAAQAAAAAAAAAAAAAAEAA=</HashCode>
+      <FileName>Common\Models\Movies\AudioEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Models.Movies.FileInfoEntity" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="26" Y="23.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIACAAAAAAAAAAAEAAAAAAAAAQAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Common\Models\Movies\FileInfoEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Models.Movies.MovieActorEntity" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="26" Y="19.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAECAAAAAAAAAAAEkAAAAAQAAQAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Common\Models\Movies\MovieActorEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Models.Movies.MovieCountryEntity" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="25.75" Y="20.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAEAAAAAAAAAQIAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Common\Models\Movies\MovieCountryEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Models.Movies.MovieCreditEntity" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="26" Y="21.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAFAAAAAAAAAQAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Common\Models\Movies\MovieCreditEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Models.Movies.MovieDirectorEntity" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="25.75" Y="22.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAACABAAAAAAAAAEAAAAAAAAAQAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Common\Models\Movies\MovieDirectorEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Models.Movies.MovieEntity" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="26" Y="14.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>wCACAlAAAAEAhAQECoIKAgAIAAIBAUQAgEQAAAgAEEA=</HashCode>
+      <FileName>Common\Models\Movies\MovieEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Models.Movies.MovieGenreEntity" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="26" Y="15.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAEAAIAAAAAAQAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Common\Models\Movies\MovieGenreEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Models.Movies.MovieRatingEntity" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="25.75" Y="16.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>ACACAAAAABAAAAAEAAAAAAQAAQAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>Common\Models\Movies\MovieRatingEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Models.Movies.MovieResumeEntity" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="25.75" Y="17.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAkAAAAAAAAAQAAQAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Common\Models\Movies\MovieResumeEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Models.Movies.MovieTagEntity" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="26" Y="18.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAgAAAEAAAAAAAAAQAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Common\Models\Movies\MovieTagEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Models.Movies.StreamDetailsEntity" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="25.75" Y="25.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAEQAEAAAAAAQAAAAAAAAAAAAAAAAg=</HashCode>
+      <FileName>Common\Models\Movies\StreamDetailsEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Models.Movies.SubtitleEntity" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="26" Y="24.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAACAAAAAAEAAAAAAAAAQAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Common\Models\Movies\SubtitleEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Models.Movies.VideoEntity" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="26" Y="27.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAABQAAAEAEAAQAAEAAAQAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Common\Models\Movies\VideoEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Models.Seasons.SeasonEntity" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="28.5" Y="14.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAACAgAABAEAAAAEAIAAAAAIABEAAAAAAAAQAAAAAAA=</HashCode>
+      <FileName>Common\Models\Seasons\SeasonEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Models.Songs.SongEntity" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="34.25" Y="14.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAkAAAAAAAEAEAAAAEABAgAAgAAMAAAAAAAAAAAA=</HashCode>
+      <FileName>Common\Models\Songs\SongEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Models.TvShows.TvShowActorsEntity" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="17.75" Y="17.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAECAAAAAAAAAAAEkAAAAAQAAAEAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Common\Models\TvShows\TvShowActorsEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Models.TvShows.TvShowEntity" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="18" Y="14.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QKACAgAAAAEAgAQEC4oKAAIIAACBAQQBAAYAAAgAAAA=</HashCode>
+      <FileName>Common\Models\TvShows\TvShowEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Models.TvShows.TvShowGenreEntity" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="17.75" Y="16.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAEAAIAAAAAAAEAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Common\Models\TvShows\TvShowGenreEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Models.TvShows.TvShowRatingsEntity" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="17.75" Y="15.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>ACACAAAAABAAAAAEAAAAAAQAAAEAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>Common\Models\TvShows\TvShowRatingsEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Models.TvShows.TvShowResumeEntity" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="17.75" Y="18.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAkAAAAAAAAAAEAQCAAAAAAAAAIAAA=</HashCode>
+      <FileName>Common\Models\TvShows\TvShowResumeEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Models.Users.UserEntity" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="23.25" Y="14.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAEAUAAAAAAAAAAAAQCIAAAAAAAAAA=</HashCode>
+      <FileName>Common\Models\Users\UserEntity.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.117" Collapsed="true" />
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Models.ApiResponse">
+    <Position X="5.5" Y="29.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAAAAAQAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Common\Models\ApiResponse.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="IDataAccess" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Leya.DataAccess.Common.Models.ApiResponse&lt;T&gt;">
+    <Position X="5.5" Y="31" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAAAAAQAAAAAAAAQAAAAAABAAAAAAAAAAAAA=</HashCode>
+      <FileName>Common\Models\ApiResponse.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="IDataAccess" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Leya.DataAccess.Repositories.Albums.AlbumRepository" BaseTypeListCollapsed="true">
+    <Position X="9.25" Y="11.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAACAAgAAAAAAAAQABAAAAAAAgAAAAAAAQAIQA=</HashCode>
+      <FileName>Repositories\Albums\AlbumRepository.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="dataAccess" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.468" />
+  </Class>
+  <Class Name="Leya.DataAccess.Repositories.Artists.ArtistRepository" BaseTypeListCollapsed="true">
+    <Position X="20" Y="11.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAACAAgAAAAAAAAQABAAAAAAAgAAAAAAAQAIQA=</HashCode>
+      <FileName>Repositories\Artists\ArtistRepository.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="dataAccess" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.52" />
+  </Class>
+  <Class Name="Leya.DataAccess.Repositories.Common.RepositoryDictionary">
+    <Position X="2.25" Y="4.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>BAIAAAAAAAAAAABAAAAAAAQAAAAAAAAAAAAAAABAAAA=</HashCode>
+      <FileName>Repositories\Common\RepositoryDictionary.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Leya.DataAccess.Repositories.Common.RepositoryFactory" BaseTypeListCollapsed="true">
+    <Position X="4.75" Y="6" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Repositories\Common\RepositoryFactory.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Leya.DataAccess.Repositories.Episodes.EpisodeRepository" BaseTypeListCollapsed="true">
+    <Position X="30.75" Y="11.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAACAAgAAAAAAAAQABACAAAAAgAAAAAAAAAIQA=</HashCode>
+      <FileName>Repositories\Episodes\EpisodeRepository.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="dataAccess" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.433" />
+  </Class>
+  <Class Name="Leya.DataAccess.Repositories.Media.MediaTypeRepository" BaseTypeListCollapsed="true">
+    <Position X="12" Y="11.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAACAAgAAAAAAAAAABAAAAAAAgAAAAAAAQAIQA=</HashCode>
+      <FileName>Repositories\Media\MediaTypeRepository.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="dataAccess" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.432" />
+  </Class>
+  <Class Name="Leya.DataAccess.Repositories.Media.MediaTypeSourceRepository" BaseTypeListCollapsed="true">
+    <Position X="14.5" Y="11.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAACAAgAAAAAAAAAABAAAAAAAgAAAAAAAAAIQA=</HashCode>
+      <FileName>Repositories\Media\MediaTypeSourceRepository.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="dataAccess" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.458" />
+  </Class>
+  <Class Name="Leya.DataAccess.Repositories.Movies.MovieRepository" BaseTypeListCollapsed="true">
+    <Position X="25.25" Y="11.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAACAAgAAAAAAAAQABACAAAAAgAAAAAAAAAIQA=</HashCode>
+      <FileName>Repositories\Movies\MovieRepository.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="dataAccess" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.464" />
+  </Class>
+  <Class Name="Leya.DataAccess.Repositories.Seasons.SeasonRepository" BaseTypeListCollapsed="true">
+    <Position X="28" Y="11.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAACAAgAAAAAAAAQABACAAAAAgAAAAAAAAAIQA=</HashCode>
+      <FileName>Repositories\Seasons\SeasonRepository.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="dataAccess" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.441" />
+  </Class>
+  <Class Name="Leya.DataAccess.Repositories.Songs.SongRepository" BaseTypeListCollapsed="true">
+    <Position X="33.5" Y="11.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAACAAgAAAAAAAAQABAAAAAAAgAAAAAAAQAIQA=</HashCode>
+      <FileName>Repositories\Songs\SongRepository.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="dataAccess" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.508" />
+  </Class>
+  <Class Name="Leya.DataAccess.Repositories.TvShows.TvShowRepository" BaseTypeListCollapsed="true">
+    <Position X="17.25" Y="11.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAACAAgAAAAAAAAQABACAAAAAgAAAAAAAAAIQA=</HashCode>
+      <FileName>Repositories\TvShows\TvShowRepository.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="dataAccess" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.57" />
+  </Class>
+  <Class Name="Leya.DataAccess.Repositories.Users.UserRepository" BaseTypeListCollapsed="true">
+    <Position X="22.75" Y="11.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAACAAgQAAAAAAAAABAAAAAAAgAAAAAAAAAIQg=</HashCode>
+      <FileName>Repositories\Users\UserRepository.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="dataAccess" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.464" />
+  </Class>
+  <Class Name="Leya.DataAccess.StorageAccess.SqlDataAccess" BaseTypeListCollapsed="true">
+    <Position X="21.25" Y="32.25" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>IAACAAAACAABAAAIAAAAChgAAAAAAAgAAIAAkAAAAIA=</HashCode>
+      <FileName>StorageAccess\SqlDataAccess.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="dbTransaction" />
+      <Field Name="config" />
+      <Field Name="dbConnection" />
+      <Property Name="EntityContainers" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.269" />
+  </Class>
+  <Interface Name="Leya.DataAccess.IUnitOfWork">
+    <Position X="21.25" Y="0.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IUnitOfWork.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Leya.DataAccess.Common.Configuration.IAppConfig">
+    <Position X="18.25" Y="34.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAA=</HashCode>
+      <FileName>Common\Configuration\IAppConfig.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Leya.DataAccess.Repositories.Albums.IAlbumRepository">
+    <Position X="9.25" Y="9.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAQAAAA=</HashCode>
+      <FileName>Repositories\Albums\IAlbumRepository.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Leya.DataAccess.Repositories.Artists.IArtistRepository">
+    <Position X="20" Y="9.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAQAAAA=</HashCode>
+      <FileName>Repositories\Artists\IArtistRepository.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Leya.DataAccess.Repositories.Common.IRepository&lt;TEntity&gt;">
+    <Position X="21.5" Y="5.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAACAAgAAAAAAAAAABAAAAAAAgAAAAAAAAAIAA=</HashCode>
+      <FileName>Repositories\Common\IRepository.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Leya.DataAccess.Repositories.Common.IRepositoryFactory">
+    <Position X="4.75" Y="4.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Repositories\Common\IRepositoryFactory.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Leya.DataAccess.Repositories.Episodes.IEpisodeRepository">
+    <Position X="30.75" Y="9.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAQAAACAAAAAAAAAAAAAAAIAA=</HashCode>
+      <FileName>Repositories\Episodes\IEpisodeRepository.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Leya.DataAccess.Repositories.Media.IMediaTypeRepository">
+    <Position X="12" Y="9.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAA=</HashCode>
+      <FileName>Repositories\Media\IMediaTypeRepository.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Leya.DataAccess.Repositories.Media.IMediaTypeSourceRepository">
+    <Position X="14.5" Y="9.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Repositories\Media\IMediaTypeSourceRepository.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Leya.DataAccess.Repositories.Movies.IMovieRepository">
+    <Position X="25.25" Y="9.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAQAAACAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Repositories\Movies\IMovieRepository.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Leya.DataAccess.Repositories.Seasons.ISeasonRepository">
+    <Position X="28" Y="9.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAQAAACAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Repositories\Seasons\ISeasonRepository.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Leya.DataAccess.Repositories.Songs.ISongRepository">
+    <Position X="33.5" Y="9.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAQAIAA=</HashCode>
+      <FileName>Repositories\Songs\ISongRepository.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Leya.DataAccess.Repositories.TvShows.ITvShowRepository">
+    <Position X="17.25" Y="9.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAQAAACAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Repositories\TvShows\ITvShowRepository.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Leya.DataAccess.Repositories.Users.IUserRepository">
+    <Position X="22.75" Y="9.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAg=</HashCode>
+      <FileName>Repositories\Users\IUserRepository.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Leya.DataAccess.StorageAccess.IDataAccess">
+    <Position X="9.5" Y="29.75" Width="26.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAACAAAAAAIAAAAAhAAAAAAAAgAAAAAAAAAAIA=</HashCode>
+      <FileName>StorageAccess\IDataAccess.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Leya.DataAccess.StorageAccess.IStorageEntity">
+    <Position X="5.75" Y="14.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>StorageAccess\IStorageEntity.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="System.Data.IDbConnection" Collapsed="true">
+    <Position X="18.25" Y="32.25" Width="1.75" />
+    <TypeIdentifier />
+  </Interface>
+  <Interface Name="System.Data.IDbTransaction" Collapsed="true">
+    <Position X="18.25" Y="33.25" Width="1.75" />
+    <TypeIdentifier />
+  </Interface>
+  <Enum Name="Leya.DataAccess.Common.Enums.EntityContainers">
+    <Position X="25.25" Y="32.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgIJCQAQCUBkAAAAJAUAQMAAEAAAAAAIEQBDAQBAUE=</HashCode>
+      <FileName>Common\Enums\EntityContainers.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

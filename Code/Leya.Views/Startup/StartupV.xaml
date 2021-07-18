@@ -1,0 +1,32 @@
+﻿<Window x:Class="Leya.Views.Startup.StartupV"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:i="clr-namespace:Microsoft.Xaml.Behaviors;assembly=Microsoft.Xaml.Behaviors"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Leya.ViewModels.Startup;assembly=Leya.ViewModels"
+        xmlns:converters="clr-namespace:Leya.Views.Common.Converters" 
+        mc:Ignorable="d"
+        Title="{Binding WindowTitle}" Style="{DynamicResource WindowStyle}" Visibility="{Binding IsWindowVisible, Mode=TwoWay, Converter={StaticResource BooleanToVisibilityConverter}}" Height="234.478" Width="550" MinWidth="365" AllowsTransparency="False" ResizeMode="NoResize" WindowStyle="None" WindowStartupLocation="CenterScreen" MinHeight="216" MaxHeight="250" MaxWidth="550" ContentRendered="Window_ContentRendered">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="ContentRendered">
+            <i:InvokeCommandAction Command="{Binding ContentRendered_Command}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <Window.Resources>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </Window.Resources>
+    <Grid Background="{DynamicResource containerBackground}">
+        <Border Style="{DynamicResource contentBorder}" Margin="10,10,10,45"/>
+        <Button Command="{Binding LoginAsync_Command}" Style="{DynamicResource confirmButton}" IsDefault="True" Content="Login" Margin="0,0,10,10" BorderThickness="0" Height="22" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="105" TabIndex="2"/>
+        <Button Command="{Binding RegisterUsername_Command}" Style="{DynamicResource abortButton}" IsEnabled="True" Content="Register" Margin="0,0,131,10" BorderThickness="0" Height="22" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="105" TabIndex="5"/>
+        <Button Command="{Binding RecoverPassword_Command}" Style="{DynamicResource abortButton}" IsEnabled="True" Content="Recover Password" Margin="0,0,253,10" BorderThickness="0" Height="22" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="117" TabIndex="5"/>
+        <Button Command="{Binding ChangePassword_Command}" Style="{DynamicResource abortButton}" IsEnabled="True" Content="Change Password" Margin="0,0,387,10" BorderThickness="0" Height="22" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="117" TabIndex="5"/>
+        <Label Content="Username" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="15,22,0,0" Foreground="{DynamicResource textForeground}"/>
+        <Label Content="Password" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="15,53,0,0" Foreground="{DynamicResource textForeground}"/>
+        <TextBox x:Name="txtUsername" Text="{Binding Username, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Style="{DynamicResource textBoxStyle}" Height="23" Margin="122,25,21,0" VerticalAlignment="Top" TabIndex="0"/>
+        <PasswordBox Style="{DynamicResource passwordBoxStyle}" x:Name="txtPassword" Height="23" Margin="122,53,21,0" VerticalAlignment="Top" TabIndex="1" PasswordChanged="PasswordChanged"/>
+        <CheckBox IsChecked="{Binding RememberCredentials}" Command="{Binding RememberCredentials_Command}" Style="{DynamicResource CheckBoxStyle}" Content="Remember username and password" HorizontalAlignment="Left" Margin="122,81,0,0" Height="30" VerticalAlignment="Top" TabIndex="3"/>
+        <CheckBox IsChecked="{Binding AutoLogin}" Command="{Binding AutoLoginAsync_Command}" Style="{DynamicResource CheckBoxStyle}" Content="Login automatically" HorizontalAlignment="Left" Margin="122,111,0,0" VerticalAlignment="Top" TabIndex="4" Height="30"/>
+    </Grid>
+</Window>

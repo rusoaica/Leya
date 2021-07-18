@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup />
+  <ItemGroup>
+    <ApplicationDefinition Update="App.xaml">
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Common\Controls\NavigationTreeView\FileSystemTreeView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Common\Dialogs\FileBrowserDialogV.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Common\Dialogs\FileSaveDialogV.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Common\Dialogs\FolderBrowserDialogV.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Common\Dialogs\MsgBoxV.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Main\MainWindowV.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Options\SystemV.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Register\ChangePasswordV.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Register\RecoverPasswordV.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Register\RegisterV.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Startup\StartupV.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Common\Controls\NavigationTreeView\FileSystemTreeView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Common\Dialogs\FileBrowserDialogV.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Common\Dialogs\FileSaveDialogV.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Common\Dialogs\FolderBrowserDialogV.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Common\Dialogs\MsgBoxV.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Main\MainWindowV.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Options\SystemV.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Register\ChangePasswordV.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Register\RecoverPasswordV.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Register\RegisterV.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Startup\StartupV.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+</Project>

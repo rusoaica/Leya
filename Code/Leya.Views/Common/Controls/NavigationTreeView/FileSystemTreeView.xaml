@@ -1,0 +1,36 @@
+﻿<UserControl x:Class="Leya.Views.Common.Controls.NavigationTreeView.FileSystemTreeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:converter="clr-namespace:Leya.Views.Common.Converters"
+             mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="300" Background="Transparent">
+    <UserControl.Resources>
+        <converter:ImageSourceConverter x:Key="ImageSourceConverter"/>
+        <HierarchicalDataTemplate x:Key="NavigationTreeViewTemplate" ItemsSource="{Binding Children}">
+            <Button Style="{DynamicResource TreeViewButton}" Cursor="Hand" ToolTip="{Binding Path=FullPathName, Mode=OneTime}" Background="Transparent" BorderBrush="{x:Null}" Padding="0,0,2,0" Height="22" Focusable="False" ClickMode="Press" 
+                    Command="{Binding Path=DataContext.TreeSelectedItemChangedAsync_Command, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" CommandParameter="{Binding FullPathName}">
+                <StackPanel Orientation="Horizontal" Margin="3,1,3,1" VerticalAlignment="Stretch" >
+                    <Image Source="{Binding Path=Icon, Mode=OneTime, Converter={StaticResource ImageSourceConverter}}" Stretch="Fill" Height="19" Width="19"/>
+                    <TextBlock Margin="5,0,0,0" Text="{Binding FriendlyName, Mode=OneTime}" Foreground="{DynamicResource textForeground}"/>
+                </StackPanel>
+            </Button>
+        </HierarchicalDataTemplate>
+    </UserControl.Resources>
+    <Grid ClipToBounds="True">
+        <TreeView Style="{DynamicResource TreeView}" x:Name="tree" BorderThickness="0" ItemsSource="{Binding Path=RootChildren}" ItemTemplate="{StaticResource NavigationTreeViewTemplate}">
+            <TreeView.InputBindings>
+                <KeyBinding Key="Enter" Command="{Binding Path=DataContext.NavigateToSelectedItemAsync_Command, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=TreeView}}" />
+            </TreeView.InputBindings>
+        </TreeView>
+        <Rectangle Fill="Black" Height="10" Margin="-3,-10,-3,0" VerticalAlignment="Top">
+            <Rectangle.Effect>
+                <DropShadowEffect BlurRadius="15" Color="#000" Direction="300" Opacity="0.8" RenderingBias="Quality" ShadowDepth="5" />
+            </Rectangle.Effect>
+        </Rectangle>
+        <Rectangle Fill="Black" Width="10" Margin="-10,-3,0,-3" HorizontalAlignment="Left">
+            <Rectangle.Effect>
+                <DropShadowEffect BlurRadius="15" Color="#000" Direction="000" Opacity="0.8" RenderingBias="Quality" ShadowDepth="5" />
+            </Rectangle.Effect>
+        </Rectangle>
+    </Grid>
+</UserControl>

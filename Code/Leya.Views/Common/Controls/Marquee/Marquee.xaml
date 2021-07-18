@@ -1,0 +1,12 @@
+﻿<UserControl x:Class="Leya.Views.Common.Controls.Marquee"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="100" d:DesignWidth="200" SizeChanged="UserControl_SizeChanged" MouseEnter="UserControl_MouseEnter" MouseLeave="UserControl_MouseLeave">
+    <Grid ClipToBounds="True" Name="CanvasMain">
+        <TextBlock Name="TextBlockMain" Text="{Binding Text}" TextWrapping="NoWrap" HorizontalAlignment="Left"/>
+        <!--TextTrimming="CharacterEllipsis"-->
+    </Grid>
+</UserControl>

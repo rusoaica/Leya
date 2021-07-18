@@ -1,0 +1,111 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>Leya</AssemblyName>
+    <ApplicationIcon>Resources\icon.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>..\..\Build\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>..\..\Release\Debug\</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\background.jpg" />
+    <None Remove="Resources\banner-mask.png" />
+    <None Remove="Resources\bg-mask.png" />
+    <None Remove="Resources\description-mask.png" />
+    <None Remove="Resources\drive.png" />
+    <None Remove="Resources\file-info.png" />
+    <None Remove="Resources\file.png" />
+    <None Remove="Resources\folder-empty.png" />
+    <None Remove="Resources\tp.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\background.jpg" />
+    <Resource Include="Resources\banner-mask.png" />
+    <Resource Include="Resources\bg-bluray.png" />
+    <Resource Include="Resources\bg-description.png" />
+    <Resource Include="Resources\bg-dvd.png" />
+    <Resource Include="Resources\bg-mask.png" />
+    <Resource Include="Resources\cast.png" />
+    <Resource Include="Resources\description-mask.png" />
+    <Resource Include="Resources\drive.png" />
+    <Resource Include="Resources\empty_trash.png" />
+    <Resource Include="Resources\export.png" />
+    <Resource Include="Resources\extras.png" />
+    <Resource Include="Resources\file-info.png" />
+    <Resource Include="Resources\file.png" />
+    <Resource Include="Resources\folder-empty.png" />
+    <Resource Include="Resources\folder.png" />
+    <Resource Include="Resources\get_info.png" />
+    <Resource Include="Resources\green.png" />
+    <Resource Include="Resources\honeycomb_tile.png" />
+    <Resource Include="Resources\LCARS.ttf" />
+    <Resource Include="Resources\mb_iconasterisk.png" />
+    <Resource Include="Resources\mb_iconexclamation.png" />
+    <Resource Include="Resources\mb_iconhand.png" />
+    <Resource Include="Resources\mb_iconquestion.png" />
+    <Resource Include="Resources\Next-icon.png" />
+    <Resource Include="Resources\no_actor.jpg" />
+    <Resource Include="Resources\Previous-icon.png" />
+    <Resource Include="Resources\red.png" />
+    <Resource Include="Resources\scrollbar_dots.png" />
+    <Resource Include="Resources\tp.png" />
+    <Resource Include="Resources\transp.png" />
+    <Resource Include="Resources\update.png" />
+    <Resource Include="Resources\yellow.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac" Version="6.2.0" />
+    <PackageReference Include="Autofac.Extras.DynamicProxy" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.31" />
+    <PackageReference Include="VirtualizingWrapPanel" Version="1.5.4" />
+    <PackageReference Include="WPFSpark" Version="1.5.0" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\Leya.Infrastructure\Leya.Infrastructure.csproj" />
+    <ProjectReference Include="..\Leya.Models\Leya.Models.csproj" />
+    <ProjectReference Include="..\Leya.ViewModels\Leya.ViewModels.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\icon.ico">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="Common\Dispatching\" />
+    <Folder Include="Common\Styles\StyleableWindow\" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,17 @@
+change media case cover to dvd/bluray/cd, depending on loaded media type
+
+add trivia for episodes
+
+add rest of info in System Info section (cpu, gpu, etc - crossplatform)
+
+propagate the IsHelpButtonVisible notification from Pages to parent Window
+
+finish the "play all" functionality
+finish the "play media" functionality
+port the WPF UI to Avalonia
+add menu entry for rebuilding database
+
+add performance aspect in infrastructure layer
+enable proxy interception on release!
+
+make file navigation treeview asynchronous

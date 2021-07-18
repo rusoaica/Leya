@@ -1,0 +1,11 @@
+Code/.vs/*
+Code/.editorconfig
+Code/Leya.DataAccess/obj/*
+Code/Leya.Infrastructure/obj/*
+Code/Leya.Models/obj/*
+Code/Leya.ViewModels/obj/*
+Code/Leya.Views/obj/*
+Tests/Leya.DataAccess.Tests/obj/*
+Tests/Leya.DataAccess.Tests/bin/*
+Build/*
+.git/*

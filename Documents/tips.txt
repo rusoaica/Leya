@@ -1,0 +1,18 @@
+1)	Programmer rant: on all forums you see two things:
+	1. "Don't use App.config, use the new and improved appsettings.json with .NET Core!!"
+	2. "Don't litter your code with hard-coded dependencies to the configuration class, use Dependency Injection!"
+	While I totally agree with the second point, the first point cannot be achieved, simply because some fucktards at Microbrain decided that using IConfiguration with binders 
+	and appsettings.json doesn't require persistance. In other words, yes, you can read your settings json file, yes, you can change the options in memory, but you have no
+	integrated way of storing them back in the json file. Because who the fuck, pardon my French, would ever want to also save modified configurations??...
+	Should I also mention the ton of dependencies that the configuration nuget packages require?.......
+	So, end of rant, after 2 wasted days of googling and reading github issues: FUCK YOU, Microsoft, I'll just fucking serialize/deserialize a json file with newtonsoft.json and be done with it.
+	For those interested, take a look here: https://github.com/aspnet/Configuration/issues/386#issuecomment-445504262
+
+2) for the VLC remote controlling using C#, https://gist.github.com/SamSaffron/101357
+
+3) for replacing Interactions and Interactivity with NET Core versions:
+
+	Remove reference to “Microsoft.Expression.Interactions” and “System.Windows.Interactivity”
+	Install the Microsoft.Xaml.Behaviors.Wpf NuGet package.
+	XAML files – replace the xmlns namespaces http://schemas.microsoft.com/expression/2010/interactivity and http://schemas.microsoft.com/expression/2010/interactions with http://schemas.microsoft.com/xaml/behaviors
+	C# files – replace the usings in c# files “Microsoft.Xaml.Interactivity” and “Microsoft.Xaml.Interactions” with “Microsoft.Xaml.Behaviors”
