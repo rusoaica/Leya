@@ -1,7 +1,8 @@
-﻿/// Written by: Yulia Danilova
+﻿
+using System.Threading.Tasks;
+/// Written by: Yulia Danilova
 /// Creation Date: 10th of June, 2021
 /// Purpose: Base interface for all views
-
 namespace Leya.ViewModels.Common.ViewFactory
 {
     public interface IView
@@ -22,7 +23,7 @@ namespace Leya.ViewModels.Common.ViewFactory
         /// </summary>
         /// <returns>A nullable bool that specifies whether the activity was accepted (true) or canceled (false). 
         /// The return value is the value of the DialogResult property before a window closes</returns>
-        bool? ShowDialog();
+        Task<bool?> ShowDialog();
         #endregion
     }
 }

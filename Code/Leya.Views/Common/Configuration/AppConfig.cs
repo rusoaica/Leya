@@ -8,6 +8,7 @@ using Leya.Infrastructure.Enums;
 using System.Collections.Generic;
 using Leya.Infrastructure.Notification;
 using Leya.Infrastructure.Configuration;
+using System.Threading.Tasks;
 #endregion
 
 namespace Leya.Views.Common.Configuration
@@ -40,12 +41,12 @@ namespace Leya.Views.Common.Configuration
         /// <summary>
         /// Saves the application's configuration settings
         /// </summary>
-        public void UpdateConfiguration()
+        public async Task UpdateConfigurationAsync()
         {
             if (!string.IsNullOrEmpty(ConfigurationFilePath) && File.Exists(ConfigurationFilePath))
                 File.WriteAllText(ConfigurationFilePath, JsonConvert.SerializeObject(this, Formatting.Indented));
             else
-                notificationService.Show("Application's configuration file was not found!", "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
+                await notificationService.ShowAsync("Application's configuration file was not found!", "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
         }
         #endregion
     }

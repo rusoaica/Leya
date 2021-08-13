@@ -3,6 +3,7 @@
 /// Purpose: Explicit implementation of abstract Dispatcher interface, used during unit testing synchronization contexts
 #region ========================================================================= USING =====================================================================================
 using System;
+using System.Threading.Tasks;
 #endregion
 
 namespace Leya.ViewModels.Common.Dispatcher
@@ -15,7 +16,7 @@ namespace Leya.ViewModels.Common.Dispatcher
         /// </summary>
         /// <param name="method">A delegate to a method that takes one argument.</param>
         /// <param name="args">An object to pass as an argument to the given method.</param>
-        public void Dispatch(Delegate method, params object[] args)
+        public async Task Dispatch(Action method, params object[] args)
         {
             method.DynamicInvoke((object)args);
         }
@@ -25,7 +26,7 @@ namespace Leya.ViewModels.Common.Dispatcher
         /// </summary>
         /// <param name="callback">A func delegate to a method that takes one argument and returns a result.</param>
         /// <exception cref="NotImplementedException">Always thrown, this method violates interface segregation principle (it is only used for the ApplicationDispatcher, not the mocked one) :(</exception>
-        public TResult Dispatch<TResult>(Func<TResult> callback)
+        public async Task<TResult> Dispatch<TResult>(Func<TResult> callback)
         {
             // TODO: implement a possible working solution
             throw new NotImplementedException();

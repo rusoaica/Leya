@@ -36,10 +36,8 @@ namespace Leya.ViewModels.Common.Controls.NavigationTreeView
         private ObservableCollection<INavigationTreeViewItem> rootChildren = new ObservableCollection<INavigationTreeViewItem>();
         public ObservableCollection<INavigationTreeViewItem> RootChildren
         {
-            get { return rootChildren; 
-            }
-            set { rootChildren = value; 
-                Notify(); }
+            get { return rootChildren; }
+            set { rootChildren = value; Notify(); }
         }
         #endregion
 

@@ -60,8 +60,7 @@ namespace Leya.Models.Core.Player
             TvShowEntity tvShow = mediaLibrary.Library.TvShows.Where(t => t.Id == season.TvShowId)
                                                               .First();
             MediaTypeSourceEntity mediaSource = mediaLibrary.Library.MediaTypes.SelectMany(mt => mt.MediaTypeSources)
-                                                                               .Where(mts => mts.Id == tvShow.MediaTypeSourceId)
-                                                                               .First();
+                                                                               .First(mts => mts.Id == tvShow.MediaTypeSourceId);
             string path = mediaSource.MediaSourcePath + @"\" + season.SeasonName + @"\" + episode.NamedTitle;
             await PlayVideoItemAsync(path, mediaLibrary, media);
         }

@@ -9,6 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Leya.DataAccess", "Leya.Dat
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documents", "Documents", "{1A2B9EC5-212B-4540-9538-4AFF126D9C81}"
 	ProjectSection(SolutionItems) = preProject
+		database.sql = database.sql
 		..\Documents\license.md = ..\Documents\license.md
 		..\Documents\readme.md = ..\Documents\readme.md
 		..\Documents\tips.txt = ..\Documents\tips.txt
@@ -33,6 +34,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Leya.Infrastructure", "Leya.Infrastructure\Leya.Infrastructure.csproj", "{9170BA48-E1D2-40DB-B117-FBA04DC9AFC5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Leya.Views", "Leya.Views\Leya.Views.csproj", "{9A927A85-41FA-45A6-83AE-8F2CFE089E84}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Leya.ViewsAvalonia", "Leya.Views.Avalonia\Leya.ViewsAvalonia.csproj", "{7B69D923-4296-4612-A89D-A46789C29B4D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -64,6 +67,10 @@ Global
 		{9A927A85-41FA-45A6-83AE-8F2CFE089E84}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9A927A85-41FA-45A6-83AE-8F2CFE089E84}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9A927A85-41FA-45A6-83AE-8F2CFE089E84}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B69D923-4296-4612-A89D-A46789C29B4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B69D923-4296-4612-A89D-A46789C29B4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B69D923-4296-4612-A89D-A46789C29B4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B69D923-4296-4612-A89D-A46789C29B4D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

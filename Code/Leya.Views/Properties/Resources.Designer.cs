@@ -133,6 +133,16 @@ namespace Leya.Views.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] database {
+            get {
+                object obj = ResourceManager.GetObject("database", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] description_mask {
             get {
                 object obj = ResourceManager.GetObject("description_mask", resourceCulture);

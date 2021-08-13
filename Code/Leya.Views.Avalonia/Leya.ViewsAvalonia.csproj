@@ -1,0 +1,158 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Leya.Views</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>..\..\Build\Debug\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>..\..\Build\Release\</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <AvaloniaResource Include="Assets\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <AvaloniaXaml Remove="Common\Animation\**" />
+    <Compile Remove="Common\Animation\**" />
+    <EmbeddedResource Remove="Common\Animation\**" />
+    <None Remove="Common\Animation\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <AvaloniaResource Remove="Assets\database.db" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Assets\background.jpg" />
+    <None Remove="Assets\banner-mask.png" />
+    <None Remove="Assets\bg-bluray.png" />
+    <None Remove="Assets\bg-description.png" />
+    <None Remove="Assets\bg-dvd.png" />
+    <None Remove="Assets\bg-mask.png" />
+    <None Remove="Assets\cast.png" />
+    <None Remove="Assets\description-mask.png" />
+    <None Remove="Assets\drive.png" />
+    <None Remove="Assets\empty_trash.png" />
+    <None Remove="Assets\export.png" />
+    <None Remove="Assets\extras.png" />
+    <None Remove="Assets\file-info.png" />
+    <None Remove="Assets\file.png" />
+    <None Remove="Assets\folder-empty.png" />
+    <None Remove="Assets\folder.png" />
+    <None Remove="Assets\get_info.png" />
+    <None Remove="Assets\green.png" />
+    <None Remove="Assets\honeycomb_tile.png" />
+    <None Remove="Assets\icon.ico" />
+    <None Remove="Assets\LCARS.ttf" />
+    <None Remove="Assets\mb_iconasterisk.png" />
+    <None Remove="Assets\mb_iconexclamation.png" />
+    <None Remove="Assets\mb_iconhand.png" />
+    <None Remove="Assets\mb_iconquestion.png" />
+    <None Remove="Assets\Next-icon.png" />
+    <None Remove="Assets\no_actor.jpg" />
+    <None Remove="Assets\Previous-icon.png" />
+    <None Remove="Assets\red.png" />
+    <None Remove="Assets\scrollbar_dots.png" />
+    <None Remove="Assets\tp.png" />
+    <None Remove="Assets\transp.png" />
+    <None Remove="Assets\update.png" />
+    <None Remove="Assets\yellow.png" />
+    <None Remove="Common\Styles\ApplicationSpecificDark.xaml" />
+    <None Remove="Common\Styles\ApplicationSpecificLight.xaml" />
+    <None Remove="Common\Styles\AutoCompleteBox.xaml" />
+    <None Remove="Common\Styles\Button.xaml" />
+    <None Remove="Common\Styles\CheckBox.xaml" />
+    <None Remove="Common\Styles\ComboBox.xaml" />
+    <None Remove="Common\Styles\CommonStyles.xaml" />
+    <None Remove="Common\Styles\Dark.xaml" />
+    <None Remove="Common\Styles\Light.xaml" />
+    <None Remove="Common\Styles\ListBox.xaml" />
+    <None Remove="Common\Styles\RepeatButton.xaml" />
+    <None Remove="Common\Styles\ScrollBar.xaml" />
+    <None Remove="Common\Styles\ScrollViewer.xaml" />
+    <None Remove="Common\Styles\TextBox.xaml" />
+    <None Remove="Common\Styles\ToolTip.xaml" />
+    <None Remove="Common\Styles\TreeView.xaml" />
+    <None Remove="Common\Styles\Window.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <AvaloniaResource Include="Common\Styles\ApplicationSpecificDark.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Common\Styles\ApplicationSpecificLight.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Common\Styles\AutoCompleteBox.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Common\Styles\CheckBox.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Common\Styles\ComboBox.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Common\Styles\CommonStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Common\Styles\Dark.xaml" />
+    <AvaloniaResource Include="Common\Styles\Light.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <AvaloniaResource Include="Common\Styles\Button.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Common\Styles\ListBox.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Common\Styles\ScrollViewer.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Common\Styles\TextBox.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </AvaloniaResource>
+    <AvaloniaResource Include="Common\Styles\ToolTip.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </AvaloniaResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AvaloniaResource Include="Common\Styles\Window.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </AvaloniaResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AvaloniaResource Include="Common\Styles\TreeView.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </AvaloniaResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AvaloniaResource Include="Common\Styles\ScrollBar.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </AvaloniaResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AvaloniaResource Include="Common\Styles\RepeatButton.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </AvaloniaResource>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Autofac" Version="6.2.0" />
+    <PackageReference Include="Autofac.Extras.DynamicProxy" Version="6.0.0" />
+    <PackageReference Include="Avalonia" Version="0.10.6" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.10.6" />
+    <PackageReference Include="Avalonia.Diagnostics" Version="0.10.6" />
+    <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.6.10" />
+    <PackageReference Include="Avalonia.Xaml.Interactions.Custom" Version="0.10.3" />
+    <PackageReference Include="Avalonia.Xaml.Interactivity" Version="0.10.6.10" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Leya.Infrastructure\Leya.Infrastructure.csproj" />
+    <ProjectReference Include="..\Leya.Models\Leya.Models.csproj" />
+    <ProjectReference Include="..\Leya.ViewModels\Leya.ViewModels.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

@@ -86,7 +86,7 @@ namespace Leya.ViewModels.Common.Controls.NavigationTreeView
                 for (int i = children.Count - 1; i >= 0; i--)
                 {
                     children[i].DeleteChildren();
-                    children[i] = null;
+                    //children[i] = null;
                     children.RemoveAt(i);
                 }
                 children = null;

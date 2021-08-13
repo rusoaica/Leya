@@ -3,6 +3,7 @@
 /// Purpose: Interface for custom notifications
 #region ========================================================================= USING =====================================================================================
 using Leya.Infrastructure.Enums;
+using System.Threading.Tasks;
 #endregion
 
 namespace Leya.Infrastructure.Notification
@@ -15,7 +16,7 @@ namespace Leya.Infrastructure.Notification
         /// </summary>
         /// <param name="text">The text to be displayed inside the notification</param>
         /// <returns>A <see cref="System.Nullable{System.Boolean}"/> representing the result of the notification</returns>
-        NotificationResult Show(string text);
+        Task<NotificationResult> ShowAsync(string text);
 
         /// <summary>
         /// Shows a new notification
@@ -23,7 +24,7 @@ namespace Leya.Infrastructure.Notification
         /// <param name="text">The text to be displayed inside the notification</param>
         /// <param name="caption">The text displayed on the title of the notification</param>
         /// <returns>A <see cref="System.Nullable{System.Boolean}"/> representing the result of the notification</returns>
-        NotificationResult Show(string text, string caption);
+        Task<NotificationResult> ShowAsync(string text, string caption);
 
         /// <summary>
         /// Shows a new notification
@@ -32,7 +33,7 @@ namespace Leya.Infrastructure.Notification
         /// <param name="caption">The text displayed on the title of the notification</param>
         /// <param name="notificationType">The type of the notification, which determines what buttons are visibile and their captions</param>
         /// <returns>A <see cref="System.Nullable{System.Boolean}"/> representing the result of the notification</returns>
-        NotificationResult Show(string text, string caption, NotificationButton notificationType);
+        Task<NotificationResult> ShowAsync(string text, string caption, NotificationButton notificationType);
 
         /// <summary>
         /// Shows a new notification
@@ -42,7 +43,7 @@ namespace Leya.Infrastructure.Notification
         /// <param name="notificationType">The type of the notification, which determines what buttons are visibile and their captions</param>
         /// <param name="image">The icon image of the notification</param>
         /// <returns>A <see cref="System.Nullable{System.Boolean}"/> representing the result of the notification</returns>
-        NotificationResult Show(string text, string caption, NotificationButton notificationType, NotificationImage image);
+        Task<NotificationResult> ShowAsync(string text, string caption, NotificationButton notificationType, NotificationImage image);
 
         /// <summary>
         /// Changes the result of the custom notification

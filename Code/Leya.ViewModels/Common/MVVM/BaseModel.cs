@@ -3,11 +3,11 @@
 /// Purpose: Base class for view models, containing additional functionality for UI
 #region ========================================================================= USING =====================================================================================
 using Leya.Infrastructure.Notification;
-using Leya.ViewModels.Common.Dialogs;
 using Leya.ViewModels.Common.Dispatcher;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Timers;
 #endregion
 
@@ -16,13 +16,12 @@ namespace Leya.ViewModels.Common.MVVM
     public class BaseModel : IBaseModel
     {
         #region ============================================================== FIELD MEMBERS ================================================================================
-        public event EventHandler ClosingView;
+        public event EventHandler ClosingView ;
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected IDispatcher dispatcher;
         protected INotificationService notificationService;
         protected bool isMediaPlaying;
-        private bool isMediaPlayingVisible;
         private readonly Timer mediaPlayingIndicatorDispatcher = new Timer(500);
         #endregion
 
@@ -45,7 +44,21 @@ namespace Leya.ViewModels.Common.MVVM
         public bool IsMediaPlayingIndicatorVisible
         {
             get { return isMediaPlayingIndicatorVisible; }
-            set { isMediaPlayingIndicatorVisible = value; Notify(); }
+            set 
+            {
+                if (!isMediaPlayingIndicatorSocketVisible)
+                    isMediaPlayingIndicatorVisible = false;
+                else
+                    isMediaPlayingIndicatorVisible = value;
+                Notify(); 
+            }
+        }
+
+        private bool isMediaPlayingIndicatorSocketVisible;
+        public bool IsMediaPlayingIndicatorSocketVisible
+        {
+            get { return isMediaPlayingIndicatorSocketVisible; }
+            set { isMediaPlayingIndicatorSocketVisible = value; Notify(); }
         }
 
         private bool isProgressBarVisible;
@@ -107,9 +120,9 @@ namespace Leya.ViewModels.Common.MVVM
         /// <summary>
         /// Executes the code that needs to be ran when the help button of a view is clicked
         /// </summary>
-        public virtual void ShowHelp()
+        public virtual async Task ShowHelpAsync()
         {
-            notificationService?.Show(WindowHelp, "LEYA - Help");
+            await notificationService?.ShowAsync(WindowHelp, "LEYA - Help");
         }
 
         /// <summary>
@@ -152,8 +165,7 @@ namespace Leya.ViewModels.Common.MVVM
         private void MediaPlayingIndicatorDispatcher_Tick(object sender, ElapsedEventArgs e)
         {
             MediaPlayingImage = (isMediaPlaying ? "red" : "green") + ".png";
-            IsMediaPlayingIndicatorVisible = isMediaPlayingVisible;
-            isMediaPlayingVisible = !isMediaPlayingVisible;
+            IsMediaPlayingIndicatorVisible = !IsMediaPlayingIndicatorVisible;
         }
         #endregion
     }

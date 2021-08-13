@@ -57,10 +57,10 @@
             <CheckBox IsChecked="{Binding IsFavoritePath}" Style="{DynamicResource styleRatingCheckBox}" ToolTip="Favorite Directory" VerticalAlignment="Center" HorizontalAlignment="Center" Height="20" Width="20" Cursor="Hand" Opacity="0.4" Grid.Column="1">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="Checked">
-                        <i:InvokeCommandAction Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SetIsFavoritePath_Command}"/>
+                        <i:InvokeCommandAction Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SetIsFavoritePathAsync_Command}"/>
                     </i:EventTrigger>
                     <i:EventTrigger EventName="Unchecked">
-                        <i:InvokeCommandAction Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SetIsFavoritePath_Command}"/>
+                        <i:InvokeCommandAction Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SetIsFavoritePathAsync_Command}"/>
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </CheckBox>

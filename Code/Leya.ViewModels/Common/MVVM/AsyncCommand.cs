@@ -24,7 +24,7 @@ namespace Leya.ViewModels.Common.MVVM
 
         #region ================================================================== CTOR =====================================================================================
         /// <summary>
-        /// Default C-tor
+        /// Overload C-tor
         /// </summary>
         /// <param name="execute">The async Task method to be executed</param>
         /// <param name="canExecute">The method indicating whether the <paramref name="execute"/>can be executed</param>
@@ -70,7 +70,6 @@ namespace Leya.ViewModels.Common.MVVM
         /// </summary>
         public void RaiseCanExecuteChanged()
         {
-
             CanExecuteChanged?.Invoke(this, EventArgs.Empty);
         }
 
@@ -111,7 +110,7 @@ namespace Leya.ViewModels.Common.MVVM
 
         #region ================================================================== CTOR =====================================================================================
         /// <summary>
-        /// Default C-tor
+        /// Overload C-tor
         /// </summary>
         /// <param name="execute">The async Task method to be executed</param>
         /// <param name="canExecute">The method indicating whether the <paramref name="execute"/>can be executed</param>

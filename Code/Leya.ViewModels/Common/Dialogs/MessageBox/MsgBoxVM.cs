@@ -7,6 +7,7 @@ using Leya.ViewModels.Common.MVVM;
 using Leya.ViewModels.Common.Clipboard;
 using Leya.ViewModels.Common.ViewFactory;
 using Leya.Views.Common.Dialogs.MessageBox;
+using System.Threading.Tasks;
 #endregion
 
 namespace Leya.ViewModels.Common.Dialogs.MessageBox
@@ -105,6 +106,7 @@ namespace Leya.ViewModels.Common.Dialogs.MessageBox
         private void Yes()
         {
             DialogResult = true;
+            CloseView();
         }
 
         /// <summary>
@@ -113,6 +115,7 @@ namespace Leya.ViewModels.Common.Dialogs.MessageBox
         private void No()
         {
             DialogResult = false;
+            CloseView();
         }
 
         /// <summary>
@@ -128,14 +131,14 @@ namespace Leya.ViewModels.Common.Dialogs.MessageBox
         /// </summary>
         /// <param name="text">The text to be displayed inside the MessageBox</param>
         /// <returns>A <see cref="NotificationResult"/> representing the DialogResult of the MessageBox window</returns>
-        public NotificationResult Show(string text)
+        public async Task<NotificationResult> ShowAsync(string text)
         {
             Prompt = text;
             YesLabel = "OK";
             IsNoVisible = false;
             IsCancelVisible = false;
             // display the message box view
-            viewFactory.CreateView<IMsgBoxView, IMsgBoxVM>(this).ShowDialog();
+            await viewFactory.CreateView<IMsgBoxView, IMsgBoxVM>(this).ShowDialog();
             return DialogResult == true ? NotificationResult.OK : NotificationResult.None;
         }
 
@@ -145,7 +148,7 @@ namespace Leya.ViewModels.Common.Dialogs.MessageBox
         /// <param name="text">The text to be displayed inside the MessageBox</param>
         /// <param name="caption">The text displayed on the title bar of the MessageBox</param>
         /// <returns>A <see cref="NotificationResult"/> representing the DialogResult of the MessageBox window</returns>
-        public NotificationResult Show(string text, string caption)
+        public async Task<NotificationResult> ShowAsync(string text, string caption)
         {
             Prompt = text;
             YesLabel = "OK";
@@ -153,7 +156,7 @@ namespace Leya.ViewModels.Common.Dialogs.MessageBox
             IsCancelVisible = false;
             WindowTitle = caption;
             // display the message box view
-            viewFactory.CreateView<IMsgBoxView, IMsgBoxVM>(this).ShowDialog();
+            await viewFactory.CreateView<IMsgBoxView, IMsgBoxVM>(this).ShowDialog();
             return DialogResult == true ? NotificationResult.OK : NotificationResult.None;
         }
 
@@ -164,7 +167,7 @@ namespace Leya.ViewModels.Common.Dialogs.MessageBox
         /// <param name="caption">The text displayed on the title bar of the MessageBox</param>
         /// <param name="messageType">The type of the MessageBox, which determines what buttons are visibile and their captions</param>
         /// <returns>A <see cref="NotificationResult"/> representing the DialogResult of the MessageBox window</returns>
-        public NotificationResult Show(string text, string caption, NotificationButton messageType)
+        public async Task<NotificationResult> ShowAsync(string text, string caption, NotificationButton messageType)
         {
             switch (messageType)
             {
@@ -201,7 +204,7 @@ namespace Leya.ViewModels.Common.Dialogs.MessageBox
             Prompt = text;
             WindowTitle = caption;
             // display the message box view
-            viewFactory.CreateView<IMsgBoxView, IMsgBoxVM>(this).ShowDialog();
+            await viewFactory.CreateView<IMsgBoxView, IMsgBoxVM>(this).ShowDialog();
             switch (messageType)
             {
                 case NotificationButton.OK:
@@ -225,7 +228,7 @@ namespace Leya.ViewModels.Common.Dialogs.MessageBox
         /// <param name="messageType">The type of the MessageBox, which determines what buttons are visibile and their captions</param>
         /// <param name="image">The icon image of the MessageBox</param>
         /// <returns>A <see cref="NotificationResult"/> representing the DialogResult of the MessageBox window</returns>
-        public NotificationResult Show(string text, string caption, NotificationButton messageType, NotificationImage image)
+        public async Task<NotificationResult> ShowAsync(string text, string caption, NotificationButton messageType, NotificationImage image)
         {
             switch (messageType)
             {
@@ -281,7 +284,7 @@ namespace Leya.ViewModels.Common.Dialogs.MessageBox
             Prompt = text;
             WindowTitle = caption;
             // display the message box view
-            viewFactory.CreateView<IMsgBoxView, IMsgBoxVM>(this).ShowDialog();
+            await viewFactory.CreateView<IMsgBoxView, IMsgBoxVM>(this).ShowDialog();
             switch (messageType)
             {
                 case NotificationButton.OK:

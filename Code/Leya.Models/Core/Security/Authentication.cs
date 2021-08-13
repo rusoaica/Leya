@@ -59,7 +59,7 @@ namespace Leya.Models.Core.Security
                 if (result.Count == 1)
                 {
                     // update the password of the user
-                    result.Data[0].Password = User.Password.ConvertSecureStringToString();
+                    result.Data[0].Password = User.Password;
                     // update the user in the storage medium
                     var update = await userRepository.ChangePasswordAsync(User.ToStorageEntity());
                     if (!string.IsNullOrEmpty(update.Error))
@@ -87,7 +87,7 @@ namespace Leya.Models.Core.Security
                     if (string.IsNullOrEmpty(result.Error) && result.Data != null)
                     {
                         // check if the provided password coincides with the one from the storage medium
-                        if (!PasswordHash.CheckStringAgainstHash(Crypto.Encrypt(User.Password.ConvertSecureStringToString()), Uri.UnescapeDataString(result.Data[0].Password)))
+                        if (!PasswordHash.CheckStringAgainstHash(Crypto.Encrypt(User.Password), Uri.UnescapeDataString(result.Data[0].Password)))
                             throw new InvalidOperationException("Invalid username or password!");
                     }
                     else
@@ -161,14 +161,14 @@ namespace Leya.Models.Core.Security
                     if (string.IsNullOrEmpty(result.Error))
                     {
                         // check if the provided security answer coincides with the one from the storage medium
-                        if (!PasswordHash.CheckStringAgainstHash(Crypto.Encrypt(User.SecurityAnswerConfirm.ConvertSecureStringToString()), Uri.UnescapeDataString(result.Data[0].SecurityAnswer)))
+                        if (!PasswordHash.CheckStringAgainstHash(Crypto.Encrypt(User.SecurityAnswerConfirm), Uri.UnescapeDataString(result.Data[0].SecurityAnswer)))
                             throw new InvalidOperationException("Invalid security answer!");
                         else
                         {
-                            User.Password = User.Username.ToSecureString();
+                            User.Password = User.Username;
                             await userRepository.ChangePasswordAsync(User.ToStorageEntity());
                             if (string.IsNullOrEmpty(result.Error))
-                                notificationService.Show("Your password has been changed to " + User.Username + "!\nChange it to a secure password as soon as you log in!", "LEYA - Success");
+                                notificationService.ShowAsync("Your password has been changed to " + User.Username + "!\nChange it to a secure password as soon as you log in!", "LEYA - Success");
                             else
                                 throw new InvalidOperationException("Error updating the password of the account! " + (result.Error ?? string.Empty));
                         }
@@ -196,7 +196,7 @@ namespace Leya.Models.Core.Security
                 if (result.Count == 1)
                 {
                     // update the password of the user
-                    result.Data[0].SecurityAnswer = User.SecurityAnswer.ConvertSecureStringToString();
+                    result.Data[0].SecurityAnswer = User.SecurityAnswer;
                     // update the user in the storage medium
                     var update = await userRepository.UpdateAsync(result.Data[0]);
                     if (!string.IsNullOrEmpty(update.Error))
@@ -239,7 +239,12 @@ namespace Leya.Models.Core.Security
                 // get the details of the user from the storage medium
                 var result = await userRepository.GetByUsernameAsync(username);
                 if (string.IsNullOrEmpty(result.Error))
-                    User = Services.AutoMapper.Map<UserEntity>(result.Data[0]);
+                {
+                    if (result.Count > 0)
+                        User = Services.AutoMapper.Map<UserEntity>(result.Data[0]);
+                    else
+                        throw new InvalidOperationException("Specified username does not exist!");
+                }
                 else
                     throw new InvalidOperationException("Error getting the user from the repository: " + result.Error);
             }
@@ -250,7 +255,7 @@ namespace Leya.Models.Core.Security
         /// <summary>
         /// Stores the credentials in the application's configuration file, for later retrieval
         /// </summary>
-        public void RememberLoginCredentials()
+        public async Task RememberLoginCredentialsAsync()
         {
             if (RememberCredentials)
             {
@@ -271,8 +276,8 @@ namespace Leya.Models.Core.Security
                 {
                     config.Settings.RememberCredentials = true;
                     config.Settings.Username = Crypto.Encrypt(User.Username);
-                    config.Settings.Password = Crypto.Encrypt(User.Password.ConvertSecureStringToString());
-                    config.UpdateConfiguration();
+                    config.Settings.Password = Crypto.Encrypt(User.Password);
+                    await config.UpdateConfigurationAsync();
                 }
             }
             else
@@ -283,7 +288,7 @@ namespace Leya.Models.Core.Security
                 config.Settings.RememberCredentials = false;
                 config.Settings.Username = string.Empty;
                 config.Settings.Password = string.Empty;
-                config.UpdateConfiguration();
+                await config.UpdateConfigurationAsync();
             }
         }
 
@@ -303,7 +308,7 @@ namespace Leya.Models.Core.Security
                 }
                 // save the automatic login state in the application's configuration
                 config.Settings.Autologin = true;
-                config.UpdateConfiguration();
+                await config.UpdateConfigurationAsync();
                 // credentials remembering must be enabled for automatic login to work
                 RememberCredentials = true;
                 // wait 3 seconds for the user to be able to disable autologin, if so desired
@@ -313,7 +318,7 @@ namespace Leya.Models.Core.Security
             else
             {
                 config.Settings.Autologin = false;
-                config.UpdateConfiguration();
+                await config.UpdateConfigurationAsync();
             }
         }
         #endregion

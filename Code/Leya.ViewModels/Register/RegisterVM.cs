@@ -21,23 +21,23 @@ namespace Leya.ViewModels.Register
         #endregion
 
         #region ============================================================= BINDING COMMANDS ==============================================================================
-        public SyncCommand ContentRendered_Command { get; private set; }
+        public SyncCommand ViewOpened_Command { get; private set; }
         public AsyncCommand RegisterAccount_Command { get; private set; }
         #endregion
 
         #region ============================================================ BINDING PROPERTIES =============================================================================
-        private SecureString password = new SecureString();
-        public SecureString Password
+        private string password;
+        public string Password
         {
             private get { return password; }
-            set { password = value; RegisterAccount_Command?.RaiseCanExecuteChanged(); authentication.User.Password = value; }
+            set { password = value; Notify(); RegisterAccount_Command?.RaiseCanExecuteChanged(); authentication.User.Password = value; }
         }
 
-        private SecureString securityAnswer = new SecureString();
-        public SecureString SecurityAnswer
+        private string securityAnswer;
+        public string SecurityAnswer
         {
             private get { return securityAnswer; }
-            set { securityAnswer = value; RegisterAccount_Command?.RaiseCanExecuteChanged(); authentication.User.SecurityAnswer = value; }
+            set { securityAnswer = value; Notify(); RegisterAccount_Command?.RaiseCanExecuteChanged(); authentication.User.SecurityAnswer = value; }
         }
         
         private string username = string.Empty;
@@ -53,11 +53,20 @@ namespace Leya.ViewModels.Register
             get { return securityQuestion; }
             set { securityQuestion = value; Notify(); RegisterAccount_Command.RaiseCanExecuteChanged(); authentication.User.SecurityQuestion = value; }
         }
-        #endregion
+        
+        private string confirmPassword = string.Empty;
+        public string ConfirmPassword
+        {
+            private get { return confirmPassword; }
+            set { confirmPassword = value; Notify(); RegisterAccount_Command?.RaiseCanExecuteChanged(); authentication.User.PasswordConfirm = value; }
+        }
 
-        #region ================================================================ PROPERTIES =================================================================================
-        public SecureString ConfirmPassword { get; set; }
-        public SecureString ConfirmSecurityAnswer { get; set; }
+        private string confirmSecurityAnswer = string.Empty;
+        public string ConfirmSecurityAnswer
+        {
+            private get { return confirmSecurityAnswer; }
+            set { confirmSecurityAnswer = value; Notify(); RegisterAccount_Command?.RaiseCanExecuteChanged(); authentication.User.SecurityAnswerConfirm = value; }
+        }
         #endregion
 
         #region ================================================================== CTOR =====================================================================================
@@ -68,7 +77,7 @@ namespace Leya.ViewModels.Register
         /// <param name="notificationService">Injected notification service</param>
         public RegisterVM(IAuthentication authentication, INotificationService notificationService)
         {
-            ContentRendered_Command = new SyncCommand(Window_ContentRendered);
+            ViewOpened_Command = new SyncCommand(ViewOpened);
             RegisterAccount_Command = new AsyncCommand(RegisterUsername, ValidateRegister);
             this.authentication = authentication;
             this.notificationService = notificationService;
@@ -85,12 +94,12 @@ namespace Leya.ViewModels.Register
             try
             {
                 await authentication.RegisterUsernameAsync();
-                notificationService.Show("Account created!", "LEYA - Success");
+                await notificationService.ShowAsync("Account created!", "LEYA - Success");
                 CloseView();
             }
             catch (Exception ex) when (ex is InvalidOperationException || ex is ArgumentException)
             {
-                notificationService.Show(ex.Message, "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
+                await notificationService.ShowAsync(ex.Message, "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
             }
             HideProgressBar();
         }
@@ -102,8 +111,8 @@ namespace Leya.ViewModels.Register
         public bool ValidateRegister()
         {
             bool isValid = !string.IsNullOrEmpty(Username) && Password != null && Password.Length > 0 && ConfirmPassword != null && ConfirmPassword.Length > 0 && SecurityQuestion != null && 
-                SecurityQuestion.Length > 0 && SecurityAnswer != null && SecurityAnswer.Length > 0 && Password.IsSecureStringEqual(ConfirmPassword) && ConfirmSecurityAnswer != null && 
-                ConfirmSecurityAnswer.Length > 0 && SecurityAnswer.IsSecureStringEqual(ConfirmSecurityAnswer);
+                SecurityQuestion.Length > 0 && SecurityAnswer != null && SecurityAnswer.Length > 0 && Password == ConfirmPassword && ConfirmSecurityAnswer != null && 
+                ConfirmSecurityAnswer.Length > 0 && SecurityAnswer == ConfirmSecurityAnswer;
             if (!isValid)
             {
                 ShowHelpButton();
@@ -114,7 +123,7 @@ namespace Leya.ViewModels.Register
                     WindowHelp += "Password cannot be empty!\n";
                 if (ConfirmPassword == null || ConfirmPassword.Length == 0)
                     WindowHelp += "Password Confirm cannot be empty!\n";
-                if (Password != null && ConfirmPassword != null && !Password.IsSecureStringEqual(ConfirmPassword))
+                if (Password != null && ConfirmPassword != null && Password != ConfirmPassword)
                     WindowHelp += "Password and Password Confirm do not match!\n";
                 if (string.IsNullOrWhiteSpace(SecurityQuestion))
                     WindowHelp += "Security Question cannot be empty!\n";
@@ -122,7 +131,7 @@ namespace Leya.ViewModels.Register
                     WindowHelp += "Security Answer cannot be empty!\n";
                 if (ConfirmSecurityAnswer == null || ConfirmSecurityAnswer.Length == 0)
                     WindowHelp += "Security Answer Confirm cannot be empty!\n";
-                if (SecurityAnswer != null && ConfirmSecurityAnswer != null && !SecurityAnswer.IsSecureStringEqual(ConfirmSecurityAnswer))
+                if (SecurityAnswer != null && ConfirmSecurityAnswer != null && SecurityAnswer != ConfirmSecurityAnswer)
                     WindowHelp += "Security Answer and Security Answer Confirm do not match!\n";
             }
             else
@@ -133,17 +142,17 @@ namespace Leya.ViewModels.Register
         /// <summary>
         /// Displays the help for the current window
         /// </summary>
-        public override void ShowHelp()
+        public override async Task ShowHelpAsync()
         {
-            notificationService.Show(WindowHelp, "LEYA - Help");
+            await notificationService.ShowAsync(WindowHelp, "LEYA - Help");
         }
         #endregion
 
         #region ============================================================= EVENT HANDLERS ================================================================================
         /// <summary>
-        /// Handles the ContentRendered event of the view
+        /// Handles the Opened event of the view
         /// </summary>
-        private void Window_ContentRendered()
+        private void ViewOpened()
         {
             WindowTitle = "LEYA - Register new account";
         }

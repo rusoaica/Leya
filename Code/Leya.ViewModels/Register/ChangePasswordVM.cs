@@ -22,37 +22,36 @@ namespace Leya.ViewModels.Register
         #endregion
 
         #region ============================================================= BINDING COMMANDS ==============================================================================
-        public SyncCommand ContentRendered_Command { get; private set; }
-        public AsyncCommand ChangePasswordAsync_Command { get; private set; }
+        public IAsyncCommand ViewOpenedAsync_Command { get; private set; }
+        public IAsyncCommand ChangePasswordAsync_Command { get; private set; }
         #endregion
 
         #region ============================================================ BINDING PROPERTIES =============================================================================
-        private SecureString oldPassword = new SecureString();
-        public SecureString OldPassword
+        private string oldPassword;
+        public string OldPassword
         {
             private get { return oldPassword; }
-            set { oldPassword = value; authentication.User.Password = value; }
+            set { oldPassword = value; authentication.User.Password = value; Notify(); ChangePasswordAsync_Command.RaiseCanExecuteChanged(); }
         }
 
-        private SecureString newPassword = new SecureString();
-        public SecureString NewPassword
+        private string newPassword;
+        public string NewPassword
         {
             private get { return newPassword; }
-            set { newPassword = value; }
+            set { newPassword = value; Notify(); ChangePasswordAsync_Command.RaiseCanExecuteChanged(); }
         }
 
-        private SecureString newPasswordConfirm = new SecureString();
-        public SecureString NewPasswordConfirm
+        private string newPasswordConfirm;
+        public string NewPasswordConfirm
         {
             private get { return newPasswordConfirm; }
-            set { newPasswordConfirm = value; }
+            set { newPasswordConfirm = value; Notify(); ChangePasswordAsync_Command.RaiseCanExecuteChanged(); }
         }
 
-        private string username = string.Empty;
         public string Username
         {
-            get { return username; }
-            set { username = value; Notify(); authentication.User.Username = value; }
+            get { return authentication.User.Username; }
+            set { authentication.User.Username = value; Notify(); }
         }
         #endregion
 
@@ -68,7 +67,7 @@ namespace Leya.ViewModels.Register
         /// <param name="notificationService">Injected notification service</param>
         public ChangePasswordVM(IAuthentication authentication, INotificationService notificationService)
         {
-            ContentRendered_Command = new SyncCommand(Window_ContentRendered);
+            ViewOpenedAsync_Command = new AsyncCommand(ViewOpenedAsync);
             ChangePasswordAsync_Command = new AsyncCommand(ChangePasswordAsync, ValidateChangePassword);
             this.authentication = authentication;
             this.notificationService = notificationService;
@@ -89,13 +88,13 @@ namespace Leya.ViewModels.Register
                 // assign the new password
                 authentication.User.Password = NewPassword;
                 await authentication.ChangePasswordAsync();
-                notificationService.Show("The password has been changed!", "LEYA - Success");
-                authentication.RememberLoginCredentials();
+                await notificationService.ShowAsync("The password has been changed!", "LEYA - Success");
+                await authentication.RememberLoginCredentialsAsync();
                 CloseView();
             }
             catch (Exception ex) when (ex is InvalidOperationException || ex is ArgumentException)
             {
-                notificationService.Show(ex.Message, "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
+                await notificationService.ShowAsync(ex.Message, "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
             }
             HideProgressBar();
         }
@@ -110,7 +109,7 @@ namespace Leya.ViewModels.Register
                 OldPassword != null && OldPassword.Length > 0 && 
                 NewPassword != null && NewPassword.Length > 0 && 
                 NewPasswordConfirm != null && NewPasswordConfirm.Length > 0 &&
-                NewPassword.IsSecureStringEqual(NewPasswordConfirm);
+                NewPassword == NewPasswordConfirm;
             if (!isValid)
             {
                 ShowHelpButton();
@@ -123,7 +122,7 @@ namespace Leya.ViewModels.Register
                     WindowHelp += "Password cannot be empty!\n";
                 if (NewPasswordConfirm == null || NewPasswordConfirm.Length == 0)
                     WindowHelp += "Password Confirm cannot be empty!\n";
-                if (NewPassword != null && NewPasswordConfirm != null && !NewPassword.IsSecureStringEqual(NewPasswordConfirm))
+                if (NewPassword != null && NewPasswordConfirm != null && NewPassword != NewPasswordConfirm)
                     WindowHelp += "Password and Password Confirm do not match!\n";
             }
             else
@@ -134,29 +133,29 @@ namespace Leya.ViewModels.Register
         /// <summary>
         /// Displays the help for the current window
         /// </summary>
-        public override void ShowHelp()
+        public override async Task ShowHelpAsync()
         {
-            notificationService.Show(WindowHelp, "LEYA - Help");
+            await notificationService.ShowAsync(WindowHelp, "LEYA - Help");
         }
         #endregion
 
         #region ============================================================= EVENT HANDLERS ================================================================================
         /// <summary>
-        /// Handles the ContentRendered event of the view
+        /// Handles the Opened event of the view
         /// </summary>
-        private void Window_ContentRendered()
+        private async Task ViewOpenedAsync()
         {
             WindowTitle = "LEYA - Change password";
             try
             {
                 ShowProgressBar();
                 // get the account details based on the provided username
-                authentication.GetUserAsync(username);
+                authentication.GetUserAsync(Username);
                 HideProgressBar();
             }
             catch (Exception ex) when (ex is InvalidOperationException)
             {
-                notificationService.Show(ex.Message, "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
+                await notificationService.ShowAsync(ex.Message, "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
             }
         }
         #endregion

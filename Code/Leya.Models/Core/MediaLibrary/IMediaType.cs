@@ -19,6 +19,14 @@ namespace Leya.Models.Core.MediaLibrary
         /// Gets all the media types from the storage medium
         /// </summary>
         Task GetMediaTypesAsync();
+
+        /// <summary>
+        /// Deletes an entity identified by <paramref name="id"/> from the storage medium
+        /// </summary>
+        /// <param name="id">The id of the entity to be deleted</param>
+        Task DeleteMediaTypeAsync(int id);
+
+        Task<int> AddMediaTypeAsync(MediaTypeEntity media);
         #endregion
     }
 }

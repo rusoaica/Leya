@@ -24,7 +24,7 @@
     </i:Interaction.Triggers>
     <Grid Background="{DynamicResource containerBackground}">
         <Border Style="{DynamicResource contentBorder}" Margin="10,31,10,74"/>
-        <Button Content="Save" Style="{DynamicResource confirmButton}" Command="{Binding ConfirmSelection_Command}" HorizontalAlignment="Right" Margin="0,0,10,10" Height="22" VerticalAlignment="Bottom" Width="105"/>
+        <Button Content="Save" Style="{DynamicResource confirmButton}" Command="{Binding ConfirmSelectionAsync_Command}" HorizontalAlignment="Right" Margin="0,0,10,10" Height="22" VerticalAlignment="Bottom" Width="105"/>
         <Button Content="Cancel" Style="{DynamicResource abortButton}" Command="{Binding DiscardSelection_Command}" Margin="0,0,120,9" Height="22" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="105"/>
         <Grid Height="31" VerticalAlignment="Top" Margin="81,0,10,0">
             <Grid.ColumnDefinitions>
@@ -58,10 +58,10 @@
             <CheckBox IsChecked="{Binding IsFavoritePath}" Style="{DynamicResource styleRatingCheckBox}" ToolTip="Favorite Directory" VerticalAlignment="Center" HorizontalAlignment="Center" Height="20" Width="20" Cursor="Hand" Opacity="0.4" Grid.Column="1">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="Checked">
-                        <i:InvokeCommandAction Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SetIsFavoritePath_Command}"/>
+                        <i:InvokeCommandAction Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SetIsFavoritePathAsync_Command}"/>
                     </i:EventTrigger>
                     <i:EventTrigger EventName="Unchecked">
-                        <i:InvokeCommandAction Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SetIsFavoritePath_Command}"/>
+                        <i:InvokeCommandAction Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SetIsFavoritePathAsync_Command}"/>
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
             </CheckBox>

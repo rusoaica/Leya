@@ -20,24 +20,24 @@ namespace Leya.ViewModels.Register
         #endregion
 
         #region ============================================================= BINDING COMMANDS ==============================================================================
-        public SyncCommand ContentRendered_Command { get; private set; }
-        public AsyncCommand RecoverAccountAsync_Command { get; private set; }
+        public IAsyncCommand ViewOpenedAsync_Command { get; private set; }
+        public IAsyncCommand RecoverAccountAsync_Command { get; private set; }
         #endregion
 
         #region ============================================================ BINDING PROPERTIES =============================================================================
-        private SecureString password = new SecureString();
-        public SecureString Password
+        private string password;
+        public string Password
         {
             private get { return password; }
             set { password = value; authentication.User.Password = value; }
         }
 
-        private SecureString securityAnswer = new SecureString();
-        public SecureString SecurityAnswer
+        private string securityAnswer;
+        public string SecurityAnswer
         {
             private get { return securityAnswer; }
             // uses SecurityAnswerConfirm because SecurityAnswer is already populated with the data from the database, against which it needs to be compared
-            set { securityAnswer = value; RecoverAccountAsync_Command?.RaiseCanExecuteChanged(); authentication.User.SecurityAnswerConfirm = value; } 
+            set { securityAnswer = value; Notify(); RecoverAccountAsync_Command?.RaiseCanExecuteChanged(); authentication.User.SecurityAnswerConfirm = value; } 
         }
 
         private string username = string.Empty;
@@ -67,7 +67,7 @@ namespace Leya.ViewModels.Register
         /// <param name="notificationService">Injected notification service</param>
         public RecoverPasswordVM(IAuthentication authentication, INotificationService notificationService)
         {
-            ContentRendered_Command = new SyncCommand(Window_ContentRendered);
+            ViewOpenedAsync_Command = new AsyncCommand(ViewOpenedAsync);
             RecoverAccountAsync_Command = new AsyncCommand(RecoverAccountAsync, ValidateRecover);
             this.authentication = authentication;
             this.notificationService = notificationService;
@@ -88,7 +88,7 @@ namespace Leya.ViewModels.Register
             }
             catch (Exception ex) when (ex is InvalidOperationException || ex is ArgumentException)
             {
-                notificationService.Show(ex.Message, "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
+                await notificationService.ShowAsync(ex.Message, "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
             }
             HideProgressBar();
         }
@@ -119,31 +119,31 @@ namespace Leya.ViewModels.Register
         /// <summary>
         /// Displays the help for the current window
         /// </summary>
-        public override void ShowHelp()
+        public override async Task ShowHelpAsync()
         {
-            notificationService.Show(WindowHelp, "LEYA - Help");
+            await notificationService.ShowAsync(WindowHelp, "LEYA - Help");
         }
         #endregion
 
         #region ============================================================= EVENT HANDLERS ================================================================================
         /// <summary>
-        /// Handles the ContentRendered event of the view
+        /// Handles the Opened event of the view
         /// </summary>
-        private void Window_ContentRendered()
+        private async Task ViewOpenedAsync()
         {
             WindowTitle = "LEYA - Recover password";
             try
             {
                 ShowProgressBar();
                 // get the account details based on the provided username
-                authentication.GetUserAsync(username);
+                await authentication.GetUserAsync(username);
                 SecurityQuestion = authentication.User.SecurityQuestion;
                 RecoverAccountAsync_Command?.RaiseCanExecuteChanged();
                 HideProgressBar();
             }
             catch (Exception ex) when (ex is InvalidOperationException)
             {
-                notificationService.Show(ex.Message, "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
+                await notificationService.ShowAsync(ex.Message, "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
             }
         }
         #endregion

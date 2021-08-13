@@ -3,6 +3,7 @@
 /// Purpose: Interface for custom folder browser dialogs
 #region ========================================================================= USING =====================================================================================
 using Leya.Infrastructure.Enums;
+using System.Threading.Tasks;
 #endregion
 
 namespace Leya.Infrastructure.Dialog
@@ -10,8 +11,9 @@ namespace Leya.Infrastructure.Dialog
     public interface IFolderBrowserService
     {
         #region =============================================================== PROPERTIES ==================================================================================
-        bool ShowNewFolderButton { get; set; }
         string InitialFolder { get; set; }
+        bool ShowNewFolderButton { get; set; }
+        bool AllowMultiselection { get; set; }
         string SelectedDirectories { get; set; }
         #endregion
 
@@ -20,7 +22,7 @@ namespace Leya.Infrastructure.Dialog
         /// Shows a new folder browser dialog
         /// </summary>
         /// <returns>A <see cref="NotificationResult"/> representing the result of displaying the custom folder browser dialog</returns>
-        NotificationResult Show();
+        Task<NotificationResult> Show();
         #endregion
     }
 }

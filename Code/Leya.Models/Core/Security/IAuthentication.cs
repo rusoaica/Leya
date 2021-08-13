@@ -46,7 +46,7 @@ namespace Leya.Models.Core.Security
         /// <summary>
         /// Stores the credentials in the application's configuration file, for later retrival
         /// </summary>
-        void RememberLoginCredentials();
+        Task RememberLoginCredentialsAsync();
 
         /// <summary>
         /// Recovers an account by checking the security answer against the one stored in the storage medium

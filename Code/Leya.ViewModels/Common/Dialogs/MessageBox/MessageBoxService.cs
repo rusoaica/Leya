@@ -3,6 +3,7 @@
 /// Purpose: Explicit implementation of abstract custom message box service
 #region ========================================================================= USING =====================================================================================
 using System;
+using System.Threading.Tasks;
 using Leya.Infrastructure.Enums;
 using Leya.Infrastructure.Notification;
 using Leya.ViewModels.Common.Dispatcher;
@@ -53,12 +54,11 @@ namespace Leya.ViewModels.Common.Dialogs.MessageBox
         /// </summary>
         /// <param name="message">The text to display in the custom MessageBox</param>
         /// <returns>A <see cref="NotificationResult"/> value representing the result of the custom MessageBox dialog</returns>
-        public NotificationResult Show(string message)
+        public async Task<NotificationResult> ShowAsync(string message)
         {
-            return (NotificationResult)(dispatcher?.Dispatch(new Func<NotificationResult>(() =>
-            {
-                return msgBoxVM.Invoke().Show(message);
-            })));
+            return await await dispatcher?.Dispatch(new Func<Task<NotificationResult>>(async () =>
+                 await msgBoxVM.Invoke().ShowAsync(message)
+            ));
         }
 
         /// <summary>
@@ -67,12 +67,11 @@ namespace Leya.ViewModels.Common.Dialogs.MessageBox
         /// <param name="message">The text to display in the custom MessageBox</param>
         /// <param name="title">The Title of the custom MessageBox dialog</param>
         /// <returns>A <see cref="NotificationResult"/> value representing the result of the custom MessageBox dialog</returns>
-        public NotificationResult Show(string message, string title)
+        public async Task<NotificationResult> ShowAsync(string message, string title)
         {
-            return (NotificationResult)(dispatcher?.Dispatch(new Func<NotificationResult>(() =>
-            {
-                return msgBoxVM.Invoke().Show(message, title);
-            })));
+            return await await dispatcher?.Dispatch(new Func<Task<NotificationResult>>(async () =>
+                await msgBoxVM.Invoke().ShowAsync(message, title)
+            ));
         }
 
         /// <summary>
@@ -82,12 +81,11 @@ namespace Leya.ViewModels.Common.Dialogs.MessageBox
         /// <param name="title">The Title of the custom MessageBox dialog</param>
         /// <param name="buttons">The buttons displayed inside the custom MessageBox dialog</param>
         /// <returns>A <see cref="NotificationResult"/> value representing the result of the custom MessageBox dialog</returns>
-        public NotificationResult Show(string message, string title, NotificationButton buttons)
+        public async Task<NotificationResult> ShowAsync(string message, string title, NotificationButton buttons)
         {
-            return (NotificationResult)(dispatcher?.Dispatch(new Func<NotificationResult>(() =>
-            {
-                return msgBoxVM.Invoke().Show(message, title, buttons);
-            })));
+            return await await dispatcher?.Dispatch(new Func<Task<NotificationResult>>(async () =>
+                await msgBoxVM.Invoke().ShowAsync(message, title, buttons)
+            ));
         }
 
         /// <summary>
@@ -98,12 +96,11 @@ namespace Leya.ViewModels.Common.Dialogs.MessageBox
         /// <param name="buttons">The buttons displayed inside the custom MessageBox dialog</param>
         /// <param name="image">The icon of the custom MessageBox dialog</param>
         /// <returns>A <see cref="NotificationResult"/> value representing the result of the custom MessageBox dialog</returns>
-        public NotificationResult Show(string message, string title, NotificationButton buttons, NotificationImage image)
+        public async Task<NotificationResult> ShowAsync(string message, string title, NotificationButton buttons, NotificationImage image)
         {
-            return (NotificationResult)(dispatcher?.Dispatch(new Func<NotificationResult>(() =>
-            {
-                return msgBoxVM.Invoke().Show(message, title, buttons, image);
-            })));
+            return await await dispatcher?.Dispatch(new Func<Task<NotificationResult>>(async () =>
+                 await msgBoxVM.Invoke().ShowAsync(message, title, buttons, image)
+            ));
         }
         #endregion
     }

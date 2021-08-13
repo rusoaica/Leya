@@ -19,6 +19,8 @@ namespace Leya.Models.Core.MediaLibrary
         /// Gets all the media type sources from the storage medium
         /// </summary>
         Task GetMediaTypeSourcesAsync();
+
+        Task<int> InsertMediaTypeSource(MediaTypeSourceEntity media);
         #endregion
     }
 }

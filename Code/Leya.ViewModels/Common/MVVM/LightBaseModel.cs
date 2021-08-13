@@ -23,6 +23,15 @@ namespace Leya.ViewModels.Common.MVVM
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
         }
+
+
+        public virtual void Set<T>(ref T field, T value, [CallerMemberName] string propName = null)
+        {
+            field = value;
+            Notify(propName);
+        }
+
+
         #endregion
     }
 }

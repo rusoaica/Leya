@@ -15,6 +15,7 @@ using Leya.Models.Core.Artists;
 using Leya.Models.Core.MediaLibrary;
 using Leya.Models.Core.Movies;
 using Leya.Models.Core.Navigation;
+using Leya.Models.Core.Options;
 using Leya.Models.Core.Player;
 using Leya.Models.Core.Security;
 using Leya.Models.Core.TvShows;
@@ -72,10 +73,11 @@ namespace Leya.Views.Common.Configuration
             builder.RegisterType<RecoverPasswordVM>().As<IRecoverPasswordVM>().InstancePerDependency();
             builder.RegisterType<ChangePasswordVM>().As<IChangePasswordVM>().InstancePerDependency();
             builder.RegisterType<MainWindowVM>().As<IMainWindowVM>().InstancePerDependency();
-            builder.RegisterType<SystemVM>().As<ISystemVM>().InstancePerDependency();
+            //builder.RegisterType<SystemVM>().As<ISystemVM>().InstancePerDependency();
             builder.RegisterType<FolderBrowserDialogVM>().As<IFolderBrowserDialogVM>().InstancePerDependency();
             builder.RegisterType<FileBrowserDialogVM>().As<IFileBrowserDialogVM>().InstancePerDependency();
             builder.RegisterType<FileSaveDialogVM>().As<IFileSaveDialogVM>().InstancePerDependency();
+            builder.RegisterType<OptionsMediaVM>().As<IOptionsMediaVM>().InstancePerDependency();
             #endregion
 
             #region models            
@@ -190,6 +192,15 @@ namespace Leya.Views.Common.Configuration
                    .InterceptedBy(typeof(LoggerInterceptor))
 //#endif
                    .SingleInstance();
+
+            builder.RegisterType<OptionsMedia>()
+                   .As<IOptionsMedia>()
+//#if !DEBUG
+                   .EnableInterfaceInterceptors()
+                   .InterceptedBy(typeof(LoggerInterceptor))
+//#endif
+                   .SingleInstance();
+
             #endregion
 
             #region data access
@@ -320,11 +331,13 @@ namespace Leya.Views.Common.Configuration
             // views
 
             builder.RegisterType<StartupV>().OnActivating(e => e.Instance.DataContext = e.Context.Resolve<IStartupVM>()).As<IStartupView>().InstancePerDependency();
-            builder.RegisterType<SystemV>().OnActivating(e => e.Instance.DataContext = e.Context.Resolve<ISystemVM>()).As<ISystemView>().InstancePerDependency();
+            //builder.RegisterType<SystemV>().OnActivating(e => e.Instance.DataContext = e.Context.Resolve<ISystemVM>()).As<ISystemView>().InstancePerDependency();
             builder.RegisterType<RegisterV>().OnActivating(e => e.Instance.DataContext = e.Context.Resolve<IRegisterVM>()).As<IRegisterView>().InstancePerDependency();
             builder.RegisterType<MainWindowV>().OnActivating(e => e.Instance.DataContext = e.Context.Resolve<IMainWindowVM>()).As<IMainWindowView>().InstancePerDependency();
             builder.RegisterType<RecoverPasswordV>().OnActivating(e => e.Instance.DataContext = e.Context.Resolve<IRecoverPasswordVM>()).As<IRecoverPasswordView>().InstancePerDependency();
             builder.RegisterType<ChangePasswordV>().OnActivating(e => e.Instance.DataContext = e.Context.Resolve<IChangePasswordVM>()).As<IChangePasswordView>().InstancePerDependency();
+            builder.RegisterType<OptionsMediaV>().OnActivating(e => e.Instance.DataContext = e.Context.Resolve<IOptionsMediaVM>()).As<IOptionsMediaView>().InstancePerDependency();
+            #endregion
 
 
             builder.RegisterType<MsgBoxV>().As<IMsgBoxView>().InstancePerDependency();
@@ -334,7 +347,6 @@ namespace Leya.Views.Common.Configuration
             builder.RegisterType<ApplicationDispatcher>().As<IDispatcher>().InstancePerDependency();
             builder.RegisterType<WindowsClipboard>().As<IClipboard>().SingleInstance();
             builder.RegisterType<ViewFactory>().As<IViewFactory>().InstancePerDependency();
-            #endregion
 
             return builder.Build();
         }

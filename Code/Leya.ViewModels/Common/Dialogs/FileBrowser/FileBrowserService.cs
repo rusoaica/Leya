@@ -7,6 +7,7 @@ using Leya.Infrastructure.Enums;
 using Leya.Infrastructure.Dialog;
 using System.Collections.Generic;
 using Leya.ViewModels.Common.Dispatcher;
+using System.Threading.Tasks;
 #endregion
 
 namespace Leya.ViewModels.Common.Dialogs.FileBrowser
@@ -51,9 +52,9 @@ namespace Leya.ViewModels.Common.Dialogs.FileBrowser
         /// Shows a new custom folder browser dialog
         /// </summary>
         /// <returns>A <see cref="NotificationResult"/> value representing the result of the custom folder browser dialog</returns>
-        public NotificationResult Show()
+        public async Task<NotificationResult> Show()
         {
-            return (NotificationResult)(dispatcher?.Dispatch(new Func<NotificationResult>(() =>
+            return await await dispatcher?.Dispatch(new Func<Task<NotificationResult>>(async () =>
             {
                 IFileBrowserDialogVM fileBrowserDialogVM = fileBrowserVM.Invoke();
                 fileBrowserDialogVM.Filter = Filter;
@@ -61,8 +62,12 @@ namespace Leya.ViewModels.Common.Dialogs.FileBrowser
                 fileBrowserDialogVM.SelectedFiles = SelectedFiles;
                 fileBrowserDialogVM.AllowMultiselection = AllowMultiselection;
                 fileBrowserDialogVM.ShowNewFolderButton = ShowNewFolderButton;
-                return fileBrowserDialogVM.Show();
-            })));
+                // display the file browse dialog as modal, and await its result
+                NotificationResult result = await fileBrowserDialogVM.Show();
+                // after file browse dialog is closed, relay the selected filenames
+                SelectedFiles = fileBrowserDialogVM.SelectedFiles;
+                return result; 
+            }));
         }
         #endregion
     }

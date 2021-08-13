@@ -3,6 +3,7 @@
 /// Purpose: Interface for interacting with Dispatcher objects
 #region ========================================================================= USING =====================================================================================
 using System;
+using System.Threading.Tasks;
 #endregion
 
 namespace Leya.ViewModels.Common.Dispatcher
@@ -16,14 +17,15 @@ namespace Leya.ViewModels.Common.Dispatcher
         /// <typeparam name="TResult">The return type of the method to be executed</typeparam>
         /// <param name="callback">The method to be executed</param>
         /// <returns>The result of executing <paramref name="callback"/></returns>
-        TResult Dispatch<TResult>(Func<TResult> callback);
-
+        //TResult Dispatch<TResult>(Func<TResult> callback);
+        Task<TResult> Dispatch<TResult>(Func<TResult> callback);
         /// <summary>
         /// Executes <paramref name="method"/> with the <paramref name="args"/> arguments, synchronously on the thread the Dispatcher is associated with.
         /// </summary>
         /// <param name="method">The method to be executed</param>
         /// <param name="args">The arguments to pass to the method to be executed</param>
-        void Dispatch(Delegate method, params object[] args);
+        //void Dispatch(Delegate method, params object[] args);
+        Task Dispatch(Action method, params object[] args);
         #endregion
     }
 }

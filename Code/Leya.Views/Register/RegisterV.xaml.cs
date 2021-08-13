@@ -35,7 +35,7 @@ namespace Leya.Views.Register
             // this doesn't break MVVM patterns, since it's still View binding related code
             if (DataContext != null && (sender as PasswordBox).IsFocused)
             {
-                (DataContext as RegisterVM).Password = ((PasswordBox)sender).SecurePassword;
+                (DataContext as RegisterVM).Password = ((PasswordBox)sender).Password;
                 (DataContext as RegisterVM).RegisterAccount_Command.RaiseCanExecuteChanged();
             }
         }
@@ -49,7 +49,7 @@ namespace Leya.Views.Register
             // this doesn't break MVVM patterns, since it's still View binding related code
             if (DataContext != null && (sender as PasswordBox).IsFocused)
             {
-                (DataContext as RegisterVM).ConfirmPassword = ((PasswordBox)sender).SecurePassword;
+                (DataContext as RegisterVM).ConfirmPassword = ((PasswordBox)sender).Password;
                 (DataContext as RegisterVM).RegisterAccount_Command.RaiseCanExecuteChanged();
             }
         }
@@ -63,7 +63,7 @@ namespace Leya.Views.Register
             // this doesn't break MVVM patterns, since it's still View binding related code
             if (DataContext != null && (sender as PasswordBox).IsFocused)
             {
-                (DataContext as RegisterVM).SecurityAnswer = ((PasswordBox)sender).SecurePassword;
+                (DataContext as RegisterVM).SecurityAnswer = ((PasswordBox)sender).Password;
                 (DataContext as RegisterVM).RegisterAccount_Command.RaiseCanExecuteChanged();
             }
         }
@@ -77,7 +77,7 @@ namespace Leya.Views.Register
             // this doesn't break MVVM patterns, since it's still View binding related code
             if (DataContext != null && (sender as PasswordBox).IsFocused)
             {
-                (DataContext as RegisterVM).ConfirmSecurityAnswer = ((PasswordBox)sender).SecurePassword;
+                (DataContext as RegisterVM).ConfirmSecurityAnswer = ((PasswordBox)sender).Password;
                 (DataContext as RegisterVM).RegisterAccount_Command.RaiseCanExecuteChanged();
             }
         }

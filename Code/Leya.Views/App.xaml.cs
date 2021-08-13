@@ -21,7 +21,7 @@ namespace Leya
         /// Raises the Application.Startup event
         /// </summary>
         /// <param name="e">A StartupEventArgs that contains the event data</param>
-        protected override void OnStartup(StartupEventArgs e)
+        protected override async void OnStartup(StartupEventArgs e)
         {
             // configure the dependency injection services
             IContainer container = DIContainerConfig.Configure();
@@ -32,7 +32,7 @@ namespace Leya
                 // get a view factory from the DI container and display the startup view from it, as modal dialog
                 IViewFactory factory = container.Resolve<IViewFactory>();
                 IStartupView main = factory.CreateView<IStartupView>();
-                main.ShowDialog();
+                await main.ShowDialog();
             }
         }
         #endregion

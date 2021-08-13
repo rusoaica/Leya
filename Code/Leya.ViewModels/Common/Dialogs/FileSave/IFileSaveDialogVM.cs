@@ -2,6 +2,7 @@
 /// Creation Date: 04th of July, 2021
 /// Purpose: Interface for the view model for the FileSaveDialog view
 #region ========================================================================= USING =====================================================================================
+using System.Threading.Tasks;
 using Leya.Infrastructure.Enums;
 using System.Collections.Generic;
 using Leya.ViewModels.Common.MVVM;
@@ -24,7 +25,7 @@ namespace Leya.ViewModels.Common.Dialogs.FileSave
         /// Shows a new instance of the folder browser dialog
         /// </summary>
         /// <returns>A <see cref="NotificationResult"/> representing the DialogResult of the folder browser dialog</returns>
-        NotificationResult Show();
+        Task<NotificationResult> Show();
         #endregion
     }
 }

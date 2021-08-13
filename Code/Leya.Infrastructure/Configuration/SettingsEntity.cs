@@ -22,6 +22,7 @@ namespace Leya.Infrastructure.Configuration
         public double DialogsWidth { get; set; }
         public double DisplayOffset { get; set; }
         public double DialogsHeight { get; set; }
+        public double PreviewPanelWidth { get; set; }
         public double NavigationPanelWidth { get; set; }
         public double DirectoriesPanelWidth { get; set; }
         public bool Autologin { get; set; }

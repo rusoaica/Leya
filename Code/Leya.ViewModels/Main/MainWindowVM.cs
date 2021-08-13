@@ -19,6 +19,9 @@ using Leya.Infrastructure.Notification;
 using Leya.Models.Common.Models.Common;
 using Leya.ViewModels.Common.ViewFactory;
 using Leya.ViewModels.Common.Models.Media;
+using System.IO;
+using System.Text.RegularExpressions;
+using Leya.Models.Core.Options;
 #endregion
 
 namespace Leya.ViewModels.Main
@@ -27,11 +30,12 @@ namespace Leya.ViewModels.Main
     {
         #region ============================================================== FIELD MEMBERS ================================================================================
         public event Action Navigated;
+        public event Action<bool> ValidationChanged;
 
-        private ISystemView optionsFrame;
         private readonly IViewFactory viewFactory;
         private readonly IMediaLibrary mediaLibrary;
         private readonly IMediaLibraryNavigation mediaLibraryNavigation;
+        private readonly IOptionsMedia optionsMedia;
         #endregion
 
         #region ============================================================= BINDING COMMANDS ==============================================================================
@@ -39,16 +43,25 @@ namespace Leya.ViewModels.Main
         public IAsyncCommand SaveMediaLibraryAsync_Command { get; private set; }
         public IAsyncCommand Search_EnterKeyUpAsync_Command { get; private set; }
         public IAsyncCommand Search_DropDownClosingAsync_Command { get; private set; }
-        public IAsyncCommand Window_ContentRenderedAsync_Command { get; private set; }
+        public IAsyncCommand ViewOpenedAsync_Command { get; private set; }
         public IAsyncCommand<MediaEntity> ShowMediaCastAsync_Command { get; private set; }
         public IAsyncCommand<MediaEntity> SetIsWatchedStatusAsync_Command { get; private set; }
         public IAsyncCommand<MediaEntity> SetIsFavoriteStatusAsync_Command { get; private set; }
+        public IAsyncCommand<MediaTypeEntity> DeleteMediaTypeAsync_Command { get; private set; }
+        public ISyncCommand<MediaTypeEntity> GetMediaTypeSources_Command { get; private set; }
         public ISyncCommand<MediaTypeEntity> DisplayMediaTypeInfo_Command { get; private set; }
+        public ISyncCommand<MediaTypeSourceEntity> DeleteMediaSource_Command { get; private set; }
+        public ISyncCommand<MediaTypeSourceEntity> OpenMediaSourceLocation_Command { get; private set; }
+        public IAsyncCommand<string> AddMediaSourceAsync_Command { get; private set; }
         public ISyncCommand<decimal> DisplayOffset_ValueChanged_Command { get; private set; }
+        public SyncCommand ShowMediaOptions_Command { get; private set; }
         public SyncCommand OpenMediaFolder_Command { get; private set; }
         public SyncCommand Filter_EnterKeyUp_Command { get; private set; }
         public SyncCommand SelectedMediaChanged_Command { get; private set; }
         public SyncCommand Filter_DropDownClosing_Command { get; private set; }
+        public SyncCommand OpenLoggingDirectory_Command { get; private set; }
+        public SyncCommand ResetAddMediaSourceElements_Command { get; private set; }
+        public AsyncCommand RefreshMediaSourcesAsync_Command { get; private set; }
         //public AutoCompleteFilterPredicate<object> SearchMediaLibrary_Command { get; private set; }
         #endregion
 
@@ -173,6 +186,13 @@ namespace Leya.ViewModels.Main
             set { totalMediaCountType = value; Notify(); }
         }
 
+        private string mediaName;
+        public string MediaName
+        {
+            get { return mediaName; }
+            set { mediaName = value?.ToUpper(); Notify(); RefreshMediaSourcesAsync_Command?.RaiseCanExecuteChanged(); }
+        }
+
         private int totalMediaCount = 0;
         public int TotalMediaCount
         {
@@ -227,6 +247,20 @@ namespace Leya.ViewModels.Main
         {
             get { return fahrenheit; }
             set { fahrenheit = value; Notify(); }
+        }
+
+        private bool isMediaOptionsPanelVisible;
+        public bool IsMediaOptionsPanelVisible
+        {
+            get { return isMediaOptionsPanelVisible; }
+            set { isMediaOptionsPanelVisible = value; Notify(); }
+        }
+
+        private bool isMainMenuVisible = true;
+        public bool IsMainMenuVisible
+        {
+            get { return isMainMenuVisible; }
+            set { isMainMenuVisible = value; Notify(); }
         }
 
         private bool areActorsVisible = false;
@@ -313,6 +347,13 @@ namespace Leya.ViewModels.Main
             set { isDirectorVisible = value; Notify(); }
         }
 
+        private bool isMediaOptionVisible;
+        public bool IsMediaOptionVisible
+        {
+            get { return isMediaOptionVisible; }
+            set { isMediaOptionVisible = value; Notify(); }
+        }
+
         //private bool isMediaContextMenuOpen;
         //public bool IsMediaContextMenuOpen
         //{
@@ -357,11 +398,32 @@ namespace Leya.ViewModels.Main
             get { return DateTime.Now; }
         }
 
+        private ObservableCollection<MediaTypeEntity> sourceMediaCategories = new ObservableCollection<MediaTypeEntity>();
+        public ObservableCollection<MediaTypeEntity> SourceMediaCategories
+        {
+            get { return sourceMediaCategories; }
+            set { sourceMediaCategories = value; Notify(); }
+        }
+
+        private ObservableCollection<MediaTypeSourceEntity> sourceMediaCategorySources = new ObservableCollection<MediaTypeSourceEntity>();
+        public ObservableCollection<MediaTypeSourceEntity> SourceMediaCategorySources
+        {
+            get { return sourceMediaCategorySources; }
+            set { sourceMediaCategorySources = value; Notify(); RefreshMediaSourcesAsync_Command?.RaiseCanExecuteChanged(); }
+        }        
+
         private ObservableCollection<MediaTypeEntity> sourceMediaTypes = new ObservableCollection<MediaTypeEntity>();
         public ObservableCollection<MediaTypeEntity> SourceMediaTypes
         {
             get { return sourceMediaTypes; }
             set { sourceMediaTypes = value; Notify(); }
+        }
+
+        private ObservableCollection<SearchEntity> sourceMediaCategoryTypes = new ObservableCollection<SearchEntity>();
+        public ObservableCollection<SearchEntity> SourceMediaCategoryTypes
+        {
+            get { return sourceMediaCategoryTypes; }
+            set { sourceMediaCategoryTypes = value; Notify(); }
         }
 
         private ObservableCollection<SearchEntity> sourceActors;
@@ -399,17 +461,18 @@ namespace Leya.ViewModels.Main
             set { searchSelectedItem = value; Notify(); }
         }
 
+        private SearchEntity selectedMediaCategoryType;
+        public SearchEntity SelectedMediaCategoryType
+        {
+            get { return selectedMediaCategoryType; }
+            set { selectedMediaCategoryType = value; Notify(); RefreshMediaSourcesAsync_Command?.RaiseCanExecuteChanged(); }
+        }
+
         private IMediaEntity sourceMediaSelectedItem;
         public IMediaEntity SourceMediaSelectedItem
         {
             get { return sourceMediaSelectedItem; }
             set { sourceMediaSelectedItem = value; Notify(); }
-        }
-
-        public ISystemView OptionsFrame
-        {
-            get { return optionsFrame; }
-            set { optionsFrame = value; Notify(); }
         }
         #endregion
 
@@ -417,22 +480,32 @@ namespace Leya.ViewModels.Main
         public NavigationLevel CurrentNavigationLevel { get { return mediaLibraryNavigation.CurrentNavigationLevel; } }
         #endregion
 
+        private ObservableCollection<MediaEntity> someList = new ObservableCollection<MediaEntity>();
+
+        public ObservableCollection<MediaEntity> SomeList
+        {
+            get { return someList; }
+            set { someList = value; Notify(); }
+        }
+
+
         #region ================================================================== CTOR =====================================================================================
         /// <summary>
         /// Overload C-tor
         /// </summary>
         /// <param name="viewFactory">Injected abstract factory for creating views</param>
-        /// <param name="systemView">Injected view for system settings page</param>
         /// <param name="mediaLibrary">Injected media library business model</param>
         /// <param name="mediaLibraryNavigation">Injected media library navigation business model</param>
         /// <param name="notificationService">Injected notification service</param>
-        public MainWindowVM(IViewFactory viewFactory, ISystemView systemView, IMediaLibrary mediaLibrary, IMediaLibraryNavigation mediaLibraryNavigation, INotificationService notificationService)
+        public MainWindowVM(IViewFactory viewFactory, IMediaLibrary mediaLibrary, IMediaLibraryNavigation mediaLibraryNavigation, INotificationService notificationService, IOptionsMedia optionsMedia)
         {
-            OptionsFrame = systemView;
+            SomeList = new ObservableCollection<MediaEntity>() { new MediaEntity() { MediaName = "abc" }, new MediaEntity() { MediaName = "xyz" }, new MediaEntity() { MediaName = "asrewrbc" }, new MediaEntity() { MediaName = "jkuyk fdsfds" } };
+
             this.viewFactory = viewFactory;
             this.mediaLibrary = mediaLibrary;
             this.notificationService = notificationService;
             this.mediaLibraryNavigation = mediaLibraryNavigation;
+            this.optionsMedia = optionsMedia;
             this.mediaLibrary.MediaTypesLoaded += MediaLibrary_MediaTypesLoaded;
             this.mediaLibrary.LibraryLoaded += MediaLibrary_LibraryLoaded;
             //IsOptionsContainerVisible = true;
@@ -446,13 +519,28 @@ namespace Leya.ViewModels.Main
             //ShowMediaCastAsync_Command = new AsyncCommand<MediaDisplayEntity>(ShowMediaCastAsync);
             DisplayMediaTypeInfo_Command = new SyncCommand<MediaTypeEntity>(DisplayMediaTypeStatistics);
             SetIsWatchedStatusAsync_Command = new AsyncCommand<MediaEntity>(SetIsWatchedStatusAsync);
-            Window_ContentRenderedAsync_Command = new AsyncCommand(Window_ContentRenderedAsync);
+            ViewOpenedAsync_Command = new AsyncCommand(ViewOpenedAsync);
             //Search_DropDownClosingAsync_Command = new AsyncCommand(Search_DropDownClosingAsync);
             SetIsFavoriteStatusAsync_Command = new AsyncCommand<MediaEntity>(SetIsFavoriteStatusAsync);
             //DisplayOffset_ValueChanged_Command = new SyncCommand<decimal>(DisplayOffset_ValueChanged);
             mediaLibraryNavigation.Navigated += InitiateNavigation;
+            OpenLoggingDirectory_Command = new SyncCommand(OpenLoggingDirectory);
             // SearchMediaLibrary_Command = new AutoCompleteFilterPredicate<object>(SearchMediaLibrary);
             this.mediaLibraryNavigation.PropertyChanged += DomainModelPropertyChanged;
+            AddMediaSourceAsync_Command = new AsyncCommand<string>(AddMediaTypeSourceAsync);
+            RefreshMediaSourcesAsync_Command = new AsyncCommand(UpdateMediaLibraryAsync, ValidateAddMediaTypeSource);
+            ResetAddMediaSourceElements_Command = new SyncCommand(ResetAddMediaSourceElements);
+            DeleteMediaTypeAsync_Command = new AsyncCommand<MediaTypeEntity>(DeleteMediaTypeAsync);
+            GetMediaTypeSources_Command = new SyncCommand<MediaTypeEntity>(GetMediaTypeSources);
+            DeleteMediaSource_Command = new SyncCommand<MediaTypeSourceEntity>(DeleteMediaTypeSource);
+            OpenMediaSourceLocation_Command = new SyncCommand<MediaTypeSourceEntity>(optionsMedia.OpenMediaSourceLocation);
+            ShowMediaOptions_Command = new SyncCommand(ShowMediaOptions);
+            SourceMediaCategoryTypes = new ObservableCollection<SearchEntity>()
+            {
+                new SearchEntity() { Text = "TV SHOW" },
+                new SearchEntity() { Text = "MOVIE" },
+                new SearchEntity() { Text = "MUSIC" },
+            };
         }
 
 
@@ -541,7 +629,7 @@ namespace Leya.ViewModels.Main
             }
             catch (Exception ex) when (ex is InvalidOperationException || ex is ArgumentException)
             {
-                notificationService.Show(ex.Message, "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
+                await notificationService.ShowAsync(ex.Message, "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
             }
         }
 
@@ -570,16 +658,180 @@ namespace Leya.ViewModels.Main
             }
             catch (Exception ex) when (ex is InvalidOperationException || ex is ArgumentException)
             {
-                notificationService.Show(ex.Message, "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
+                await notificationService.ShowAsync(ex.Message, "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
             }
         }
 
-        #region navigation
+        /// <summary>
+        /// Opens a directory containing the logs of the application
+        /// </summary>
+        private void OpenLoggingDirectory()
+        {
+            // TODO: replace with cross platform way of opening folders
+            Process.Start(AppDomain.CurrentDomain.BaseDirectory + @"Logs");
+        }
+
+        #region Options Media
+        /// <summary>
+        /// Refreshes the media library
+        /// </summary>
+        private async Task UpdateMediaLibraryAsync()
+        {
+            // do not allow two media items with same name
+            if (SourceMediaCategories.Where(mc => mc.MediaName == MediaName).Count() > 0 && !optionsMedia.IsMediaTypeSourceUpdate)
+                await notificationService.ShowAsync("The specified media name already exists!", "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
+            else
+            {
+                MediaTypeEntity item = new MediaTypeEntity() { MediaName = MediaName, IsMedia = true, MediaType = SelectedMediaCategoryType.Text, Id = optionsMedia.IsMediaTypeSourceUpdate ? optionsMedia.Id : 0 };
+                // if we are updating an already existing media type, delete it and its sources before re-inserting them (might contain modifications)
+                if (optionsMedia.IsMediaTypeSourceUpdate)
+                    await DeleteMediaTypeAsync(item);
+                // add the new media type and get the returned row id
+                int newMediaId = await optionsMedia.SaveMediaTypeAsync(item);
+                if (newMediaId != -1)
+                    await optionsMedia.SaveMediaLibrarySourcesAsync(newMediaId);
+                // refresh the list of media types
+                await optionsMedia.RefreshMediaTypes(mediaLibrary);
+                GetMediaTypes();
+                optionsMedia.IsMediaTypeSourceUpdate = false;
+            }
+        }
+
+        /// <summary>
+        /// Resets the fields required to create a new media type to their default values
+        /// </summary>
+        private void ResetAddMediaSourceElements()
+        {
+            optionsMedia.ResetAddMediaSourceElements();
+        }
+
+        /// <summary>
+        /// Validates the required information for adding a new media source
+        /// </summary>
+        /// <returns>True if required information is fine, False otherwise</returns>
+        private bool ValidateAddMediaTypeSource()
+        {
+            bool isValid = !string.IsNullOrEmpty(MediaName) && SourceMediaCategorySources.Count > 0 && SelectedMediaCategoryType != null && !string.IsNullOrEmpty(SelectedMediaCategoryType.Text);
+            if (!isValid && IsMediaOptionVisible)
+            {
+                ShowHelpButton();
+                WindowHelp = "\n";
+                if (string.IsNullOrEmpty(MediaName))
+                    WindowHelp += "Media name cannot be empty!\n";
+                if (SourceMediaCategorySources.Count == 0)
+                    WindowHelp += "No media source added!\n";
+                if (SelectedMediaCategoryType != null && string.IsNullOrEmpty(SelectedMediaCategoryType.Text))
+                    WindowHelp += "No media type chosen!\n";
+            }
+            else
+                HideHelpButton();
+            ValidationChanged?.Invoke(isValid);
+            return isValid;
+        }
+
+        /// <summary>
+        /// Adds a new media source to the selected media
+        /// </summary>
+        /// <param name="selectedDirectories">The paths of the selected directories representing the media sources to be added</param>
+        private async Task AddMediaTypeSourceAsync(string selectedDirectories)
+        {
+            // ask whether the selected directories contain a single media or not (ie: selecting a single folder which contains more than one tv show inside)
+            NotificationResult response = await notificationService.ShowAsync("Selected folder contains a single media?", "LEYA", NotificationButton.YesNo, NotificationImage.Question);
+            try
+            {
+                foreach (string mediaSource in optionsMedia.AddMediaTypeSource(selectedDirectories, response == NotificationResult.Yes))
+                {
+                    // do not add same source path twice
+                    if (SourceMediaCategorySources.Count(ms => ms.MediaSourcePath == mediaSource.ToUpper()) == 0)
+                    {
+                        SourceMediaCategorySources.Add(new MediaTypeSourceEntity()
+                        {
+                            MediaSourcePath = mediaSource.ToUpper()
+                        });
+                    }
+                }
+                RefreshMediaSourcesAsync_Command.RaiseCanExecuteChanged();
+            }
+            catch (Exception ex) when (ex is IOException)
+            {
+                await notificationService.ShowAsync(ex.Message, "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
+            }
+        }
+
+        /// <summary>
+        /// Removes <paramref name="item"/> from the list of media type sources
+        /// </summary>
+        /// <param name="item">The item to be removed from the media sources</param>
+        private void DeleteMediaTypeSource(MediaTypeSourceEntity item)
+        {
+            SourceMediaCategorySources.Remove(item);
+            RefreshMediaSourcesAsync_Command.RaiseCanExecuteChanged();
+        }
+
+        /// <summary>
+        /// Gets the media type sources for <paramref name="item"/>
+        /// </summary>
+        /// <param name="item">The media type for which to get the media type sources</param>
+        private void GetMediaTypeSources(MediaTypeEntity item)
+        {
+            ShowProgressBar();
+            // the user is updating the sources of an existing media type, not creating a new one
+            optionsMedia.IsMediaTypeSourceUpdate = true;
+            optionsMedia.Id = item.Id;
+            // get the media type sources of the provided media type
+            SourceMediaCategorySources = new ObservableCollection<MediaTypeSourceEntity>(mediaLibrary.Library.MediaTypes.SelectMany(mt => mt.MediaTypeSources)
+                                                                                                                        .Where(mts => mts.MediaTypeId == item.Id));
+            // re-assign the current media name and selected media type
+            MediaName = item.MediaName;
+            SelectedMediaCategoryType = SourceMediaCategoryTypes.First(mt => mt.Text == item.MediaType);
+            HideProgressBar();
+        }
+
+        /// <summary>
+        /// Deletes a media type and all its associated media type sources
+        /// </summary>
+        /// <param name="media">The media type to be deleted</param>
+        private async Task DeleteMediaTypeAsync(MediaTypeEntity media)
+        {
+            try
+            {
+                await optionsMedia.DeleteMediaTypeAsync(media.Id);
+                await optionsMedia.RefreshMediaTypes(mediaLibrary);
+                GetMediaTypes();
+            }
+            catch (Exception ex) when (ex is InvalidOperationException || ex is ArgumentException)
+            {
+                await notificationService .ShowAsync(ex.Message, "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
+            }
+        }
+
+        /// <summary>
+        /// Gets the user defined media types
+        /// </summary>
+        public void GetMediaTypes() 
+        {
+            ShowProgressBar();
+            SourceMediaCategories = new ObservableCollection<MediaTypeEntity>(optionsMedia.GetMediaTypesAsync(mediaLibrary));
+            HideProgressBar();
+        }
+
+        /// <summary>
+        /// Displays the options related to the media library
+        /// </summary>
+        private void ShowMediaOptions()
+        {
+            IsMediaOptionVisible = true;
+            GetMediaTypes();
+        }
+        #endregion
+
+        #region Navigation
         /// <summary>
         /// Triggers the event that signals the beginning of media library navigation
         /// </summary>
         private void InitiateNavigation()
         {
+            UpdateMainSectionsVisibility();
             Navigated?.Invoke();
         }
 
@@ -629,8 +881,8 @@ namespace Leya.ViewModels.Main
                 IEnumerable<IMediaEntity> temp = new List<IMediaEntity>();
                 await Task.Run(() =>
                 {
-                // get the parent items of the currently displayed items
-                if (CurrentNavigationLevel == NavigationLevel.Season)
+                    // get the parent items of the currently displayed items
+                    if (CurrentNavigationLevel == NavigationLevel.Season)
                         temp = mediaLibraryNavigation.GetTvShowsNavigationList(mediaLibrary, () => new MediaEntity());
                     else if (CurrentNavigationLevel == NavigationLevel.Episode)
                         temp = mediaLibraryNavigation.GetSeasonsNavigationListFromEpisode(mediaLibrary, media, () => new MediaEntity());
@@ -647,11 +899,46 @@ namespace Leya.ViewModels.Main
             }
             else
             {
-                // no media in the selected category, return to main menu (should never happen, but...)
+                // no media in the selected category, return to main menu
                 mediaLibraryNavigation.CurrentNavigationLevel = NavigationLevel.None;
                 mediaLibraryNavigation.IsBackNavigationPossible = false;
+                UpdateMainSectionsVisibility();
+                Navigated?.Invoke();
             }
             HideProgressBar();
+        }
+
+        /// <summary>
+        /// Updates the visibility of the main section elements in the main view
+        /// </summary>
+        private void UpdateMainSectionsVisibility()
+        {
+            // update the visibility of elements based on the current navigation level
+            switch (CurrentNavigationLevel)
+            {
+                case NavigationLevel.None:
+                    IsMediaContainerVisible = false;
+                    IsOptionsContainerVisible = false;
+                    IsMainMenuVisible = true;
+                    break;
+                case NavigationLevel.TvShow:
+                case NavigationLevel.Movie:
+                case NavigationLevel.Artist:
+                    IsMediaContainerVisible = true;
+                    IsMainMenuVisible = false;
+                    break;
+                case NavigationLevel.System:
+                case NavigationLevel.Search:
+                case NavigationLevel.Favorite:
+                    IsOptionsContainerVisible = true;
+                    IsMediaContainerVisible = false;
+                    IsMainMenuVisible = false;
+                    break;
+                default:
+                    break;
+            }
+            // display the appropriate media library list, if applicable
+            CompleteNavigation();
         }
 
         /// <summary>
@@ -685,7 +972,7 @@ namespace Leya.ViewModels.Main
             }
             catch (Exception ex) when (ex is InvalidOperationException || ex is ArgumentException)
             {
-                notificationService.Show(ex.Message, "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
+                await notificationService.ShowAsync(ex.Message, "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
             }
             HideProgressBar();
         }
@@ -703,14 +990,15 @@ namespace Leya.ViewModels.Main
 
         #region ============================================================= EVENT HANDLERS ================================================================================
         /// <summary>
-        /// Handles the ContentRendered event of the Window
+        /// Handles the ViewOpenedAsync event of the Window
         /// </summary>
-        private async Task Window_ContentRenderedAsync()
+        private async Task ViewOpenedAsync()
         {
             // get the current version of the software
             Version = "v. " + FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location).FileVersion;
             ShowProgressBar();
             ScannerOutput = "Loading media library...";
+            IsScannerTextVisible = true;
             await mediaLibrary.GetMediaLibraryAsync();
             HideProgressBar();
         }

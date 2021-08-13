@@ -67,15 +67,28 @@ namespace Leya.Models.Core.MediaLibrary
             });
         }
 
+
+        /// <summary>
+        /// Deletes an entity identified by <paramref name="id"/> from the storage medium
+        /// </summary>
+        /// <param name="id">The id of the entity to be deleted</param>
+        public async Task DeleteMediaTypeAsync(int id)
+        {
+            var result = await mediaTypeRepository.DeleteByIdAsync(id);
+            if (!string.IsNullOrEmpty(result.Error))
+                throw new InvalidOperationException("Error deleting the media type in the repository: " + result.Error);
+            await GetMediaTypesAsync();
+        }
+
         /// <summary>
         /// Creates the default media types that are always present
         /// </summary>
         /// <returns>A list of media types that are always present</returns>
         private async Task<List<MediaTypeEntity>> InsertDefaultMediaItemsAsync()
         {
-            await AddMediaType(new MediaTypeEntity() { MediaName = "SEARCH" });
-            await AddMediaType(new MediaTypeEntity() { MediaName = "FAVORITES" });
-            await AddMediaType(new MediaTypeEntity() { MediaName = "SYSTEM" });
+            await AddMediaTypeAsync(new MediaTypeEntity() { MediaName = "SEARCH" });
+            await AddMediaTypeAsync(new MediaTypeEntity() { MediaName = "FAVORITES" });
+            await AddMediaTypeAsync(new MediaTypeEntity() { MediaName = "SYSTEM" });
             return new List<MediaTypeEntity>()
             {
                 new MediaTypeEntity() { MediaName = "SEARCH", Id = 1 },
@@ -88,11 +101,13 @@ namespace Leya.Models.Core.MediaLibrary
         /// Saves <paramref name="media"/> in the storage medium
         /// </summary>
         /// <param name="media">The media to be saved</param>
-        private async Task AddMediaType(MediaTypeEntity media)
+        public async Task<int> AddMediaTypeAsync(MediaTypeEntity media)
         {
             var result = await mediaTypeRepository.InsertAsync(media.ToStorageEntity());
             if (!string.IsNullOrEmpty(result.Error))
                 throw new InvalidOperationException("Error inserting the media type in the repository: " + result.Error);
+            else
+                return result.Data[0].Id;
         }
         #endregion
     }

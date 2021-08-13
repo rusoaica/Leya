@@ -99,21 +99,21 @@ namespace Leya.Views.Common.Dialogs
         /// <summary>
         /// Handles window's SizeChanged event
         /// </summary>
-        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        private async void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             appConfig.Settings.DialogsHeight = Height;
             appConfig.Settings.DialogsWidth = Width;
-            appConfig.UpdateConfiguration();
+            await appConfig.UpdateConfigurationAsync();
         }
 
         /// <summary>
         /// Handles separator's DragCompleted event
         /// </summary>
-        private void Separator_DragCompleted(object sender, DragCompletedEventArgs e)
+        private async void Separator_DragCompleted(object sender, DragCompletedEventArgs e)
         {
             appConfig.Settings.NavigationPanelWidth = grdContainer.ColumnDefinitions[0].Width.Value;
             appConfig.Settings.DirectoriesPanelWidth = grdContainer.ColumnDefinitions[2].Width.Value;
-            appConfig.UpdateConfiguration();
+            await appConfig.UpdateConfigurationAsync();
         }
 
         /// <summary>

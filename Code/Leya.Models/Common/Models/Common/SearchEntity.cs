@@ -23,7 +23,7 @@ namespace Leya.Models.Common.Models.Common
         /// <returns>Custom string value showing relevant data for current class</returns>
         public override string ToString()
         {
-            return Text + " :: " + Value;
+            return Text;
         }
         #endregion
     }

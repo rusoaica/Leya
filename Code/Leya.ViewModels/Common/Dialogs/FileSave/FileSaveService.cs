@@ -3,6 +3,7 @@
 /// Purpose: Explicit implementation of abstract custom file save service
 #region ========================================================================= USING =====================================================================================
 using System;
+using System.Threading.Tasks;
 using Leya.Infrastructure.Enums;
 using Leya.Infrastructure.Dialog;
 using System.Collections.Generic;
@@ -48,9 +49,9 @@ namespace Leya.ViewModels.Common.Dialogs.FileSave
         /// Shows a new custom folder save dialog
         /// </summary>
         /// <returns>A <see cref="NotificationResult"/> value representing the result of the custom folder save dialog</returns>
-        public NotificationResult Show()
+        public async Task<NotificationResult> Show()
         {
-            return (NotificationResult)(dispatcher?.Dispatch(new Func<NotificationResult>(() =>
+            return await await dispatcher?.Dispatch(new Func<Task<NotificationResult>>(async () =>
             {
                 IFileSaveDialogVM fileSaveDialogVM = fileSaveVM.Invoke();
                 fileSaveDialogVM.Filter = Filter;
@@ -58,12 +59,12 @@ namespace Leya.ViewModels.Common.Dialogs.FileSave
                 fileSaveDialogVM.Filename = Filename;
                 fileSaveDialogVM.ShowNewFolderButton = ShowNewFolderButton;
                 // display the file save dialog as modal, and get its result
-                NotificationResult result = fileSaveDialogVM.Show();
+                NotificationResult result = await fileSaveDialogVM.Show();
                 // after file save dialog is closed, relay the provided filename and whether to override existing files or not
                 Filename = fileSaveDialogVM.Filename;
                 OverwriteExisting = fileSaveDialogVM.OverwriteExisting;
                 return result;
-            })));
+            }));
         }
         #endregion
     }

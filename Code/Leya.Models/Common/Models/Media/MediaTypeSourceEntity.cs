@@ -1,6 +1,9 @@
 ﻿/// Written by: Yulia Danilova
 /// Creation Date: 17th of November, 2020
 /// Purpose: Data transfer object for the list of media type sources
+#region ========================================================================= USING =====================================================================================
+using Leya.Models.Common.Infrastructure;
+#endregion
 
 namespace Leya.Models.Common.Models.Media
 {
@@ -20,6 +23,15 @@ namespace Leya.Models.Common.Models.Media
         public override string ToString()
         {
             return Id + " :: " + MediaTypeId;
+        }
+
+        /// <summary>
+        /// Maps between this entity and the coresponding persistance entity
+        /// </summary>
+        /// <returns>A data storage entity representation of this entity</returns>
+        public DataAccess.Common.Models.Media.MediaTypeSourceEntity ToStorageEntity()
+        {
+            return Services.AutoMapper.Map<DataAccess.Common.Models.Media.MediaTypeSourceEntity>(this);
         }
         #endregion  
     }

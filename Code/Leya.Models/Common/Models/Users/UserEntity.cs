@@ -15,10 +15,10 @@ namespace Leya.Models.Common.Models.Users
         public int Id { get; set; }
         public string Username { get; set; }
         public string SecurityQuestion { get; set; }
-        public SecureString Password { get; set; } = new SecureString();
-        public SecureString SecurityAnswer { get; set; } = new SecureString();
-        public SecureString PasswordConfirm { get; set; } = new SecureString();
-        public SecureString SecurityAnswerConfirm { get; set; } = new SecureString();
+        public string Password { get; set; }
+        public string SecurityAnswer { get; set; }
+        public string PasswordConfirm { get; set; }
+        public string SecurityAnswerConfirm { get; set; }
         public DateTime Created { get; set; }
         #endregion
 

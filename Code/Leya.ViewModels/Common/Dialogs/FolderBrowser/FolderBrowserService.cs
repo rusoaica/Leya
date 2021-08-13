@@ -3,6 +3,7 @@
 /// Purpose: Explicit implementation of abstract custom folder browser service
 #region ========================================================================= USING =====================================================================================
 using System;
+using System.Threading.Tasks;
 using Leya.Infrastructure.Enums;
 using Leya.Infrastructure.Dialog;
 using Leya.ViewModels.Common.Dispatcher;
@@ -21,9 +22,10 @@ namespace Leya.ViewModels.Common.Dialogs.FolderBrowser
         #endregion
       
         #region =============================================================== PROPERTIES ==================================================================================
-        public bool ShowNewFolderButton { get; set; }
         public string InitialFolder { get; set; }
         public string SelectedDirectories { get; set; }
+        public bool AllowMultiselection { get; set; }
+        public bool ShowNewFolderButton { get; set; }
         #endregion
 
         #region ================================================================== CTOR =====================================================================================
@@ -48,16 +50,21 @@ namespace Leya.ViewModels.Common.Dialogs.FolderBrowser
         /// Shows a new custom folder browser dialog
         /// </summary>
         /// <returns>A <see cref="NotificationResult"/> value representing the result of the custom folder browser dialog</returns>
-        public NotificationResult Show()
+        public async Task<NotificationResult> Show()
         {
-            return (NotificationResult)(dispatcher?.Dispatch(new Func<NotificationResult>(() =>
+            return await await dispatcher?.Dispatch(new Func<Task<NotificationResult>>(async () =>
             {
                 IFolderBrowserDialogVM folderBrowserDialogVM = folderBrowserVM.Invoke();
                 folderBrowserDialogVM.InitialFolder = InitialFolder;
                 folderBrowserDialogVM.SelectedDirectories = SelectedDirectories;
-                folderBrowserDialogVM.ShowNewFolderButton = ShowNewFolderButton; 
-                return folderBrowserDialogVM.Show();
-            })));
+                folderBrowserDialogVM.ShowNewFolderButton = ShowNewFolderButton;
+                folderBrowserDialogVM.AllowMultiselection = AllowMultiselection;
+                // display the folder browse dialog as modal, and get its result
+                NotificationResult result = await folderBrowserDialogVM.Show();
+                // after folder browse dialog is closed, relay the selected folders
+                SelectedDirectories = folderBrowserDialogVM.SelectedDirectories;
+                return result;
+            }));
         }
         #endregion
     }

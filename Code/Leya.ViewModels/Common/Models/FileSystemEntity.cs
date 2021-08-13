@@ -10,6 +10,7 @@ namespace Leya.ViewModels.Common.Models
         public int DirType { get; set; }
         public string Path { get; set; }
         public string Extension { get; set; }
+        public string IconSource { get; set; }
         #endregion
     }
 }

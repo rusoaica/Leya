@@ -35,7 +35,7 @@ namespace Leya.Views.Register
             // this doesn't break MVVM patterns, since it's still View binding related code
             if (DataContext != null && (sender as PasswordBox).IsFocused)
             {
-                (DataContext as RecoverPasswordVM).SecurityAnswer = ((PasswordBox)sender).SecurePassword;
+                (DataContext as RecoverPasswordVM).SecurityAnswer = ((PasswordBox)sender).Password;
                 (DataContext as RecoverPasswordVM).RecoverAccountAsync_Command.RaiseCanExecuteChanged();
             }
         }

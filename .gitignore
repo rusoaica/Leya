@@ -1,10 +1,12 @@
 Code/.vs/*
+Code/.idea/*
 Code/.editorconfig
 Code/Leya.DataAccess/obj/*
 Code/Leya.Infrastructure/obj/*
 Code/Leya.Models/obj/*
 Code/Leya.ViewModels/obj/*
 Code/Leya.Views/obj/*
+Code/Leya.Views.Avalonia/obj/*
 Tests/Leya.DataAccess.Tests/obj/*
 Tests/Leya.DataAccess.Tests/bin/*
 Build/*

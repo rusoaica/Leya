@@ -3,7 +3,6 @@
 /// Purpose: View Model for the startup login view
 #region ========================================================================= USING =====================================================================================
 using System;
-using System.Security;
 using Leya.ViewModels.Main;
 using System.Threading.Tasks;
 using Leya.ViewModels.Register;
@@ -14,6 +13,7 @@ using Leya.Infrastructure.Security;
 using Leya.Infrastructure.Notification;
 using Leya.Infrastructure.Configuration;
 using Leya.ViewModels.Common.ViewFactory;
+using Leya.Infrastructure.Dialog;
 #endregion
 
 namespace Leya.ViewModels.Startup
@@ -27,23 +27,24 @@ namespace Leya.ViewModels.Startup
         #endregion
 
         #region ============================================================= BINDING COMMANDS ==============================================================================
-        public AsyncCommand LoginAsync_Command { get; private set; }
-        public SyncCommand ChangePassword_Command { get; private set; }
-        public SyncCommand ContentRendered_Command { get; private set; }
-        public SyncCommand RecoverPassword_Command { get; private set; }
-        public SyncCommand RegisterUsername_Command { get; private set; }
-        public SyncCommand RememberCredentials_Command { get; private set; }
+        public ISyncCommand ViewOpened_Command { get; private set; }
+        public IAsyncCommand LoginAsync_Command { get; private set; }
         public IAsyncCommand AutoLoginAsync_Command { get; private set; }
+        public IAsyncCommand ChangePasswordAsync_Command { get; private set; }
+        public IAsyncCommand RecoverPasswordAsync_Command { get; private set; }
+        public IAsyncCommand RegisterUsernameAsync_Command { get; private set; }
+        public IAsyncCommand RememberCredentialsAsync_Command { get; private set; }
         #endregion
 
         #region ============================================================ BINDING PROPERTIES =============================================================================
-        public SecureString Password
+        public string Password
         {
             private get { return authentication.User.Password; }
             set 
             {
                 authentication.User.Password = value;
-                if (value.Length == 0)
+                Notify();
+                if (string.IsNullOrEmpty(value))
                 {
                     RememberCredentials = false;
                     AutoLogin = false;
@@ -65,8 +66,8 @@ namespace Leya.ViewModels.Startup
                     AutoLogin = false;
                 }
                 LoginAsync_Command.RaiseCanExecuteChanged();
-                RecoverPassword_Command.RaiseCanExecuteChanged();
-                ChangePassword_Command.RaiseCanExecuteChanged();
+                RecoverPasswordAsync_Command.RaiseCanExecuteChanged();
+                ChangePasswordAsync_Command.RaiseCanExecuteChanged();
             }
         }
 
@@ -104,13 +105,13 @@ namespace Leya.ViewModels.Startup
             this.viewFactory = viewFactory;
             this.authentication = authentication;
             this.notificationService = notificationService;
+            ViewOpened_Command = new SyncCommand(ViewOpened);
             AutoLoginAsync_Command = new AsyncCommand(AutologinAsync);
-            ContentRendered_Command = new SyncCommand(ContentRendered);
-            RegisterUsername_Command = new SyncCommand(RegisterUsername);
             LoginAsync_Command = new AsyncCommand(LoginAsync, ValidateLogin);
-            RememberCredentials_Command = new SyncCommand(UpdateRememberCredentials);
-            ChangePassword_Command = new SyncCommand(ChangePassword, ValidateRecoverPassword);
-            RecoverPassword_Command = new SyncCommand(RecoverPassword, ValidateRecoverPassword);
+            RegisterUsernameAsync_Command = new AsyncCommand(RegisterUsernameAsync);
+            RememberCredentialsAsync_Command = new AsyncCommand(UpdateRememberCredentialsAsync);
+            ChangePasswordAsync_Command = new AsyncCommand(ChangePasswordAsync, ValidateRecoverPassword);
+            RecoverPasswordAsync_Command = new AsyncCommand(RecoverPasswordAsync, ValidateRecoverPassword);
         }
         #endregion
 
@@ -118,15 +119,15 @@ namespace Leya.ViewModels.Startup
         /// <summary>
         /// Stores the credentials in the application's configuration file, for later retrival
         /// </summary>
-        private void UpdateRememberCredentials()
+        private async Task UpdateRememberCredentialsAsync()
         {
             try
             {
-                authentication.RememberLoginCredentials();
+                await authentication.RememberLoginCredentialsAsync();
             }
             catch (Exception ex) when (ex is InvalidOperationException || ex is ArgumentException)
             {
-                notificationService.Show(ex.Message, "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
+                await notificationService.ShowAsync(ex.Message, "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
             }
             if (string.IsNullOrEmpty(Username) || Password.Length == 0)
             {
@@ -160,12 +161,12 @@ namespace Leya.ViewModels.Startup
                 await authentication.LoginAsync();
                 // if login was successful, hide this view and display the main view as modal
                 IsWindowVisible = false;
-                viewFactory.CreateView<IMainWindowView>().ShowDialog();
+                await viewFactory.CreateView<IMainWindowView>().ShowDialog();
                 IsWindowVisible = true;
             }
             catch (Exception ex) when (ex is InvalidOperationException || ex is ArgumentException)
             {
-                notificationService.Show(ex.Message, "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
+                await notificationService.ShowAsync(ex.Message, "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
             }
             HideProgressBar();
         }
@@ -176,14 +177,14 @@ namespace Leya.ViewModels.Startup
         /// <returns>True if required information is fine, False otherwise</returns>
         private bool ValidateLogin()
         {
-            bool isValid = !string.IsNullOrEmpty(Username) && Password.Length > 0;
+            bool isValid = !string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password);
             if (!isValid)
             {
                 ShowHelpButton();
                 WindowHelp = "\n";
                 if (string.IsNullOrEmpty(Username))
                     WindowHelp += "Username cannot be empty!\n";
-                if (Password.Length == 0)
+                if (string.IsNullOrEmpty(Password))
                     WindowHelp += "Password cannot be empty!\n";
             }
             else
@@ -203,44 +204,52 @@ namespace Leya.ViewModels.Startup
         /// <summary>
         /// Opens up the Register View
         /// </summary>
-        private void RegisterUsername()
+        private async Task RegisterUsernameAsync()
         {
             IsWindowVisible = false;
-            viewFactory.CreateView<IRegisterView>().ShowDialog();
+            await viewFactory.CreateView<IRegisterView>().ShowDialog();
             IsWindowVisible = true;
         }
 
         /// <summary>
         /// Opens up the Recover Password view
         /// </summary>
-        private void RecoverPassword()
+        private async Task RecoverPasswordAsync()
         {
             IsWindowVisible = false;
-            viewFactory.CreateView<IRecoverPasswordView>(Username).ShowDialog();
+            await viewFactory.CreateView<IRecoverPasswordView>(Username).ShowDialog();
             IsWindowVisible = true;
         }
 
         /// <summary>
         /// Opens up the Change Password view
         /// </summary>
-        private void ChangePassword()
+        private async Task ChangePasswordAsync()
         {
             IsWindowVisible = false;
-            viewFactory.CreateView<IChangePasswordView>(Username).ShowDialog();
+            await viewFactory.CreateView<IChangePasswordView>(Username).ShowDialog();
             IsWindowVisible = true;
         }
         #endregion
 
         #region ============================================================= EVENT HANDLERS ================================================================================
         /// <summary>
-        /// Handles the ContentRendered event of the view
+        /// Handles the ViewOpened event of the view
         /// </summary>
-        private void ContentRendered()
+        private void ViewOpened()
         {
-            if (!string.IsNullOrEmpty(config.Settings.Username))
-                Username = Crypto.Decrypt(config.Settings.Username);
+            //fileBrowserService.ShowNewFolderButton = true;
+            //fileBrowserService.AllowMultiselection = true;
+            //fileBrowserService.InitialFolder = @"A:\Downloads";
+            //fileBrowserService.Filter = new System.Collections.Generic.List<string>() { ".rar", ".exe" };
+            //await fileBrowserService.Show();
+
             if (config.Settings.RememberCredentials)
             {
+                if (!string.IsNullOrEmpty(config.Settings.Username))
+                    Username = Crypto.Decrypt(config.Settings.Username);
+                if (!string.IsNullOrEmpty(config.Settings.Password))
+                    Password = Crypto.Decrypt(config.Settings.Password);
                 RememberCredentials = true;
                 if (config.Settings.Autologin)
                     AutoLogin = true;

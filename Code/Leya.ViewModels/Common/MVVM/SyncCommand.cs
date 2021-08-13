@@ -8,7 +8,7 @@ using System.Windows.Input;
 
 namespace Leya.ViewModels.Common.MVVM
 {
-    public class SyncCommand : ICommand
+    public class SyncCommand : ISyncCommand
     {
         #region ============================================================== FIELD MEMBERS ================================================================================
         public event EventHandler CanExecuteChanged;

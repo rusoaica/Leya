@@ -3,6 +3,7 @@
 /// Purpose: Interface for the application's configuration
 #region ========================================================================= USING =====================================================================================
 using System.Collections.Generic;
+using System.Threading.Tasks;
 #endregion
 
 namespace Leya.Infrastructure.Configuration
@@ -19,7 +20,7 @@ namespace Leya.Infrastructure.Configuration
         /// <summary>
         /// Saves the application's configuration settings
         /// </summary>
-        void UpdateConfiguration();
+        Task UpdateConfigurationAsync();
         #endregion
     }
 }

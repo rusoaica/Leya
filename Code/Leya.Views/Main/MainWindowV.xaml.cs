@@ -25,6 +25,11 @@ using Leya.Infrastructure.Enums;
 using Leya.Views.Options;
 using Leya.Models.Common.Models.Media;
 using System.Windows.Media.Animation;
+using Leya.ViewModels.Common.ViewFactory;
+using Leya.ViewModels.Options;
+using Leya.Views.Register;
+using Leya.ViewModels.Register;
+using Leya.Infrastructure.Dialog;
 #endregion
 
 namespace Leya.Views.Main
@@ -37,6 +42,8 @@ namespace Leya.Views.Main
         #region ============================================================== FIELD MEMBERS ================================================================================
         private static string lastUsedPath;
         private const int ABM_GETTASKBARPOS = 5;
+        private readonly IViewFactory viewFactory;
+        private readonly IFolderBrowserService folderBrowserService;
         private string currentLibraryName = string.Empty;
 
         [DllImport("shell32.dll")]
@@ -61,9 +68,11 @@ namespace Leya.Views.Main
         /// <summary>
         /// Default C-tor
         /// </summary>
-        public MainWindowV()
+        public MainWindowV(IViewFactory viewFactory, IFolderBrowserService folderBrowserService)
         {
             InitializeComponent();
+            this.viewFactory = viewFactory;
+            this.folderBrowserService = folderBrowserService;
             //// get the saved last used path in dialogs such as open/save file/folder
             //lastUsedPath = Views.Properties.Settings.Default.LastSelectedFolder;
             //if (string.IsNullOrEmpty(lastUsedPath) || !Directory.Exists(lastUsedPath))
@@ -276,36 +285,10 @@ namespace Leya.Views.Main
 
         #region Navigation
         /// <summary>
-        /// Handles the viewmodel's Navigated event
+        /// ~~~Handles the viewmodel's Navigated event
         /// </summary>
         private void MainWindowV_Navigated()
         {
-            // update the visibility of elements based on the current navigation level
-            switch ((DataContext as MainWindowVM).CurrentNavigationLevel)
-            {
-                case NavigationLevel.None:
-                    (DataContext as MainWindowVM).IsMediaContainerVisible = false;
-                    (DataContext as MainWindowVM).IsOptionsContainerVisible = false;
-                    grdMainMenu.Visibility = Visibility.Visible;
-                    break;
-                case NavigationLevel.TvShow:
-                case NavigationLevel.Movie:
-                case NavigationLevel.Artist:
-                    (DataContext as MainWindowVM).IsMediaContainerVisible = true;
-                    grdMainMenu.Visibility = Visibility.Collapsed;
-                    break;
-                case NavigationLevel.System:
-                case NavigationLevel.Search:
-                case NavigationLevel.Favorite:
-                    (DataContext as MainWindowVM).IsOptionsContainerVisible = true;
-                    (DataContext as MainWindowVM).IsMediaContainerVisible = false;
-                    grdMainMenu.Visibility = Visibility.Collapsed;
-                    break;
-                default:
-                    break;
-            }
-            // display the appropriate media library list, if applicable
-            (DataContext as MainWindowVM).CompleteNavigation();
             // start the fade out animation of the black mask
             DoubleAnimation animation = new DoubleAnimation
             {
@@ -322,7 +305,7 @@ namespace Leya.Views.Main
         }
 
         /// <summary>
-        /// Handles window KeyUp event
+        /// ~~~Handles window KeyUp event
         /// </summary>
         private void Window_KeyUp(object sender, KeyEventArgs e)
         {
@@ -349,7 +332,7 @@ namespace Leya.Views.Main
         }
 
         /// <summary>
-        /// Handles NavigateUp MouseUp event
+        /// ~~~Handles NavigateUp MouseUp event
         /// </summary>
         private void NavigateUp_MouseUp(object sender, MouseButtonEventArgs e)
         {
@@ -370,7 +353,7 @@ namespace Leya.Views.Main
         }
 
         /// <summary>
-        /// Handles the MenuItem's MouseDown event
+        /// ~~~Handles the MenuItem's MouseDown event
         /// </summary>
         private void MenuItem_MouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -397,7 +380,7 @@ namespace Leya.Views.Main
         }
 
         /// <summary>
-        /// Handles MediaItem's MouseDoubleClick event
+        /// ~~~Handles MediaItem's MouseDoubleClick event
         /// </summary>
         private async void MediaItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
@@ -432,6 +415,141 @@ namespace Leya.Views.Main
             }
         }
         #endregion
+
+        #endregion
+
+        /// <summary>
+        /// Handles OptionsMenu MouseUp event
+        /// </summary>
+        private void OptionsMenu_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            grdOptionsMenu.Visibility = Visibility.Collapsed;
+            switch ((sender as Control).Tag.ToString())
+            {
+                case "Media":
+                    //grdMediaOptions.Visibility = Visibility.Visible;
+                    //(DataContext as MainWindowVM).GetMediaTypes();
+                    break;
+                case "Interface":
+                    //navOptions.Source = new Uri(@"pack://application:,,,/Leya;component/Options/OptionsInterfaceV.xaml", UriKind.Absolute);
+                    break;
+                case "Player":
+                    //navOptions.Source = new Uri(@"pack://application:,,,/Leya;component/Options/OptionsPlayerV.xaml", UriKind.Absolute);
+                    break;
+                case "System Info":
+                    //navOptions.Source = new Uri(@"pack://application:,,,/Leya;component/Options/OptionsSystemInfoV.xaml", UriKind.Absolute);
+                    break;
+                case "System":
+                    //navOptions.Source = new Uri(@"pack://application:,,,/Leya;component/Options/OptionsSystemV.xaml", UriKind.Absolute);
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Handles Security MouseUp event
+        /// </summary>
+        private async void Security_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            bool isOpened = false;
+            // iterate all opened windows
+            foreach (object window in Application.Current.Windows)
+            {
+                // check if a Change Password view is already opened
+                if (window is ChangePasswordV)
+                {
+                    // brind the Change Password window to front
+                    ((Window)window).WindowState = WindowState.Normal;
+                    ((Window)window).Activate();
+                    isOpened = true;
+                    break;
+                }
+            }
+            // if no Change Password window is opened, open a new one
+            if (!isOpened)
+                await viewFactory.CreateView<IChangePasswordView>().ShowDialog();
+        }
+
+        #region Options Media
+        /// <summary>
+        /// Handles Media SizeChanged event
+        /// </summary>
+        private void Media_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            ListView listView = sender as ListView;
+            GridView gridView = listView.View as GridView;
+            double workingWidth = listView.ActualWidth - 35;
+            gridView.Columns[0].Width = workingWidth * 0.75;
+            gridView.Columns[1].Width = workingWidth * 0.20;
+            gridView.Columns[2].Width = workingWidth * 0.05;
+        }
+
+        /// <summary>
+        /// Handles SourceMedia SizeChanged event
+        /// </summary>
+        private void SourceMedia_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            ListView listView = sender as ListView;
+            GridView gridView = listView.View as GridView;
+            double workingWidth = listView.ActualWidth - 35;
+            gridView.Columns[0].Width = workingWidth * 0.95;
+            gridView.Columns[1].Width = workingWidth * 0.05;
+        }
+
+        /// <summary>
+        /// Handles MediaType MouseDoubleClick event
+        /// </summary>
+        private void MediaType_MouseDoucleClick(object sender, MouseButtonEventArgs e)
+        {
+            // only display the panel for media type sources if the double click happened on a listview item of media types listview
+            DependencyObject originalSource = (DependencyObject)e.OriginalSource;
+            while ((originalSource != null) && !(originalSource is ListViewItem))
+                originalSource = VisualTreeHelper.GetParent(originalSource);
+            if (originalSource != null)
+                grdBackground.Visibility = Visibility.Visible;
+        }
+
+        /// <summary>
+        /// Handles the Browse button Click event
+        /// </summary>
+        private async void Browse_MouseUp(object sender, RoutedEventArgs e)
+        {
+            // display the open folder dialog
+            if (await folderBrowserService.Show() == NotificationResult.OK)
+            {
+                string filename = folderBrowserService.SelectedDirectories;
+                // invoke the view model's method for adding a new media source
+                if (!string.IsNullOrEmpty(filename))
+                    await (DataContext as MainWindowVM).AddMediaSourceAsync_Command.ExecuteAsync(filename);
+            }
+        }
+
+        /// <summary>
+        /// Handles AddNewMedia button Click event
+        /// </summary>
+        private void AddNewMedia_Click(object sender, RoutedEventArgs e)
+        {
+            grdBackground.Visibility = Visibility.Visible;
+        }
+
+        /// <summary>
+        /// Handles the Cancel button Click event
+        /// </summary>
+        private void CloseAddMedia_Click(object sender, RoutedEventArgs e)
+        {
+            // hide the panel for media type sources
+            grdBackground.Visibility = Visibility.Collapsed;
+            (DataContext as MainWindowVM).IsHelpButtonVisible = false;
+        }
+
+        Task<bool?> IView.ShowDialog()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<TResult> ShowDialog<TResult>()
+        {
+            throw new NotImplementedException();
+        }
         #endregion
     }
 }

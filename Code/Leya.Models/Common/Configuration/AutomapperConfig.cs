@@ -52,8 +52,8 @@ namespace Leya.Models.Common.Configuration
                                .ForMember("Password", opt => opt.MapFrom(src =>  (src as DataAccess.Common.Models.Users.UserEntity).Password.ToSecureString()))
                                .ForMember("SecurityAnswer", opt => opt.MapFrom(src => (src as DataAccess.Common.Models.Users.UserEntity).SecurityAnswer.ToSecureString()));                         
                             cfg.CreateMap(typeof(UserEntity), dataAccessModelType, MemberList.Destination)
-                               .ForMember("Password", opt => opt.MapFrom(src => Uri.EscapeDataString(PasswordHash.Hash(Crypto.Encrypt((src as UserEntity).Password.ConvertSecureStringToString())))))
-                               .ForMember("SecurityAnswer", opt => opt.MapFrom(src => Uri.EscapeDataString(PasswordHash.Hash(Crypto.Encrypt((src as UserEntity).SecurityAnswer.ConvertSecureStringToString()))))); 
+                               .ForMember("Password", opt => opt.MapFrom(src => Uri.EscapeDataString(PasswordHash.Hash(Crypto.Encrypt((src as UserEntity).Password)))))
+                               .ForMember("SecurityAnswer", opt => opt.MapFrom(src => Uri.EscapeDataString(PasswordHash.Hash(Crypto.Encrypt((src as UserEntity).SecurityAnswer))))); 
                         }
                         else
                         {

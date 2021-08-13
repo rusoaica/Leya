@@ -6,6 +6,8 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Controls;
 using Leya.ViewModels.Register;
+using System.Threading.Tasks;
+using Leya.ViewModels.Common.ViewFactory;
 #endregion
 
 namespace Leya.Views.Register
@@ -35,7 +37,7 @@ namespace Leya.Views.Register
             // this doesn't break MVVM patterns, since it's still View binding related code
             if (DataContext != null && (sender as PasswordBox).IsFocused)
             {
-                (DataContext as ChangePasswordVM).OldPassword = ((PasswordBox)sender).SecurePassword;
+                (DataContext as ChangePasswordVM).OldPassword = ((PasswordBox)sender).Password;
                 (DataContext as ChangePasswordVM).ChangePasswordAsync_Command.RaiseCanExecuteChanged();
             }
         }
@@ -49,7 +51,7 @@ namespace Leya.Views.Register
             // this doesn't break MVVM patterns, since it's still View binding related code
             if (DataContext != null && (sender as PasswordBox).IsFocused)
             {
-                (DataContext as ChangePasswordVM).NewPassword = ((PasswordBox)sender).SecurePassword;
+                (DataContext as ChangePasswordVM).NewPassword = ((PasswordBox)sender).Password;
                 (DataContext as ChangePasswordVM).ChangePasswordAsync_Command.RaiseCanExecuteChanged();
             }
         }
@@ -63,7 +65,7 @@ namespace Leya.Views.Register
             // this doesn't break MVVM patterns, since it's still View binding related code
             if (DataContext != null && (sender as PasswordBox).IsFocused)
             {
-                (DataContext as ChangePasswordVM).NewPasswordConfirm = ((PasswordBox)sender).SecurePassword;
+                (DataContext as ChangePasswordVM).NewPasswordConfirm = ((PasswordBox)sender).Password;
                 (DataContext as ChangePasswordVM).ChangePasswordAsync_Command.RaiseCanExecuteChanged();
             }
         }
@@ -93,6 +95,11 @@ namespace Leya.Views.Register
             // allow closing View from ViewModel without breaking MVVM
             (DataContext as ChangePasswordVM).ClosingView += (sender, e) => Close();
             pwdOldPassword.Focus();
+        }
+
+        Task<bool?> IView.ShowDialog()
+        {
+            throw new System.NotImplementedException();
         }
         #endregion
     }

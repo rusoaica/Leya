@@ -2,6 +2,7 @@
 /// Creation Date: 10th of June, 2021
 /// Purpose: Interface for the common functionality of all view models
 #region ========================================================================= USING =====================================================================================
+using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 #endregion

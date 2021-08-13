@@ -38,13 +38,13 @@ namespace Leya.ViewModels.Common.Dialogs.FolderBrowser
             get { return initialFolder; }
             set
             {
-                if (!string.IsNullOrEmpty(value) && !Directory.Exists(value))
-                    throw new InvalidOperationException("Invalid path!");
-                initialFolder = value;
+                if (!string.IsNullOrEmpty(value) && Directory.Exists(value))
+                     initialFolder = value;
             }
         }
         public bool ShowNewFolderButton { get; set; }
-        public NavigationTreeViewVM SingleTree { get; set; }
+        public bool AllowMultiselection { get; set; }
+        public NavigationTreeViewVM NavigationTree { get; set; }
         public List<FileSystemEntity> SelectedItems { get; set; }
         #endregion
 
@@ -52,17 +52,17 @@ namespace Leya.ViewModels.Common.Dialogs.FolderBrowser
         public IAsyncCommand CreateNewFolder_Command { get; set; }
         public IAsyncCommand NavigateUpAsync_Command { get; private set; }
         public IAsyncCommand NavigateBackAsync_Command { get; private set; }
-        public IAsyncCommand ContentRenderedAsync_Command { get; private set; }
+        public IAsyncCommand ViewOpenedAsync_Command { get; private set; }
         public IAsyncCommand NavigateForwardAsync_Command { get; private set; }
         public IAsyncCommand SearchDirectoriesKeyUpAsync_Command { get; private set; }
         public IAsyncCommand SearchDirectoriesDropDownClosingAsync_Command { get; private set; }
         public IAsyncCommand<string> TreeSelectedItemChangedAsync_Command { get; set; }
         public IAsyncCommand<FileSystemEntity> FolderMouseDoubleClickAsync_Command { get; private set; }
         public IAsyncCommand<INavigationTreeViewItem> NavigateToSelectedItemAsync_Command { get; private set; }
-        public SyncCommand SetIsFavoritePath_Command { get; set; }
-        public SyncCommand ShowNewFolderDialog_Command { get; set; }
-        public SyncCommand ConfirmSelection_Command { get; private set; }
-        public SyncCommand DiscardSelection_Command { get; private set; }
+        public IAsyncCommand SetIsFavoritePathAsync_Command { get; set; }
+        public ISyncCommand ShowNewFolderDialog_Command { get; set; }
+        public ISyncCommand ConfirmSelection_Command { get; private set; }
+        public ISyncCommand DiscardSelection_Command { get; private set; }
         #endregion
 
         #region ============================================================ BINDING PROPERTIES ============================================================================= 
@@ -71,15 +71,15 @@ namespace Leya.ViewModels.Common.Dialogs.FolderBrowser
             get { return appConfig.Settings.DialogNavigationFilterSelectedIndex; }
             set 
             { 
-                Notify();
                 // update the navigation treeview 
-                SingleTree.RebuildTree(value, false);
+                NavigationTree.RebuildTree(value, false);
                 // if navigation filter is set to drives, expand the navigation treeview to current path
                 if (value == 0 && SearchDirectoriesSelectedItem != null)
-                    SingleTree.SetInitialPath(SearchDirectoriesSelectedItem.Value.ToString());
+                    NavigationTree.SetInitialPath(SearchDirectoriesSelectedItem.Value.ToString());
                 // update the application's configuration for the selected navigation filter 
                 appConfig.Settings.DialogNavigationFilterSelectedIndex = value;
-                appConfig.UpdateConfiguration();
+                appConfig.UpdateConfigurationAsync();
+                Notify();
             }
         }
 
@@ -102,13 +102,6 @@ namespace Leya.ViewModels.Common.Dialogs.FolderBrowser
         {
             get { return dialogResult; }
             set { dialogResult = value; Notify(); }
-        }
-
-        private bool isPreviewPanelVisible = true;
-        public bool IsPreviewPanelVisible
-        {
-            get { return isPreviewPanelVisible; }
-            set { isPreviewPanelVisible = value; Notify(); }
         }
 
         private bool isFavoritePath;
@@ -160,10 +153,10 @@ namespace Leya.ViewModels.Common.Dialogs.FolderBrowser
             // TODO: fix history navigation when navigating to drives
             NavigateUpAsync_Command = new AsyncCommand(NavigateUpAsync);
             DiscardSelection_Command = new SyncCommand(DiscardSelection);
-            SetIsFavoritePath_Command = new SyncCommand(SetIsFavoritePath);
+            SetIsFavoritePathAsync_Command = new AsyncCommand(SetIsFavoritePathAsync);
             NavigateBackAsync_Command = new AsyncCommand(NavigateBackAsync);
             NavigateForwardAsync_Command = new AsyncCommand(NavigateForwardAsync);
-            ContentRenderedAsync_Command = new AsyncCommand(ContentRenderedAsync);
+            ViewOpenedAsync_Command = new AsyncCommand(ViewOpenedAsync);
             ShowNewFolderDialog_Command = new SyncCommand(()=>{ }, CanShowNewFolderDialog);
             CreateNewFolder_Command = new AsyncCommand(CreateNewFolder, CanCreateNewFolder);
             ConfirmSelection_Command = new SyncCommand(ConfirmSelection, CanConfirmSelection);
@@ -172,7 +165,7 @@ namespace Leya.ViewModels.Common.Dialogs.FolderBrowser
             FolderMouseDoubleClickAsync_Command = new AsyncCommand<FileSystemEntity>(FolderMouseDoubleClickAsync);
             SearchDirectoriesDropDownClosingAsync_Command = new AsyncCommand(SearchDirectoriesDropDownClosingAsync);
             NavigateToSelectedItemAsync_Command = new AsyncCommand<INavigationTreeViewItem>(NavigateToSelectedItemAsync);
-            SingleTree = new NavigationTreeViewVM(appConfig, appConfig.Settings.DialogNavigationFilterSelectedIndex);
+            NavigationTree = new NavigationTreeViewVM(appConfig, appConfig.Settings.DialogNavigationFilterSelectedIndex);
             this.appConfig = appConfig;
             this.dispatcher = dispatcher;
             this.viewFactory = viewFactory;
@@ -202,7 +195,7 @@ namespace Leya.ViewModels.Common.Dialogs.FolderBrowser
         /// <summary>
         /// Adds or removes the current path from the favorite paths
         /// </summary>
-        private void SetIsFavoritePath()
+        private async Task SetIsFavoritePathAsync()
         {
             if (SearchDirectoriesSelectedItem != null && appConfig.Settings.FavoritePaths != null)
             {
@@ -213,10 +206,10 @@ namespace Leya.ViewModels.Common.Dialogs.FolderBrowser
                 else if (!IsFavoritePath && appConfig.Settings.FavoritePaths.Where(e => e == SearchDirectoriesSelectedItem.Value.ToString()).Count() > 0)
                     appConfig.Settings.FavoritePaths.Remove(SearchDirectoriesSelectedItem.Value.ToString());
                 // if favorite paths are displayed, update the user interface navigation list
-                if (RootNr == 1 && SingleTree.RootNr != RootNr)
-                    SingleTree.RebuildTree(RootNr, false);
+                if (RootNr == 1 && NavigationTree.RootNr != RootNr)
+                    NavigationTree.RebuildTree(RootNr, false);
                 // update the application's configuration
-                appConfig.UpdateConfiguration();
+                await appConfig.UpdateConfigurationAsync();
             }
         }
         
@@ -226,8 +219,8 @@ namespace Leya.ViewModels.Common.Dialogs.FolderBrowser
         /// <returns>True if the current path is saved in the favorite paths, False otherwise</returns>
         private bool GetIsFavoritePath()
         {
-            return (SearchDirectoriesSelectedItem != null && appConfig.Settings.FavoritePaths != null &&
-                appConfig.Settings.FavoritePaths.Where(e => e == SearchDirectoriesSelectedItem.Value.ToString()).Count() > 0);
+            return SearchDirectoriesSelectedItem != null && appConfig.Settings.FavoritePaths != null &&
+                appConfig.Settings.FavoritePaths.Where(e => e == SearchDirectoriesSelectedItem.Value.ToString()).Count() > 0;
         }
 
         /// <summary>
@@ -243,11 +236,11 @@ namespace Leya.ViewModels.Common.Dialogs.FolderBrowser
                     NewFolderName);
                 // refresh the directories list for current directory and the navigation treeview
                 await GetFoldersAsync(SearchDirectoriesSelectedItem.Value.ToString());
-                SingleTree.SetInitialPath(SearchDirectoriesSelectedItem.Value.ToString());
+                NavigationTree.SetInitialPath(SearchDirectoriesSelectedItem.Value.ToString());
             }
             catch (Exception ex) when (ex is UnauthorizedAccessException || ex is IOException)
             {
-                notificationService.Show(ex.Message, "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
+                await notificationService.ShowAsync(ex.Message, "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
             }
         }
 
@@ -266,7 +259,7 @@ namespace Leya.ViewModels.Common.Dialogs.FolderBrowser
         /// <returns>True if there is a folder selected, False otherwise</returns>
         public bool CanConfirmSelection()
         {
-            bool isValid = string.IsNullOrEmpty(SelectedDirectories);
+            bool isValid = !string.IsNullOrEmpty(SelectedDirectories);
             if (!isValid)
             {
                 ShowHelpButton();
@@ -390,10 +383,7 @@ namespace Leya.ViewModels.Common.Dialogs.FolderBrowser
             // check if the current path is in the list of favorite paths
             IsFavoritePath = GetIsFavoritePath();
             // recheck if the current path permits adding new folders
-            dispatcher.Dispatch((SendOrPostCallback)delegate
-            {
-                ShowNewFolderDialog_Command.RaiseCanExecuteChanged();
-            }, null); 
+            await dispatcher.Dispatch(() => ShowNewFolderDialog_Command.RaiseCanExecuteChanged(), null); 
         }
 
         /// <summary>
@@ -410,19 +400,19 @@ namespace Leya.ViewModels.Common.Dialogs.FolderBrowser
                 {
                     // get the directories in the provided path
                     foreach (string folder in Directory.EnumerateDirectories(path))
-                        allDirectories.Add(new FileSystemEntity() { Path = folder, DirType = 2 });
+                        allDirectories.Add(new FileSystemEntity() { Path = folder, DirType = 2, IconSource = "folder-empty.png" });
                     // get the search list directories for the current path
                     await GetPathDirectoriesAsync(path);
                 }
                 catch (Exception ex) when (ex is UnauthorizedAccessException || ex is IOException)
                 {
-                    notificationService.Show(ex.Message, "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
+                    await notificationService.ShowAsync(ex.Message, "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
                 }
             });
             SourceDirectories = new ObservableCollection<FileSystemEntity>(allDirectories);
             // update the application's settings last path to the current path
             appConfig.Settings.LastDirectory = path;
-            appConfig.UpdateConfiguration();
+            await appConfig.UpdateConfigurationAsync();
             HideProgressBar();
         }
 
@@ -433,25 +423,22 @@ namespace Leya.ViewModels.Common.Dialogs.FolderBrowser
         {
             ShowProgressBar();
             List<FileSystemEntity> drives = new List<FileSystemEntity>();
-            await Task.Run(() =>
+            await Task.Run(async () =>
             {
                 try
                 {
                     // get the list of drives of the system
                     foreach (DriveInfo folder in DriveInfo.GetDrives())
-                        drives.Add(new FileSystemEntity() { Path = folder.Name, DirType = 1 });
+                        drives.Add(new FileSystemEntity() { Path = folder.Name, DirType = 1, IconSource = "drive.png" });
                 }
                 catch (Exception ex) when (ex is UnauthorizedAccessException || ex is IOException)
                 {
-                    notificationService.Show(ex.Message, "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
+                    await notificationService.ShowAsync(ex.Message, "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
                 }
             });
             SourceDirectories = new ObservableCollection<FileSystemEntity>(drives);
             // recheck if the current path permits adding new folders
-            dispatcher.Dispatch((SendOrPostCallback)delegate
-            {
-                ShowNewFolderDialog_Command.RaiseCanExecuteChanged();
-            }, null);
+            await dispatcher.Dispatch(() => ShowNewFolderDialog_Command.RaiseCanExecuteChanged(), null);
             HideProgressBar();
         }
 
@@ -475,29 +462,31 @@ namespace Leya.ViewModels.Common.Dialogs.FolderBrowser
         /// Shows a new instance of the folder browser dialog
         /// </summary>
         /// <returns>A <see cref="NotificationResult"/> representing the DialogResult of the folder browser dialog</returns>
-        public NotificationResult Show()
+        public async Task<NotificationResult> Show()
         {
             // display the folder browser dialog view
             IFolderBrowserDialogView view = viewFactory.CreateView<IFolderBrowserDialogView, IFolderBrowserDialogVM>(this);
-            view.ShowDialog();
+            await view.ShowDialog();
             return DialogResult == true ? NotificationResult.OK : NotificationResult.None;
         }
         #endregion
 
         #region ============================================================= EVENT HANDLERS ================================================================================
         /// <summary>
-        /// Handles the ContentRendered event of the view
+        /// Handles the Opened event of the view
         /// </summary>
-        private async Task ContentRenderedAsync()
+        private async Task ViewOpenedAsync()
         {
             // get the navigation treeview filters
             SourceNavigationTreeViewFilter = new ObservableCollection<string>(NavigationTreeViewRootItemUtils.ListNavigationTreeViewRootItemsByConvention());
+            RootNr = appConfig.Settings.DialogNavigationFilterSelectedIndex;
+            NavigationTree.RootNr = appConfig.Settings.DialogNavigationFilterSelectedIndex;
             if (!string.IsNullOrEmpty(InitialFolder) && Directory.Exists(InitialFolder))
             {
                 // if an initial path is provided externally, navigate to it
                 await GetFoldersAsync(InitialFolder);
                 // expand the navigation treeview to the current path
-                SingleTree.SetInitialPath(InitialFolder);
+                NavigationTree.SetInitialPath(InitialFolder);
             }
             WindowTitle = "LEYA - Open Folder";
         }
@@ -533,13 +522,16 @@ namespace Leya.ViewModels.Common.Dialogs.FolderBrowser
         /// <param name="path">The path of the newly selected item</param>
         private async Task TreeSelectedItemChangedAsync(string path)
         {
-            // store the current path in the backwards navigation list, before navigating to the new path
-            if (SearchDirectoriesSelectedItem != null)
-                undoStack.Push(SearchDirectoriesSelectedItem.Value.ToString());
-            // clear forward navigation list, it is only relevant when backward navigating
-            redoStack.Clear();
-            // navigate to the new path
-            await GetFoldersAsync(path);
+            if (Directory.Exists(path))
+            { 
+                // store the current path in the backwards navigation list, before navigating to the new path
+                if (SearchDirectoriesSelectedItem != null)
+                    undoStack.Push(SearchDirectoriesSelectedItem.Value.ToString());
+                // clear forward navigation list, it is only relevant when backward navigating
+                redoStack.Clear();
+                // navigate to the new path
+                await GetFoldersAsync(path);
+            }
         }
         #endregion
     }

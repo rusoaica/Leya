@@ -5,6 +5,8 @@
 using System.Windows;
 using Leya.Views.Common.Dialogs.MessageBox;
 using Leya.ViewModels.Common.Dialogs.MessageBox;
+using System.Threading.Tasks;
+using Leya.ViewModels.Common.ViewFactory;
 #endregion
 
 namespace Leya.Views.Common.Dialogs
@@ -31,6 +33,12 @@ namespace Leya.Views.Common.Dialogs
         public MsgBoxV()
         {
             InitializeComponent();
+        }
+
+        public new async Task<bool?> ShowDialog()
+        {
+            await Task.Delay(100);
+            throw new System.NotImplementedException();
         }
         #endregion
     }

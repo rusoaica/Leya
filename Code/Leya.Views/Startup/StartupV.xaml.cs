@@ -41,7 +41,7 @@ namespace Leya.Views.Startup
         {
             // since there is no data binding for PasswordBox, update property value here
             // this doesn't break MVVM patterns, since it's still View binding related code
-            (DataContext as StartupVM).Password = ((PasswordBox)sender).SecurePassword;
+            (DataContext as StartupVM).Password = ((PasswordBox)sender).Password;
         }
 
         /// <summary>

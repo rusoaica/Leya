@@ -1,6 +1,7 @@
 ﻿/// Written by: the Tranxition team
 /// Creation Date: 12th of October, 2008
 /// Purpose: Attached behavior for checking if a TextBlock's text is trimmed or not
+/// Remark: http://web.archive.org/web/20130316081653/http://tranxcoder.wordpress.com/2008/10/12/customizing-lookful-wpf-controls-take-2/
 #region ========================================================================= USING =====================================================================================
 using System;
 using System.Windows;

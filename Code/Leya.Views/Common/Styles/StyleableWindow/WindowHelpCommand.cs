@@ -34,7 +34,7 @@ namespace Leya.Views.Common.Styles.StyleableWindow
         public void Execute(object wnd)
         {
             if (wnd is Window window)
-                (window.DataContext as BaseModel).ShowHelp();
+                (window.DataContext as BaseModel).ShowHelpAsync();
         }
         #endregion
     }

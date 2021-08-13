@@ -14,13 +14,14 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <OutputPath>..\..\Release\Debug\</OutputPath>
+    <OutputPath>..\..\Build\Release\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="Resources\background.jpg" />
     <None Remove="Resources\banner-mask.png" />
     <None Remove="Resources\bg-mask.png" />
+    <None Remove="Resources\database.db" />
     <None Remove="Resources\description-mask.png" />
     <None Remove="Resources\drive.png" />
     <None Remove="Resources\file-info.png" />
@@ -37,6 +38,9 @@
     <Resource Include="Resources\bg-dvd.png" />
     <Resource Include="Resources\bg-mask.png" />
     <Resource Include="Resources\cast.png" />
+    <Resource Include="Resources\database.db">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Resources\description-mask.png" />
     <Resource Include="Resources\drive.png" />
     <Resource Include="Resources\empty_trash.png" />
