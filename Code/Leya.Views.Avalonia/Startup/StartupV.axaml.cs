@@ -7,6 +7,7 @@ using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using System.Threading.Tasks;
 using Leya.ViewModels.Startup;
+using System;
 #endregion
 
 namespace Leya.Views.Startup
@@ -38,6 +39,17 @@ namespace Leya.Views.Startup
         public async Task<bool?> ShowDialog()
         {
             return await ShowDialog<bool?>(Instance);
+        }
+        #endregion
+
+        #region ============================================================= EVENT HANDLERS ================================================================================
+        /// <summary>
+        /// Handles window's Opened event
+        /// </summary>
+        private void Window_Opened(object? sender, EventArgs e)
+        {
+            (DataContext as StartupVM).ShowingView += (s, e) => Show();
+            (DataContext as StartupVM).HidingView += (s, e) => Hide();
         }
         #endregion
     }

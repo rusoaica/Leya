@@ -1,8 +1,10 @@
-﻿
-using System.Threading.Tasks;
-/// Written by: Yulia Danilova
+﻿/// Written by: Yulia Danilova
 /// Creation Date: 10th of June, 2021
 /// Purpose: Base interface for all views
+#region ========================================================================= USING =====================================================================================
+using System.Threading.Tasks;
+#endregion
+
 namespace Leya.ViewModels.Common.ViewFactory
 {
     public interface IView
@@ -13,9 +15,8 @@ namespace Leya.ViewModels.Common.ViewFactory
 
         #region ================================================================= METHODS ===================================================================================
         /// <summary>
-        /// Opens a view and returns without waiting for the newly opened view to close
+        /// Opens a new view and returns without waiting for the newly opened view to close
         /// </summary>
-        /// <returns></returns>
         void Show();
 
         /// <summary>

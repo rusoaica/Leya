@@ -7,14 +7,24 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Leya.Models.Common.Models.Media;
 using Leya.Models.Core.MediaLibrary;
+using Leya.Models.Common.Models.Common;
 #endregion
 
 namespace Leya.Models.Core.Options
 {
     public interface IOptionsMedia
     {
+        #region ============================================================== FIELD MEMBERS ================================================================================
+        event Action<string, string> PropertyChanged;
+        #endregion
+
+        #region ================================================================ PROPERTIES =================================================================================
         int Id { get; set; }
         bool IsMediaTypeSourceUpdate { get; set; }
+        string MediaName { get; set; }
+        SearchEntity SelectedMediaCategoryType { get; set; }
+        List<MediaTypeSourceEntity> SourceMediaCategorySources { get; set; }
+        #endregion
 
         #region ================================================================= METHODS ===================================================================================
         Task DeleteMediaTypeAsync(int id);

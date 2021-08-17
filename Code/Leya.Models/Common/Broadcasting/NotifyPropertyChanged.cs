@@ -21,7 +21,7 @@ namespace Leya.Models.Common.Broadcasting
         /// <param name="propertyName">The property that had the value changed</param>
         public void Notify([CallerMemberName] string propertyName = null)
         {
-            PropertyChanged?.Invoke(propertyName, this.GetType().Name);
+            PropertyChanged?.Invoke(propertyName, GetType().Name);
         }
         #endregion
     }

@@ -71,13 +71,6 @@ namespace Leya.ViewModels.Startup
             }
         }
 
-        private bool isWindowVisible = true;
-        public bool IsWindowVisible
-        {
-            get { return isWindowVisible; }
-            set { isWindowVisible = value; Notify(); }
-        }
-
         public bool AutoLogin
         {
             get { return authentication.AutoLogin; }
@@ -160,9 +153,9 @@ namespace Leya.ViewModels.Startup
                 // authenticate the user
                 await authentication.LoginAsync();
                 // if login was successful, hide this view and display the main view as modal
-                IsWindowVisible = false;
+                HideView();
                 await viewFactory.CreateView<IMainWindowView>().ShowDialog();
-                IsWindowVisible = true;
+                ShowView();
             }
             catch (Exception ex) when (ex is InvalidOperationException || ex is ArgumentException)
             {
@@ -206,9 +199,9 @@ namespace Leya.ViewModels.Startup
         /// </summary>
         private async Task RegisterUsernameAsync()
         {
-            IsWindowVisible = false;
+            HideView();
             await viewFactory.CreateView<IRegisterView>().ShowDialog();
-            IsWindowVisible = true;
+            ShowView();
         }
 
         /// <summary>
@@ -216,9 +209,9 @@ namespace Leya.ViewModels.Startup
         /// </summary>
         private async Task RecoverPasswordAsync()
         {
-            IsWindowVisible = false;
+            HideView();
             await viewFactory.CreateView<IRecoverPasswordView>(Username).ShowDialog();
-            IsWindowVisible = true;
+            ShowView();
         }
 
         /// <summary>
@@ -226,9 +219,9 @@ namespace Leya.ViewModels.Startup
         /// </summary>
         private async Task ChangePasswordAsync()
         {
-            IsWindowVisible = false;
+            HideView();
             await viewFactory.CreateView<IChangePasswordView>(Username).ShowDialog();
-            IsWindowVisible = true;
+            ShowView();
         }
         #endregion
 

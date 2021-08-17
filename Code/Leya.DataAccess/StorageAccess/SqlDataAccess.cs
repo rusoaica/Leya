@@ -87,7 +87,7 @@ namespace Leya.DataAccess.StorageAccess
                     foreach (PropertyInfo f in filters)
                     {
                         query += f.Name + " = @" + f.Name;
-                        args.Add(f.Name, f.GetValue(filter));
+                        args.Add("@" + f.Name, f.GetValue(filter));
                         if (filters.Length > 1 && i < filters.Length - 1)
                         {
                             query += " AND ";
@@ -210,6 +210,7 @@ namespace Leya.DataAccess.StorageAccess
             {
                 // reconstruct the SQL query from the parameters
                 string query = "DELETE FROM " + table + (filter != null ? " WHERE " : string.Empty);
+                Dictionary<string, object> args = null;
                 // if a filter was specified, add the properties and their values from filter as the WHERE clauses of the SQL query
                 if (filter != null)
                 {
@@ -220,13 +221,13 @@ namespace Leya.DataAccess.StorageAccess
                                                   .GetProperties()
                                                   .Where(e => predicate(e))
                                                   .ToArray();
-                    Dictionary<string, object> args = new Dictionary<string, object>();
+                    args = new Dictionary<string, object>();
                     int i = 0;
                     // reconstruct the WHERE clause part of the string from the properties of filter, using named parameters
                     foreach (PropertyInfo f in filters)
                     {
                         query += f.Name + " = @" + f.Name;
-                        args.Add(f.Name, f.GetValue(filter));
+                        args.Add("@" + f.Name, f.GetValue(filter));
                         if (filters.Length > 1 && i < filters.Length - 1)
                         {
                             query += " AND ";
@@ -242,7 +243,7 @@ namespace Leya.DataAccess.StorageAccess
                 //Console.WriteLine(query);
 #endif
                 // execute the SQL query and construct the API response with the number of rows affected
-                serializedData.Count = await dbConnection.ExecuteAsync(query, filter ?? null);
+                serializedData.Count = await dbConnection.ExecuteAsync(query, args ?? null);
             }
             catch (Exception ex)
             {

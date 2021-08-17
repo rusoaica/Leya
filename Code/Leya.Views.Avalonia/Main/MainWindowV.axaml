@@ -3,12 +3,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
-        xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
-        xmlns:iac="clr-namespace:Avalonia.Xaml.Interactions.Custom;assembly=Avalonia.Xaml.Interactions.Custom"
+        xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"        
+        xmlns:iac="using:Avalonia.Xaml.Interactions.Custom"
         xmlns:controls="clr-namespace:Leya.Views.Common.Controls;assembly=Leya.ViewsAvalonia"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Leya.Views.Main.MainWindowV"
-        Title="MainWindowV" Classes="styledWindow" HasSystemDecorations="False" Opened="Window_Opened" KeyUp="Window_KeyUp">
+        Title="MainWindowV" Classes="styledWindow" HasSystemDecorations="False" Opened="Window_Opened" KeyUp="Window_KeyUp" Width="1000" Height="800" MinWidth="1024" MinHeight="768">
   <Window.Resources>
     <!--<converters:NullImageConverter x:Key="NullImageConverter"/>-->    
   </Window.Resources>
@@ -17,7 +17,7 @@
       <ia:InvokeCommandAction Command="{Binding ViewOpenedAsync_Command}"/>
     </ia:EventTriggerBehavior>
   </i:Interaction.Behaviors>
-  <Grid Background="Black">
+  <Grid Background="#222">
     <Image Source="avares://Leya.ViewsAvalonia/Assets/background.jpg" IsVisible="False" Margin="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="NaN" Height="NaN" Stretch="UniformToFill"/>
     <Grid Margin="0,0,0,60" Height="190" VerticalAlignment="Bottom" x:Name="grdMainMenu" IsVisible="{Binding IsMainMenuVisible}">
       <Grid.RowDefinitions>
@@ -505,14 +505,9 @@
       </Grid>
     </Grid>
 
-    <controls:Marquee x:Name="scannerOutput" SetText="{Binding DataContext.ScannerOutput, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" IsVisible="{Binding DataContext.IsScannerTextVisible, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Foreground="{DynamicResource ScannerTextForeground}" FontSize="40" Height="68" VerticalAlignment="Top" Margin="10,243,10,0">
-      <!--<controls:Marquee.Effect>
-        <DropShadowEffect BlurRadius="20" Color="#000" Direction="300" Opacity="1" RenderingBias="Quality" ShadowDepth="30" />
-      </controls:Marquee.Effect>-->
-    </controls:Marquee>
+    <controls:Marquee x:Name="scannerOutput" SetText="{Binding DataContext.ScannerOutput, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" IsVisible="{Binding DataContext.IsScannerTextVisible, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Foreground="{DynamicResource ScannerTextForeground}" FontSize="40" Height="68" VerticalAlignment="Top" Margin="10,243,10,0"/>
+    <Grid x:Name="grdMaskBackground" Background="{DynamicResource ModalGridBackground}" IsVisible="{Binding IsMaskBackgroundVisible}" Opacity="0.6"/>
     <Grid x:Name="grdViewOptions" Margin="150,100,150,100" IsVisible="{Binding IsOptionsContainerVisible}" Opacity="0.9">
-      <!--<Frame x:Name="frmOptions" Content="{Binding OptionsFrame}" NavigationUIVisibility="Hidden"/>-->
-      <Grid Margin="30" x:Name="grdOptionsMenu" Background="Transparent">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="25*"/>
           <ColumnDefinition Width="25*"/>
@@ -523,112 +518,63 @@
           <RowDefinition Height="50*"/>
           <RowDefinition Height="50*"/>
         </Grid.RowDefinitions>
-        <Grid.Resources>
-          <!--<Style TargetType="{x:Type Label}">
-            <Setter Property="RenderTransform">
-              <Setter.Value>
-                <ScaleTransform x:Name="transform"/>
-              </Setter.Value>
-            </Setter>
-            --><!--<Style.Triggers>
-              <EventTrigger RoutedEvent="UIElement.MouseEnter">
-                <BeginStoryboard x:Name="zoomIn">
-                  <Storyboard>
-                    <DoubleAnimation Storyboard.TargetProperty="FontSize" To="40" Duration="00:00:00.05"/>
-                  </Storyboard>
-                </BeginStoryboard>
-              </EventTrigger>
-              <EventTrigger RoutedEvent="UIElement.MouseLeave">
-                <BeginStoryboard x:Name="zoomOut">
-                  <Storyboard>
-                    <DoubleAnimation Storyboard.TargetProperty="FontSize" To="20" Duration="00:00:00.05"/>
-                  </Storyboard>
-                </BeginStoryboard>
-              </EventTrigger>
-            </Style.Triggers>--><!--
-          </Style>-->
-        </Grid.Resources>
-        <Border Opacity="1" Margin="0" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="4" Grid.RowSpan="2"/>
-        <Label Content="Media" ToolTip.Tip="Manage media sources" Cursor="Hand" Tag="Media" Grid.Row="0" Grid.Column="0" Foreground="{DynamicResource textForeground}" FontSize="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Height="50" VerticalAlignment="Bottom">
-          <!--<i:Interaction.Triggers>
-            <i:EventTrigger EventName="MouseUp">
-              <i:InvokeCommandAction Command="{Binding ShowMediaOptions_Command}"/>
-            </i:EventTrigger>
-          </i:Interaction.Triggers>-->
+        <Grid Margin="11,11,11,11" Grid.ColumnSpan="4" Grid.RowSpan="2">
+          <Path Data="M 1,0 0.5,0 Q 0,0 0,0.5 L 0,1" Fill="Transparent" HorizontalAlignment="Left" Height="6" Margin="-5" Stretch="Fill" Stroke="{DynamicResource BorderLit}" StrokeThickness="4" VerticalAlignment="Top" Width="6"/>
+          <Path Data="M 0,1 0.5,1 Q 1,1 1,0.5 L 1,0" Fill="Transparent" HorizontalAlignment="Right" Height="6" Margin="-5" Stretch="Fill" Stroke="{DynamicResource BorderUnlit}" StrokeThickness="4" VerticalAlignment="Bottom" Width="6"/>
+          <Path Data="M 0,0 0.5,0 Q 1,0 1,0.5 L 1,1" Fill="Transparent" HorizontalAlignment="Right" Height="6" Margin="-5" Stretch="Fill" Stroke="{DynamicResource AngleShadow}" StrokeThickness="4" VerticalAlignment="Top" Width="6"/>
+          <Path Data="M 0,0 0,0.5 Q 0,1 0.5,1 L 1,1" Fill="Transparent" HorizontalAlignment="Left" Height="6" Margin="-5" Stretch="Fill" Stroke="{DynamicResource AngleShadow}" StrokeThickness="4" VerticalAlignment="Bottom" Width="6"/>
+          <Line StartPoint="0,0" EndPoint="1,0" Stroke="{DynamicResource BorderLit}" Stretch="Fill" Margin="0,-5" StrokeThickness="4" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+          <Line StartPoint="0,1" EndPoint="1,1" Stroke="{DynamicResource BorderUnlit}" Stretch="Fill" Margin="0,5,0,-5" StrokeThickness="4" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+          <Line StartPoint="0,0" EndPoint="0,1" Stroke="{DynamicResource BorderLit}" Stretch="Fill" Margin="-5,-1" StrokeThickness="4" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+          <Line StartPoint="1,0" EndPoint="1,1" Stroke="{DynamicResource BorderUnlit}" Stretch="Fill" Margin="5,-1,-5,-1" StrokeThickness="4" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+          <Line StartPoint="0,0" EndPoint="1,0" Stroke="{DynamicResource UpperHighlight}" Stretch="Fill" Margin="1,-5" StrokeThickness="4" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+        </Grid>
+        <Border Margin="0" Grid.ColumnSpan="4" Grid.RowSpan="2" Classes="contentBorder" BoxShadow="50 50 50 25 #CC000000"/>
+        <Label Content="Media" Classes="zoomTransformLabel" ToolTip.Tip="Manage media sources" Cursor="Hand" Tag="Media" Grid.Row="0" Grid.Column="0" Foreground="{DynamicResource textForeground}" FontSize="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Height="50" VerticalAlignment="Center">
+          <i:Interaction.Behaviors>
+            <ia:EventTriggerBehavior EventName="PointerReleased">
+              <ia:InvokeCommandAction Command="{Binding ShowMediaOptions_Command}"/>
+            </ia:EventTriggerBehavior>
+          </i:Interaction.Behaviors>
         </Label>
-        <Label Content="Interface" ToolTip.Tip="Change the visual aspect of the application" Cursor="Hand" Tag="Interface" Grid.Row="0" Grid.Column="1" Foreground="{DynamicResource textForeground}" FontSize="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Height="50" VerticalAlignment="Bottom"/>
-        <Label Content="System" Cursor="Hand" Tag="System" Grid.Row="0" Grid.Column="2" Foreground="{DynamicResource textForeground}" FontSize="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Height="50" VerticalAlignment="Bottom"/>
-        <Label Content="Player" ToolTip.Tip="Display the options for the video player" Cursor="Hand" Tag="Player" Grid.Row="0" Grid.Column="3" Foreground="{DynamicResource textForeground}" FontSize="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Height="50" VerticalAlignment="Bottom"/>
+        <Label Content="Interface" Classes="zoomTransformLabel" ToolTip.Tip="Change the visual aspect of the application" Cursor="Hand" Tag="Interface" Grid.Row="0" Grid.Column="1" Foreground="{DynamicResource textForeground}" FontSize="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Height="50" VerticalAlignment="Center"/>
+        <Label Content="System" Classes="zoomTransformLabel" Cursor="Hand" Tag="System" Grid.Row="0" Grid.Column="2" Foreground="{DynamicResource textForeground}" FontSize="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Height="50" VerticalAlignment="Center"/>
+        <Label Content="Player" Classes="zoomTransformLabel" ToolTip.Tip="Display the options for the video player" Cursor="Hand" Tag="Player" Grid.Row="0" Grid.Column="3" Foreground="{DynamicResource textForeground}" FontSize="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Height="50" VerticalAlignment="Center"/>
 
-        <Label Content="Security" ToolTip.Tip="Change your password" Cursor="Hand" Grid.Row="1" Grid.Column="0" Foreground="{DynamicResource textForeground}" FontSize="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Height="50" VerticalAlignment="Bottom"/>
-        <Label Content="System Info" ToolTip.Tip="Display hardware and software information about the current system" Cursor="Hand" Tag="System Info" Grid.Row="1" Grid.Column="1" Foreground="{DynamicResource textForeground}" FontSize="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Height="50" VerticalAlignment="Bottom"/>
-        <Label Content="Logging" ToolTip.Tip="Open logs directory" Cursor="Hand" Tag="Logging" Grid.Row="1" Grid.Column="2" Foreground="{DynamicResource textForeground}" FontSize="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Height="50" VerticalAlignment="Bottom">
+        <Label Content="Security" Classes="zoomTransformLabel" ToolTip.Tip="Change your password" Cursor="Hand" Grid.Row="1" Grid.Column="0" Foreground="{DynamicResource textForeground}" FontSize="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Height="50" VerticalAlignment="Center"/>
+        <Label Content="System Info" Classes="zoomTransformLabel" ToolTip.Tip="Display hardware and software information about the current system" Cursor="Hand" Tag="System Info" Grid.Row="1" Grid.Column="1" Foreground="{DynamicResource textForeground}" FontSize="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Height="50" VerticalAlignment="Center"/>
+        <Label Content="Logging" Classes="zoomTransformLabel" ToolTip.Tip="Open logs directory" Cursor="Hand" Tag="Logging" Grid.Row="1" Grid.Column="2" Foreground="{DynamicResource textForeground}" FontSize="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Height="50" VerticalAlignment="Center">
           <!--<i:Interaction.Triggers>
             <i:EventTrigger EventName="MouseUp">
               <i:InvokeCommandAction Command="{Binding OpenLoggingDirectory_Command}"/>
             </i:EventTrigger>
           </i:Interaction.Triggers>-->
         </Label>
-        <Label Content="Help" ToolTip.Tip="Display application's help" Cursor="Hand" Tag="Help" Grid.Row="1" Grid.Column="3" Foreground="{DynamicResource textForeground}" FontSize="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Height="50" VerticalAlignment="Bottom"/>
+        <Label Content="Help" Classes="zoomTransformLabel" ToolTip.Tip="Display application's help" Cursor="Hand" Tag="Help" Grid.Row="1" Grid.Column="3" Foreground="{DynamicResource textForeground}" FontSize="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Height="50" VerticalAlignment="Center"/>
+    </Grid>  
+    <Grid x:Name="grdMediaTypesOptions" IsVisible="{Binding IsMediaTypesOptionVisible}" Margin="150,100,150,100" Opacity="0.9">
+      <Grid Margin="11,11,11,11">
+        <Path Data="M 1,0 0.5,0 Q 0,0 0,0.5 L 0,1" Fill="Transparent" HorizontalAlignment="Left" Height="6" Margin="-5" Stretch="Fill" Stroke="{DynamicResource BorderLit}" StrokeThickness="4" VerticalAlignment="Top" Width="6"/>
+        <Path Data="M 0,1 0.5,1 Q 1,1 1,0.5 L 1,0" Fill="Transparent" HorizontalAlignment="Right" Height="6" Margin="-5" Stretch="Fill" Stroke="{DynamicResource BorderUnlit}" StrokeThickness="4" VerticalAlignment="Bottom" Width="6"/>
+        <Path Data="M 0,0 0.5,0 Q 1,0 1,0.5 L 1,1" Fill="Transparent" HorizontalAlignment="Right" Height="6" Margin="-5" Stretch="Fill" Stroke="{DynamicResource AngleShadow}" StrokeThickness="4" VerticalAlignment="Top" Width="6"/>
+        <Path Data="M 0,0 0,0.5 Q 0,1 0.5,1 L 1,1" Fill="Transparent" HorizontalAlignment="Left" Height="6" Margin="-5" Stretch="Fill" Stroke="{DynamicResource AngleShadow}" StrokeThickness="4" VerticalAlignment="Bottom" Width="6"/>
+        <Line StartPoint="0,0" EndPoint="1,0" Stroke="{DynamicResource BorderLit}" Stretch="Fill" Margin="0,-5" StrokeThickness="4" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+        <Line StartPoint="0,1" EndPoint="1,1" Stroke="{DynamicResource BorderUnlit}" Stretch="Fill" Margin="0,5,0,-5" StrokeThickness="4" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+        <Line StartPoint="0,0" EndPoint="0,1" Stroke="{DynamicResource BorderLit}" Stretch="Fill" Margin="-5,-1" StrokeThickness="4" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <Line StartPoint="1,0" EndPoint="1,1" Stroke="{DynamicResource BorderUnlit}" Stretch="Fill" Margin="5,-1,-5,-1" StrokeThickness="4" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+        <Line StartPoint="0,0" EndPoint="1,0" Stroke="{DynamicResource UpperHighlight}" Stretch="Fill" Margin="1,-5" StrokeThickness="4" HorizontalAlignment="Center" VerticalAlignment="Top"/>
       </Grid>
-
-    </Grid>
-    <Grid x:Name="grdMediaOptions" IsVisible="{Binding IsMediaOptionVisible}">
-      <Button Command="{Binding ResetAddMediaSourceElements_Command}" IsDefault="True" Content="Add new media" Margin="0,0,10,10" BorderThickness="0" Height="22" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="105"/>
-      <ListBox Items="{Binding SourceMediaCategories}" Foreground="Black" Margin="9,10,10,42" Grid.Column="0" BorderThickness="0">
+      <Border Margin="0" Classes="contentBorder"/>
+      <TextBlock Text="Edit media types" Foreground="{DynamicResource WindowForeColor}" TextAlignment="Center" FontWeight="Bold" Height="19" VerticalAlignment="Top" Margin="10,10,10,0"/>
+      <ListBox Items="{Binding SourceMediaCategories}" Background="{DynamicResource contentBackground}" Classes="ListBox" VirtualizationMode="Simple" Foreground="Black" Margin="20,30,20,50" BorderThickness="0">
+        <i:Interaction.Behaviors>
+          <iac:NthChildBehavior />
+        </i:Interaction.Behaviors>
         <ListBox.ItemsPanel>
           <ItemsPanelTemplate>
             <VirtualizingStackPanel/>
           </ItemsPanelTemplate>
         </ListBox.ItemsPanel>
-        <!--<i:Interaction.Behaviors>
-          <sort:SortingBehavior />
-        </i:Interaction.Behaviors>-->
-        <!--<ListBox.View>
-          <GridView>
-            <GridViewColumn Header="Media Name" Width="110">
-              <GridViewColumn.CellTemplate>
-                <DataTemplate>
-                  <Label Content="{Binding MediaName}" Foreground="{DynamicResource ListTextHighlighted}" FontSize="20" Cursor="Hand" Background="Transparent" BorderThickness="0" Margin="-6,0" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" MouseDoubleClick="MediaType_MouseDoucleClick">
-                    <Label.InputBindings>
-                      <MouseBinding Gesture="LeftDoubleClick" Command="{Binding DataContext.GetMediaTypeSources_Command, RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}}" CommandParameter="{Binding Content, RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}, Mode=FindAncestor}}"/>
-                    </Label.InputBindings>
-                  </Label>
-                </DataTemplate>
-              </GridViewColumn.CellTemplate>
-            </GridViewColumn>
-            <GridViewColumn Header="Media Type" Width="110">
-              <GridViewColumn.CellTemplate>
-                <DataTemplate>
-                  <Label Content="{Binding MediaType}" Foreground="{DynamicResource ListTextNormal}" FontWeight="Bold" FontSize="20" Cursor="Hand" Background="Transparent" BorderThickness="0" Margin="-6,0" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch">
-                    <Label.InputBindings>
-                      <MouseBinding Gesture="LeftDoubleClick" Command="{Binding DataContext.GetMediaTypeSources_Command, RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}}" CommandParameter="{Binding Content, RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}, Mode=FindAncestor}}"/>
-                    </Label.InputBindings>
-                  </Label>
-                </DataTemplate>
-              </GridViewColumn.CellTemplate>
-            </GridViewColumn>
-            <GridViewColumn>
-              <GridViewColumn.CellTemplate>
-                <DataTemplate>
-                  <DockPanel Background="#00000000" LastChildFill="True" Margin="0">
-                    <Image Source="/Resources/empty_trash.png" Height="20" Width="25" Margin="0" Stretch="Fill" Cursor="Hand" Opacity="0.4">
-                      <Image.Effect>
-                        <DropShadowEffect BlurRadius="1" ShadowDepth="0" Color="{DynamicResource IconsShadowColor}" Direction="300" RenderingBias="Quality"/>
-                      </Image.Effect>
-                      <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="MouseUp">
-                          <i:InvokeCommandAction Command="{Binding DataContext.DeleteMediaTypeAsync_Command, RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}}" CommandParameter="{Binding Content, RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}, Mode=FindAncestor}}"/>
-                        </i:EventTrigger>
-                      </i:Interaction.Triggers>
-                    </Image>
-                  </DockPanel>
-                </DataTemplate>
-              </GridViewColumn.CellTemplate>
-            </GridViewColumn>
-          </GridView>
-        </ListBox.View>-->
-
         <ListBox.ItemTemplate>
           <DataTemplate>
             <Grid Margin="0,2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
@@ -637,117 +583,91 @@
                 <ColumnDefinition Width="150" />
                 <ColumnDefinition Width="50" />
               </Grid.ColumnDefinitions>
-              <Label Content="{Binding MediaName}" Foreground="{DynamicResource ListTextHighlighted}" FontSize="20" Cursor="Hand" Background="Transparent" BorderThickness="0" Margin="-6,0" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" Grid.Column="0">
-                <!--<Label.InputBindings>
-                  <MouseBinding Gesture="LeftDoubleClick" Command="{Binding DataContext.GetMediaTypeSources_Command, RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}}" CommandParameter="{Binding Content, RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}, Mode=FindAncestor}}"/>
-                </Label.InputBindings>-->
+              <Label Content="{Binding MediaName}" Foreground="{DynamicResource ListTextHighlighted}" FontSize="20" Cursor="Hand" Background="Transparent" BorderThickness="0" Margin="6,0" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" Grid.Column="0">
+                <i:Interaction.Behaviors>
+                  <ia:EventTriggerBehavior EventName="DoubleTapped">
+                    <ia:InvokeCommandAction Command="{Binding DataContext.GetMediaTypeSources_Command, RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}}" CommandParameter="{Binding Content, RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}, Mode=FindAncestor}}"/>
+                  </ia:EventTriggerBehavior>
+                </i:Interaction.Behaviors>
               </Label>
               <Label Content="{Binding MediaType}" Foreground="{DynamicResource ListTextNormal}" FontWeight="Bold" FontSize="20" Cursor="Hand" Background="Transparent" BorderThickness="0" Margin="-6,0" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" Grid.Column="1">
-                <!--<Label.InputBindings>
-                  <MouseBinding Gesture="LeftDoubleClick" Command="{Binding DataContext.GetMediaTypeSources_Command, RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}}" CommandParameter="{Binding Content, RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}, Mode=FindAncestor}}"/>
-                </Label.InputBindings>-->
+                <i:Interaction.Behaviors>
+                  <ia:EventTriggerBehavior EventName="DoubleTapped">
+                    <ia:InvokeCommandAction Command="{Binding DataContext.GetMediaTypeSources_Command, RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}}" CommandParameter="{Binding Content, RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}, Mode=FindAncestor}}"/>
+                  </ia:EventTriggerBehavior>
+                </i:Interaction.Behaviors>
               </Label>
               <DockPanel Background="#00000000" LastChildFill="True" Margin="0" Grid.Column="2">
-                <Image Source="/Resources/empty_trash.png" Height="20" Width="25" Margin="0" Stretch="Fill" Cursor="Hand" Opacity="0.4">
-                  <!--<Image.Effect>
-                    <DropShadowEffect BlurRadius="1" ShadowDepth="0" Color="{DynamicResource IconsShadowColor}" Direction="300" RenderingBias="Quality"/>
-                  </Image.Effect>-->
-                  <!--<i:Interaction.Triggers>
-                    <i:EventTrigger EventName="MouseUp">
-                      <i:InvokeCommandAction Command="{Binding DataContext.DeleteMediaTypeAsync_Command, RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}}" CommandParameter="{Binding Content, RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}, Mode=FindAncestor}}"/>
-                    </i:EventTrigger>
-                  </i:Interaction.Triggers>-->
+                <Image Source="avares://Leya.ViewsAvalonia/Assets/empty_trash.png" Height="20" Width="25" Margin="0" Stretch="Fill" Cursor="Hand" Opacity="0.4">
+                  <i:Interaction.Behaviors>
+                    <ia:EventTriggerBehavior EventName="PointerReleased">
+                      <ia:InvokeCommandAction Command="{Binding DataContext.DeleteMediaTypeAsync_Command, RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}}" CommandParameter="{Binding Content, RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}, Mode=FindAncestor}}"/>
+                    </ia:EventTriggerBehavior>
+                  </i:Interaction.Behaviors>
                 </Image>
               </DockPanel>
             </Grid>
           </DataTemplate>
         </ListBox.ItemTemplate>
       </ListBox>
-
-      <Grid Background="DodgerBlue" Margin="139,84,144,78" x:Name="grdBackground" IsVisible="False">
-        <Grid x:Name="grdMediaSources" Background="{DynamicResource containerBackground}" Margin="1">
-          <ListBox Items="{Binding SourceMediaCategorySources}" Foreground="Black" Margin="9,30,10,74" Grid.Column="0" BorderThickness="0">
-            <ListBox.ItemsPanel>
-              <ItemsPanelTemplate>
-                <VirtualizingStackPanel/>
-              </ItemsPanelTemplate>
-            </ListBox.ItemsPanel>
-            <!--<i:Interaction.Behaviors>
-              <sort:SortingBehavior />
-            </i:Interaction.Behaviors>-->
-            <!--<ListBox.View>
-              <GridView>
-                <GridViewColumn Header="Path" Width="460">
-                  <GridViewColumn.CellTemplate>
-                    <DataTemplate>
-                      <TextBox Text="{Binding MediaSourcePath}" Foreground="#74BCFF" Cursor="IBeam" FontStyle="Italic" FontSize="16" Background="Transparent" IsReadOnly="True" BorderThickness="0" Margin="-6,0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" TextAlignment="Left">
-                        --><!--<TextBox.InputBindings>
-                          <MouseBinding Gesture="LeftDoubleClick" Command="{Binding DataContext.OpenMediaSourceLocation_Command, RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}}" CommandParameter="{Binding Content, RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}, Mode=FindAncestor}}"/>
-                        </TextBox.InputBindings>--><!--
-                      </TextBox>
-                    </DataTemplate>
-                  </GridViewColumn.CellTemplate>
-                </GridViewColumn>
-                <GridViewColumn Width="30">
-                  <GridViewColumn.CellTemplate>
-                    <DataTemplate>
-                      <DockPanel Background="#00000000" LastChildFill="True" Margin="0">
-                        <Image Source="/Resources/empty_trash.png" Height="20" Width="25" Margin="0" Stretch="Fill" Cursor="Hand" Opacity="0.4">
-                          --><!--<Image.Effect>
-                            <DropShadowEffect BlurRadius="1" ShadowDepth="0" Color="{DynamicResource IconsShadowColor}" Direction="300" RenderingBias="Quality"/>
-                          </Image.Effect>--><!--
-                          --><!--<i:Interaction.Triggers>
-                            <i:EventTrigger EventName="MouseUp">
-                              <i:InvokeCommandAction Command="{Binding DataContext.DeleteMediaSource_Command, RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}}" CommandParameter="{Binding Content, RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}, Mode=FindAncestor}}"/>
-                            </i:EventTrigger>
-                          </i:Interaction.Triggers>--><!--
-                        </Image>
-                      </DockPanel>
-                    </DataTemplate>
-                  </GridViewColumn.CellTemplate>
-                </GridViewColumn>
-              </GridView>
-            </ListBox.View>-->
-
-            <ListBox.ItemTemplate>
-              <DataTemplate>
-                <Grid Margin="0,2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                  <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="150" />
-                  </Grid.ColumnDefinitions>
-                  <TextBox Text="{Binding MediaSourcePath}" Foreground="#74BCFF" Cursor="IBeam" FontStyle="Italic" FontSize="16" Background="Transparent" IsReadOnly="True" BorderThickness="0" Margin="-6,0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" TextAlignment="Left" Grid.Column="0"/>
-                  <DockPanel Background="#00000000" LastChildFill="True" Margin="0" Grid.Column="1">
-                    <Image Source="/Resources/empty_trash.png" Height="20" Width="25" Margin="0" Stretch="Fill" Cursor="Hand" Opacity="0.4">
-                      <!--<Image.Effect>
-                            <DropShadowEffect BlurRadius="1" ShadowDepth="0" Color="{DynamicResource IconsShadowColor}" Direction="300" RenderingBias="Quality"/>
-                          </Image.Effect>-->
-                      <!--<i:Interaction.Triggers>
-                            <i:EventTrigger EventName="MouseUp">
-                              <i:InvokeCommandAction Command="{Binding DataContext.DeleteMediaSource_Command, RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}}" CommandParameter="{Binding Content, RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}, Mode=FindAncestor}}"/>
-                            </i:EventTrigger>
-                          </i:Interaction.Triggers>-->
-                    </Image>
-                  </DockPanel> 
-                    
-                </Grid>
-              </DataTemplate>
-            </ListBox.ItemTemplate>
-
-          </ListBox>
-          <TextBlock Text="Edit media sources" Foreground="{DynamicResource WindowForeColor}" TextAlignment="Center" FontWeight="Bold" Height="19" VerticalAlignment="Top" Margin="10,6,10,0"/>
-          <TextBlock Text="Media source name:" Foreground="{DynamicResource textForeground}" HorizontalAlignment="Left" Width="110" Height="17" VerticalAlignment="Bottom" Margin="10,0,0,50"/>
-          <TextBox Text="{Binding MediaName}" Height="23" VerticalAlignment="Bottom" Margin="120,0,239,46"/>
-          <TextBlock Text="Media source type:" Foreground="{DynamicResource textForeground}" HorizontalAlignment="Right" Width="104" Height="17" VerticalAlignment="Bottom" Margin="0,0,130,50"/>
-          <ComboBox Items="{Binding SourceMediaCategoryTypes}" SelectedItem="{Binding SelectedMediaCategoryType}" Margin="0,0,10,46" Height="23" VerticalAlignment="Bottom" FontSize="14" IsTextSearchEnabled="False" HorizontalAlignment="Right" Width="120"/>
-          <Button Content="Browse" HorizontalAlignment="Left" Margin="10,0,0,9" Height="22" VerticalAlignment="Bottom" Width="105"/>
-          <Button Content="Confirm" Command="{Binding RefreshMediaSourcesAsync_Command}" HorizontalAlignment="Right" Margin="0,0,10,10" Height="22" VerticalAlignment="Bottom" Width="105"/>
-          <Button Content="Cancel" Focusable="False" Margin="0,0,120,9" Height="22" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="105"/>
-        </Grid>
+      <Button Command="{Binding ResetAddMediaSourceElements_Command}" Classes="confirmButton" IsDefault="True" Content="Add new media" Margin="20,0,20,15" FontSize="12" BorderThickness="0" Height="22" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="105"/>
+      <Button Command="{Binding ExitMediaTypesOptions_Command}" Classes="abortButton" IsDefault="True" Content="Back" Margin="20,0,20,15" FontSize="12" BorderThickness="0" Height="22" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="105"/>
+    </Grid>
+    <Grid x:Name="grdMediaTypeSourcesOptions" IsVisible="{Binding IsMediaTypeSourcesOptionVisible}" Margin="150,100,150,100" Opacity="0.9">
+      <Grid Margin="11,11,11,11">
+        <Path Data="M 1,0 0.5,0 Q 0,0 0,0.5 L 0,1" Fill="Transparent" HorizontalAlignment="Left" Height="6" Margin="-5" Stretch="Fill" Stroke="{DynamicResource BorderLit}" StrokeThickness="4" VerticalAlignment="Top" Width="6"/>
+        <Path Data="M 0,1 0.5,1 Q 1,1 1,0.5 L 1,0" Fill="Transparent" HorizontalAlignment="Right" Height="6" Margin="-5" Stretch="Fill" Stroke="{DynamicResource BorderUnlit}" StrokeThickness="4" VerticalAlignment="Bottom" Width="6"/>
+        <Path Data="M 0,0 0.5,0 Q 1,0 1,0.5 L 1,1" Fill="Transparent" HorizontalAlignment="Right" Height="6" Margin="-5" Stretch="Fill" Stroke="{DynamicResource AngleShadow}" StrokeThickness="4" VerticalAlignment="Top" Width="6"/>
+        <Path Data="M 0,0 0,0.5 Q 0,1 0.5,1 L 1,1" Fill="Transparent" HorizontalAlignment="Left" Height="6" Margin="-5" Stretch="Fill" Stroke="{DynamicResource AngleShadow}" StrokeThickness="4" VerticalAlignment="Bottom" Width="6"/>
+        <Line StartPoint="0,0" EndPoint="1,0" Stroke="{DynamicResource BorderLit}" Stretch="Fill" Margin="0,-5" StrokeThickness="4" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+        <Line StartPoint="0,1" EndPoint="1,1" Stroke="{DynamicResource BorderUnlit}" Stretch="Fill" Margin="0,5,0,-5" StrokeThickness="4" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+        <Line StartPoint="0,0" EndPoint="0,1" Stroke="{DynamicResource BorderLit}" Stretch="Fill" Margin="-5,-1" StrokeThickness="4" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <Line StartPoint="1,0" EndPoint="1,1" Stroke="{DynamicResource BorderUnlit}" Stretch="Fill" Margin="5,-1,-5,-1" StrokeThickness="4" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+        <Line StartPoint="0,0" EndPoint="1,0" Stroke="{DynamicResource UpperHighlight}" Stretch="Fill" Margin="1,-5" StrokeThickness="4" HorizontalAlignment="Center" VerticalAlignment="Top"/>
       </Grid>
+      <Border Margin="0" Classes="contentBorder"/>
+      <ListBox Items="{Binding SourceMediaCategorySources}" Background="{DynamicResource contentBackground}" Classes="ListBox" VirtualizationMode="Simple" Margin="20,30,20,74" Grid.Column="0" BorderThickness="0">
+          <i:Interaction.Behaviors>
+            <iac:NthChildBehavior />
+          </i:Interaction.Behaviors>
+          <ListBox.ItemsPanel>
+            <ItemsPanelTemplate>
+              <VirtualizingStackPanel/>
+            </ItemsPanelTemplate>
+          </ListBox.ItemsPanel>
+          <ListBox.ItemTemplate>
+            <DataTemplate>
+              <Grid Margin="0,2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*" />
+                  <ColumnDefinition Width="50" />
+                </Grid.ColumnDefinitions>
+                <Label Content="{Binding MediaSourcePath}" Foreground="{DynamicResource ListTextNormal}" FontStyle="Italic" FontSize="14" Cursor="Hand" Background="Transparent" BorderThickness="0" Margin="6,0" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" Grid.Column="0"/>
+                <DockPanel Background="#00000000" LastChildFill="True" Margin="0" Grid.Column="1">
+                  <Image Source="avares://Leya.ViewsAvalonia/Assets/empty_trash.png" Height="20" Width="25" Margin="0" Stretch="Fill" Cursor="Hand" Opacity="0.4">
+                    <i:Interaction.Behaviors>
+                      <ia:EventTriggerBehavior EventName="PointerReleased">
+                        <ia:InvokeCommandAction Command="{Binding DataContext.DeleteMediaTypeSource_Command, RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}}" CommandParameter="{Binding Content, RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}, Mode=FindAncestor}}"/>
+                      </ia:EventTriggerBehavior>
+                    </i:Interaction.Behaviors>
+                  </Image>
+                </DockPanel>
+              </Grid>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+        <TextBlock Text="Edit media type sources" Foreground="{DynamicResource WindowForeColor}" TextAlignment="Center" FontWeight="Bold" Height="19" VerticalAlignment="Top" Margin="10,10,10,0"/>
+        <TextBlock Text="Media source name:" Foreground="{DynamicResource textForeground}" HorizontalAlignment="Left" Width="130" Height="17" VerticalAlignment="Bottom" Margin="20,0,0,50"/>
+        <TextBox Text="{Binding MediaName}" Classes="inputField" Height="23" MinHeight="23" VerticalAlignment="Bottom" VerticalContentAlignment="Center" Margin="160,0,285,46" Padding="2" FontSize="14"/>
+        <TextBlock Text="Media source type:" Foreground="{DynamicResource textForeground}" HorizontalAlignment="Right" Width="124" Height="17" VerticalAlignment="Bottom" Margin="0,0,150,50"/>
+        <ComboBox Items="{Binding SourceMediaCategoryTypes}" SelectedItem="{Binding SelectedMediaCategoryType}" Margin="0,0,20,46" Height="23" VerticalAlignment="Bottom" FontSize="14" IsTextSearchEnabled="False" HorizontalAlignment="Right" Width="120"/>
+        <Button Content="Browse" Classes="confirmButton" HorizontalAlignment="Left" Margin="20,0,20,15" Height="22" FontSize="12" VerticalAlignment="Bottom" Width="105" Click="Browse_Click"/>
+        <Button Content="Confirm" Classes="confirmButton" Command="{Binding RefreshMediaSourcesAsync_Command}" FontSize="12" HorizontalAlignment="Right" Margin="20,0,20,15" Height="22" VerticalAlignment="Bottom" Width="105"/>
+        <Button Content="Cancel" Classes="abortButton" Command="{Binding ExitMediaTypeSourcesOptions_Command}" Focusable="False" Margin="20,0,130,15" Height="22" FontSize="12" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="105"/>
     </Grid>
 
-    <Label Content="{Binding Version}" Foreground="{DynamicResource MainMenuForeground}" FontSize="14" Height="39" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="156"/>
-    <Grid Background="#000" x:Name="grdMask" Opacity="0" IsVisible="False"/>
+    <Label Content="{Binding Version}" Foreground="{DynamicResource MainMenuForeground}" FontSize="14" Height="39" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="156" Margin="15,0,0,0"/>
+    <!--grid for fade in/fade out transitions-->
+    <Grid Background="#000" x:Name="grdTransitionMask" Opacity="0" IsVisible="False"/>
   </Grid>
 </Window>

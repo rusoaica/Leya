@@ -12,6 +12,7 @@ using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.Threading;
+using Leya.Infrastructure.Dialog;
 using Leya.Infrastructure.Enums;
 using Leya.Models.Common.Models.Media;
 using Leya.ViewModels.Common.Models.Media;
@@ -36,8 +37,8 @@ namespace Leya.Views.Main
         private Clock animationPlaybackClock = new Clock();
 
         #region ============================================================== FIELD MEMBERS ================================================================================
-        Grid grdMask;
-     
+        Grid grdTransitionMask;
+        private readonly IFolderBrowserService folderBrowserService;
         private static string lastUsedPath;
         private const int ABM_GETTASKBARPOS = 5;
         //private readonly IViewFactory viewFactory;
@@ -68,17 +69,23 @@ namespace Leya.Views.Main
         /// </summary>
         public MainWindowV()
         {
+        }
+
+        public MainWindowV(IFolderBrowserService folderBrowserService)
+        {
             AvaloniaXamlLoader.Load(this);
 #if DEBUG
             this.AttachDevTools();
 #endif
-            grdMask = this.FindControl<Grid>("grdMask");
-            
-            grdMask.Clock = animationPlaybackClock;
+            grdTransitionMask = this.FindControl<Grid>("grdTransitionMask");
+       
+            grdTransitionMask.Clock = animationPlaybackClock;
             CreateOpacityFadeInAnimation();
             CreateOpacityFadeOutAnimation();
+            this.folderBrowserService = folderBrowserService;
             //opacityAnimation.RunAsync(grdMask, animationPlaybackClock);
             //animationPlaybackClock.PlayState = PlayState.Run;
+
         }
         #endregion
 
@@ -94,8 +101,8 @@ namespace Leya.Views.Main
             if (navigationLevel is not NavigationLevel.Episode and not NavigationLevel.Song and not NavigationLevel.Movie)
             {
                 // start the fade in animation of the black mask
-                grdMask.IsVisible = true;
-                await opacityFadeInAnimation.RunAsync(grdMask, animationPlaybackClock);
+                grdTransitionMask.IsVisible = true;
+                await opacityFadeInAnimation.RunAsync(grdTransitionMask, animationPlaybackClock);
                 // WPF bug - due to virtualization, sometimes _parameter can be automatically set to "DisconnectedItem", throwing exception
                 await (DataContext as MainWindowVM).NavigateMediaLibraryDownAsync(mediaEntity);
             }
@@ -241,37 +248,13 @@ namespace Leya.Views.Main
             if (e.Key == Key.Escape && (DataContext as MainWindowVM).CurrentNavigationLevel != NavigationLevel.None)
             {
                 // start the fade in animation of the black mask
-                grdMask.IsVisible = true;
-                await opacityFadeInAnimation.RunAsync(grdMask, animationPlaybackClock);
+                grdTransitionMask.IsVisible = true;
+                await opacityFadeInAnimation.RunAsync(grdTransitionMask, animationPlaybackClock);
                 await (DataContext as MainWindowVM).ExitMediaLibrary();
                 // for some reason, the window closes when escape is pressed, so keep it handled
                 e.Handled = true;
             }
         }
-
-        ///// <summary>
-        ///// Handles main menu's scrollviewer PreviewMouseWheel event
-        ///// </summary>
-        //private void ScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
-        //{
-        //    if (e.Delta < 0) // mouse wheel down
-        //    {
-        //        // while the scrollviewer's horizontal offset minus the mouse wheel's delta (which is negative) is still greater than 0, scroll towards right
-        //        if (scrMainMenu.HorizontalOffset - e.Delta > 0)
-        //            scrMainMenu.ScrollToHorizontalOffset(scrMainMenu.HorizontalOffset - e.Delta);
-        //        else
-        //            scrMainMenu.ScrollToLeftEnd();
-        //    }
-        //    else // mouse wheel up
-        //    {
-        //        // while the scrollviewer's extend width is still greater than the scrollviewer's horizontal offset minus the mouse wheel's delta (which is positive), scroll towards left
-        //        if (scrMainMenu.ExtentWidth > scrMainMenu.HorizontalOffset - e.Delta)
-        //            scrMainMenu.ScrollToHorizontalOffset(scrMainMenu.HorizontalOffset - e.Delta);
-        //        else
-        //            scrMainMenu.ScrollToRightEnd();
-        //    }
-        //    UpdateLayout();
-        //}
 
         ///// <summary>
         ///// Handles media SizeChanged event
@@ -358,8 +341,9 @@ namespace Leya.Views.Main
         /// </summary>
         private async void MainWindowV_Navigated()
         {
-            await opacityFadeOutAnimation.RunAsync(grdMask, animationPlaybackClock);
-            grdMask.IsVisible = false;
+            await opacityFadeOutAnimation.RunAsync(grdTransitionMask, animationPlaybackClock);
+            grdTransitionMask.IsVisible = false;
+            grdTransitionMask.IsVisible = false;
         }
 
         /// <summary>
@@ -368,8 +352,8 @@ namespace Leya.Views.Main
         /// <param name="sender">The main menu item that initiated the Click event</param>
         private async void MainMenu_Click(MediaTypeEntity sender)
         {
-            grdMask.IsVisible = true;
-            await opacityFadeInAnimation.RunAsync(grdMask, animationPlaybackClock);
+            grdTransitionMask.IsVisible = true;
+            await opacityFadeInAnimation.RunAsync(grdTransitionMask, animationPlaybackClock);
             (DataContext as MainWindowVM).BeginMainMenuNavigation(sender);
         }
 
@@ -384,8 +368,8 @@ namespace Leya.Views.Main
         private async void NavigateUp_PointerReleased(object? sender, PointerReleasedEventArgs e)
         {
             // start the fade in animation of the black mask
-            grdMask.IsVisible = true;
-            await opacityFadeInAnimation.RunAsync(grdMask, animationPlaybackClock);
+            grdTransitionMask.IsVisible = true;
+            await opacityFadeInAnimation.RunAsync(grdTransitionMask, animationPlaybackClock);
             await(DataContext as MainWindowVM).NavigateMediaLibraryUpAsync();
         }
 
@@ -406,7 +390,7 @@ namespace Leya.Views.Main
         //    switch ((sender as Control).Tag.ToString())
         //    {
         //        case "Media":
-        //            //grdMediaOptions.Visibility = Visibility.Visible;
+        //            //grdMediaTypesOptions.Visibility = Visibility.Visible;
         //            //(DataContext as MainWindowVM).GetMediaTypes();
         //            break;
         //        case "Interface":
@@ -474,50 +458,28 @@ namespace Leya.Views.Main
         //    gridView.Columns[1].Width = workingWidth * 0.05;
         //}
 
-        ///// <summary>
-        ///// Handles MediaType MouseDoubleClick event
-        ///// </summary>
-        //private void MediaType_MouseDoucleClick(object sender, MouseButtonEventArgs e)
-        //{
-        //    // only display the panel for media type sources if the double click happened on a listview item of media types listview
-        //    DependencyObject originalSource = (DependencyObject)e.OriginalSource;
-        //    while ((originalSource != null) && !(originalSource is ListViewItem))
-        //        originalSource = VisualTreeHelper.GetParent(originalSource);
-        //    if (originalSource != null)
-        //        grdBackground.Visibility = Visibility.Visible;
-        //}
-
-        ///// <summary>
-        ///// Handles the Browse button Click event
-        ///// </summary>
-        //private void Browse_MouseUp(object sender, RoutedEventArgs e)
-        //{
-        //    // display the open folder dialog
-        //    if (folderBrowserService.Show() == NotificationResult.OK)
-        //    {
-        //        string filename = folderBrowserService.SelectedDirectories;
-        //        // invoke the view model's method for adding a new media source
-        //        if (!string.IsNullOrEmpty(filename))
-        //            (DataContext as MainWindowVM).AddMediaSource_Command.ExecuteSync(filename);
-        //    }
-        //}
+        /// <summary>
+        /// Handles the Browse button Click event
+        /// </summary>
+        private async void Browse_Click(object sender, RoutedEventArgs e)
+        {
+            // display the open folder dialog
+            folderBrowserService.AllowMultiselection = true;
+            if (await folderBrowserService.Show() == NotificationResult.OK)
+            {
+                string filename = folderBrowserService.SelectedDirectories;
+                // invoke the view model's method for adding a new media source
+                if (!string.IsNullOrEmpty(filename))
+                    await (DataContext as MainWindowVM).AddMediaSourceAsync_Command.ExecuteAsync(filename);
+            }
+        }
 
         ///// <summary>
         ///// Handles AddNewMedia button Click event
         ///// </summary>
         //private void AddNewMedia_Click(object sender, RoutedEventArgs e)
         //{
-        //    grdBackground.Visibility = Visibility.Visible;
-        //}
-
-        ///// <summary>
-        ///// Handles the Cancel button Click event
-        ///// </summary>
-        //private void CloseAddMedia_Click(object sender, RoutedEventArgs e)
-        //{
-        //    // hide the panel for media type sources
-        //    grdBackground.Visibility = Visibility.Collapsed;
-        //    (DataContext as MainWindowVM).IsHelpButtonVisible = false;
+        //    grdMediaSources.Visibility = Visibility.Visible;
         //}
         #endregion
     }

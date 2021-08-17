@@ -107,8 +107,6 @@ namespace Leya.Models.Core.Options
                 throw new IOException("The directory does not exist!");
         }
 
-
-
         /// <summary>
         /// Resets the fields required to create a new media type to their default values
         /// </summary>
@@ -118,6 +116,7 @@ namespace Leya.Models.Core.Options
             MediaName = null;
             SelectedMediaCategoryType = null;
             SourceMediaCategorySources.Clear();
+            Notify(nameof(SourceMediaCategorySources));
             IsMediaTypeSourceUpdate = false;
         }
 

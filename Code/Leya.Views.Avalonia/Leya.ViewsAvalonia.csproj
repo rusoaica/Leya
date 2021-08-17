@@ -11,6 +11,11 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <OutputPath>..\..\Build\Release\</OutputPath>
   </PropertyGroup>
+  <Target Name="RemoveSatelliteAssemblies" AfterTargets="ResolveAssemblyReferences">
+    <ItemGroup>
+      <ReferenceCopyLocalPaths Remove="@(ReferenceSatellitePaths)" />
+    </ItemGroup>
+  </Target>
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
@@ -66,6 +71,7 @@
     <None Remove="Common\Styles\ComboBox.xaml" />
     <None Remove="Common\Styles\CommonStyles.xaml" />
     <None Remove="Common\Styles\Dark.xaml" />
+    <None Remove="Common\Styles\Label.xaml" />
     <None Remove="Common\Styles\Light.xaml" />
     <None Remove="Common\Styles\ListBox.xaml" />
     <None Remove="Common\Styles\RepeatButton.xaml" />
@@ -96,6 +102,9 @@
       <Generator>MSBuild:Compile</Generator>
     </AvaloniaResource>
     <AvaloniaResource Include="Common\Styles\Dark.xaml" />
+    <AvaloniaResource Include="Common\Styles\Label.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </AvaloniaResource>
     <AvaloniaResource Include="Common\Styles\Light.xaml" />
   </ItemGroup>
   <ItemGroup>

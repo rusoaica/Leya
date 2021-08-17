@@ -17,6 +17,8 @@ namespace Leya.ViewModels.Common.MVVM
     {
         #region ============================================================== FIELD MEMBERS ================================================================================
         public event EventHandler ClosingView ;
+        public event EventHandler HidingView ;
+        public event EventHandler ShowingView ;
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected IDispatcher dispatcher;
@@ -115,6 +117,22 @@ namespace Leya.ViewModels.Common.MVVM
         protected void CloseView()
         {
             ClosingView?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Event handler for hiding views
+        /// </summary>
+        protected void HideView()
+        {
+            HidingView?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Event handler for showing views
+        /// </summary>
+        protected void ShowView()
+        {
+            ShowingView?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>

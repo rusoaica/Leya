@@ -55,6 +55,7 @@ namespace Leya.Infrastructure.Logging
                        innerException);
                 logger.LogError(outterException);
                 Debug.WriteLine(outterException);
+                Trace.WriteLine(outterException);
                 // preserve the original exception type and its stacktrace and re-throw it
                 ExceptionDispatchInfo.Capture(innerException).Throw();
             }

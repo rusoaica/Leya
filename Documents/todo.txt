@@ -22,3 +22,4 @@ Avalonia:
 - asynchronous file listing in file system dialogs (currently blocking UI on large folders)
 - navigation treeview: when an extensions filter is passed to dialog services (filesave, filebrowse, etc), the filter is not applied to the navigation treeview too (still shows all files)
 					   when clicking a folder, if an extension is seleted in the extensions filter, it ignores it (shows all file types in the filter, not just the selected one)
+- solve problem of dialogs not blocking any other application window (they block only their parent)

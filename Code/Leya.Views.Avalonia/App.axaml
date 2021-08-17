@@ -23,6 +23,7 @@
     <StyleInclude Source="/Common/Styles/ComboBox.xaml"/>
     <StyleInclude Source="/Common/Styles/ListBox.xaml"/>
     <StyleInclude Source="/Common/Styles/ToolTip.xaml"/>
+    <StyleInclude Source="/Common/Styles/Label.xaml"/>
 
   </Application.Styles>
 </Application>

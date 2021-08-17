@@ -38,7 +38,8 @@
     
     <Style Selector="ListBoxItem">
         <Setter Property="BorderBrush" Value="Transparent"/>
-        <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+      <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Padding" Value="2 1"/>
         <Setter Property="Template">
             <ControlTemplate>
