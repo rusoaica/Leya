@@ -17,7 +17,7 @@ namespace Leya.Models.Common.Models.Media
         decimal Rating { get; set; }
         string MediaName { get; set; }
         string CommonRating { get; set; }
-        bool IsWatched { get; set; }
+        bool? IsWatched { get; set; }
         bool IsFavorite { get; set; }
         #endregion
 

@@ -2,6 +2,7 @@
 /// Creation Date: 23rd of November, 2020
 /// Purpose: Data transfer object for the movies
 #region ========================================================================= USING =====================================================================================
+using Leya.Models.Common.Infrastructure;
 using System;
 #endregion
 
@@ -36,7 +37,7 @@ namespace Leya.Models.Common.Models.Movies
         public MovieCountryEntity[] Country { get; set; }
         public MovieDirectorEntity[] Director { get; set; }
         public bool IsEnded { get; set; }
-        public bool IsWatched { get; set; }
+        public bool? IsWatched { get; set; }
         public bool IsFavorite { get; set; }
         public DateTime Created { get; set; }
         public DateTime Premiered { get; set; }
@@ -51,6 +52,15 @@ namespace Leya.Models.Common.Models.Movies
         public override string ToString()
         {
             return Id + " :: " + MovieTitle;
+        }
+
+        /// <summary>
+        /// Maps between this entity and the coresponding persistance entity
+        /// </summary>
+        /// <returns>A data storage entity representation of this entity</returns>
+        public DataAccess.Common.Models.Movies.MovieEntity ToStorageEntity()
+        {
+            return Services.AutoMapper.Map<DataAccess.Common.Models.Movies.MovieEntity>(this);
         }
         #endregion
     }

@@ -39,7 +39,7 @@ namespace Leya.DataAccess.StorageAccess
         {
             this.dbConnection = dbConnection;
             // map the string type to the bool database type (save booleans as strings, not integers)
-            SqlMapper.AddTypeMap(typeof(bool), DbType.String);
+            SqlMapper.AddTypeMap(typeof(bool?), DbType.String);
         }
 
         /// <summary>
@@ -312,8 +312,10 @@ namespace Leya.DataAccess.StorageAccess
                     }
                 }
             }
-            // begin the transaction
-            dbTransaction = dbConnection.BeginTransaction();
+            if (dbTransaction == null) // begin the transaction
+                dbTransaction = dbConnection.BeginTransaction();
+            else
+                throw new InvalidOperationException("A transaction is already opened!");
         }
 
         /// <summary>
@@ -337,6 +339,11 @@ namespace Leya.DataAccess.StorageAccess
                 // if the transaction failed, rollback the changes
                 dbTransaction?.Rollback();
                 Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                dbTransaction.Dispose();
+                dbTransaction = null;
             }
         }
         #endregion

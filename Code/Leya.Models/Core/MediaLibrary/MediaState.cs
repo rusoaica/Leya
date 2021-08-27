@@ -70,32 +70,43 @@ namespace Leya.Models.Core.MediaLibrary
             SeasonEntity season = mediaLibrary.Library.TvShows.SelectMany(t => t.Seasons)
                                                               .Where(s => s.Id == media.SeasonOrAlbumId)
                                                               .First();
-            if (season.Episodes.All(e => e.IsWatched))
+            if (season.Episodes.All(e => e.IsWatched == true))
             {
                 await this.season.UpdateIsWatchedStatusAsync(media.SeasonOrAlbumId, true);
+                season.IsWatched = true;
+            }
+            else if (season.Episodes.All(e => e.IsWatched == false))
+            {
+                // none of the episodes in the season are watched, the season itself cannot be marked as watched
+                await this.season.UpdateIsWatchedStatusAsync(media.SeasonOrAlbumId, false);
                 season.IsWatched = true;
             }
             else
             {
                 // not all episodes in the season are watched, the season itself cannot be marked as watched
-                await this.season.UpdateIsWatchedStatusAsync(media.SeasonOrAlbumId, false);
-                season.IsWatched = false;
+                await this.season.UpdateIsWatchedStatusAsync(media.SeasonOrAlbumId, null);
+                season.IsWatched = null;
             }
             // check if all the seasons in the tv show of the current episode are watched, and if so, mark the tv show itself as watched
             TvShowEntity tvShow = mediaLibrary.Library.TvShows.Where(t => t.Id == media.Id)
                                                               .First();
-            if (tvShow.Seasons.All(t => t.IsWatched))
+            if (tvShow.Seasons.All(t => t.IsWatched == true))
             {
-                await this.tvShow.UpdateIsWatchedStatusAsync(media.Id, media.IsWatched);
+                await this.tvShow.UpdateIsWatchedStatusAsync(media.Id, true);
                 tvShow.IsWatched = true;
+            }
+            else if (tvShow.Seasons.All(t => t.IsWatched == false))
+            {
+                // none of the seasons in the tv show are watched, the tv show itself cannot be marked as watched
+                await this.tvShow.UpdateIsWatchedStatusAsync(media.Id, false);
+                tvShow.IsWatched = false;
             }
             else
             {
                 // not all seasons in the tv show are watched, the tv show itself cannot be marked as watched
-                await this.tvShow.UpdateIsWatchedStatusAsync(media.Id, media.IsWatched);
-                tvShow.IsWatched = false;
+                await this.tvShow.UpdateIsWatchedStatusAsync(media.Id, null);
+                tvShow.IsWatched = null;
             }
-
             //// update number of unwatched episodes
             //NumberOfUnwatchedEpisodes = mediaLibrary.Episodes.Where(e => e.IsWatched == false && e.NamedSeasonId == media.SeasonOrAlbumId && e.TvShowId == media.Id).Count();
         }
@@ -126,16 +137,22 @@ namespace Leya.Models.Core.MediaLibrary
             // check if all the seasons in the tv show of the current season are watched, and if so, mark the tv show itself as watched
             TvShowEntity tvShow = mediaLibrary.Library.TvShows.Where(t => t.Id == media.Id)
                                                               .First();
-            if (tvShow.Seasons.All(t => t.IsWatched))
+            if (tvShow.Seasons.All(t => t.IsWatched == true))
             {
-                await this.tvShow.UpdateIsWatchedStatusAsync(media.Id, media.IsWatched);
+                await this.tvShow.UpdateIsWatchedStatusAsync(media.Id, true);
                 tvShow.IsWatched = true;
+            }
+            else if (tvShow.Seasons.All(t => t.IsWatched == false))
+            {
+                // none of the seasons in the tv show are watched, the tv show itself cannot be marked as watched
+                await this.tvShow.UpdateIsWatchedStatusAsync(media.Id, false);
+                tvShow.IsWatched = false;
             }
             else
             {
                 // not all seasons in the tv show are watched, the tv show itself cannot be marked as watched
-                await this.tvShow.UpdateIsWatchedStatusAsync(media.Id, media.IsWatched);
-                tvShow.IsWatched = false;
+                await this.tvShow.UpdateIsWatchedStatusAsync(media.Id, null);
+                tvShow.IsWatched = null;
             }
             //// update number of unwatched episodes
             //NumberOfUnwatchedEpisodes = mediaLibrary.Episodes.Where(e => e.IsWatched == false && e.NamedSeasonId == media.SeasonOrAlbumId && e.TvShowId == media.Id).Count();
@@ -200,36 +217,46 @@ namespace Leya.Models.Core.MediaLibrary
                                                           .Where(s => s.Id == media.EpisodeOrSongId)
                                                           .First();
             // mark its listened status and update it in the repository
-            song.IsListened = media.IsWatched;
-            await this.song.UpdateIsListenedStatusAsync(media.EpisodeOrSongId, media.IsWatched);
+            song.IsListened = media.IsWatched == true;
+            await this.song.UpdateIsListenedStatusAsync(media.EpisodeOrSongId, media.IsWatched == true);
             // check if all the songs in the album of the current song are listened, and if so, mark the album itself as listened
             AlbumEntity album = mediaLibrary.Library.Artists.SelectMany(a => a.Albums)
                                                             .Where(a => a.Id == media.SeasonOrAlbumId)
                                                             .First();
-            if (album.Songs.All(s => s.IsListened))
+            if (album.Songs.All(s => s.IsListened == true))
             {
                 await this.album.UpdateIsListenedStatusAsync(media.SeasonOrAlbumId, true);
+                album.IsListened = true;
+            }
+            else if (album.Songs.All(s => s.IsListened == false))
+            {
+                await this.album.UpdateIsListenedStatusAsync(media.SeasonOrAlbumId, false);
                 album.IsListened = true;
             }
             else
             {
                 // not all songs in the album are listened, the album itself cannot be marked as listened
-                await this.album.UpdateIsListenedStatusAsync(media.SeasonOrAlbumId, false);
-                album.IsListened = false;
+                await this.album.UpdateIsListenedStatusAsync(media.SeasonOrAlbumId, null);
+                album.IsListened = null;
             }
             // check if all the albums of the artist of the current song are listened, and if so, mark the artist itself as listened
             ArtistEntity artist = mediaLibrary.Library.Artists.Where(a => a.Id == media.Id)
                                                               .First();
-            if (artist.Albums.All(a => a.IsListened))
+            if (artist.Albums.All(a => a.IsListened == true))
             {
-                await this.artist.UpdateIsListenedStatusAsync(media.Id, media.IsWatched);
+                await this.artist.UpdateIsListenedStatusAsync(media.Id, media.IsWatched == true);
                 artist.IsListened = true;
+            }
+            else if (artist.Albums.All(a => a.IsListened == false))
+            {
+                await this.artist.UpdateIsListenedStatusAsync(media.Id, media.IsWatched == false);
+                artist.IsListened = false;
             }
             else
             {
                 // not all albums of the artist are listened, the artist itself cannot be marked as listened
-                await this.artist.UpdateIsListenedStatusAsync(media.Id, media.IsWatched);
-                artist.IsListened = false;
+                await this.artist.UpdateIsListenedStatusAsync(media.Id, media.IsWatched == null);
+                artist.IsListened = null;
             }
 
             //// update number of unwatched episodes
@@ -249,7 +276,7 @@ namespace Leya.Models.Core.MediaLibrary
                                                                     .Where(s => s.AlbumId == media.SeasonOrAlbumId && s.ArtistId == media.Id))
             {
                 // mark its listened status according to the UI watch status
-                song.IsListened = media.IsWatched;
+                song.IsListened = media.IsWatched == true;
                 // update the listened status of the songs of the album
                 await this.song.UpdateIsListenedStatusAsync(song.Id, song.IsListened);
             }
@@ -257,21 +284,26 @@ namespace Leya.Models.Core.MediaLibrary
             AlbumEntity album = mediaLibrary.Library.Artists.SelectMany(a => a.Albums)
                                                             .Where(a => a.Id == media.SeasonOrAlbumId)
                                                             .First();
-            album.IsListened = media.IsWatched;
+            album.IsListened = media.IsWatched == true;
             await this.album.UpdateIsListenedStatusAsync(album.Id, album.IsListened);
             // check if all the albums of the artist of the current album are listened, and if so, mark the artist itself as listened
             ArtistEntity artist = mediaLibrary.Library.Artists.Where(a => a.Id == media.Id)
                                                               .First();
-            if (artist.Albums.All(a => a.IsListened))
+            if (artist.Albums.All(a => a.IsListened == true))
             {
-                await this.artist.UpdateIsListenedStatusAsync(media.Id, media.IsWatched);
+                await this.artist.UpdateIsListenedStatusAsync(media.Id, media.IsWatched == true);
                 artist.IsListened = true;
+            }
+            else if (artist.Albums.All(a => a.IsListened == false))
+            {
+                await this.artist.UpdateIsListenedStatusAsync(media.Id, media.IsWatched == false);
+                artist.IsListened = false;
             }
             else
             {
                 // not all albums of the artist are listened, the artist itself cannot be marked as listened
-                await this.artist.UpdateIsListenedStatusAsync(media.Id, media.IsWatched);
-                artist.IsListened = false;
+                await this.artist.UpdateIsListenedStatusAsync(media.Id, media.IsWatched == null);
+                artist.IsListened = null;
             }
             //// update number of unwatched episodes
             //NumberOfUnwatchedEpisodes = mediaLibrary.Episodes.Where(e => e.IsWatched == false && e.NamedSeasonId == media.SeasonOrAlbumId && e.TvShowId == media.Id).Count();
@@ -288,7 +320,7 @@ namespace Leya.Models.Core.MediaLibrary
             foreach (AlbumEntity album in mediaLibrary.Library.Artists.Where(a => a.Id == media.Id)
                                                                       .First().Albums)
             {
-                album.IsListened = media.IsWatched;
+                album.IsListened = media.IsWatched == true;
                 // update the listened status of the albums of the artist
                 await this.album.UpdateIsListenedStatusAsync(album.Id, album.IsListened);
                 // update the listened status of the songs of the album
@@ -296,14 +328,14 @@ namespace Leya.Models.Core.MediaLibrary
                                                                         .SelectMany(a => a.Songs)
                                                                         .Where(s => s.AlbumId == album.Id && s.ArtistId == media.Id))
                 {
-                    song.IsListened = media.IsWatched;
+                    song.IsListened = media.IsWatched == true;
                     await this.song.UpdateIsListenedStatusAsync(song.Id, song.IsListened);
                 }
             }
             // update the listened status of the artist
             ArtistEntity artist = mediaLibrary.Library.Artists.Where(a => a.Id == media.Id)
                                                               .First();
-            artist.IsListened = media.IsWatched;
+            artist.IsListened = media.IsWatched == true;
             await this.artist.UpdateIsListenedStatusAsync(artist.Id, artist.IsListened);
             // update number of unwatched episodes
             //NumberOfUnwatchedEpisodes = mediaLibrary.Episodes.Where(e => e.IsWatched == false && e.TvShowId == tvShow.Id).Count();

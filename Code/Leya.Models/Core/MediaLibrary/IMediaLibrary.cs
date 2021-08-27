@@ -26,6 +26,11 @@ namespace Leya.Models.Core.MediaLibrary
         /// Gets all the media library from the storage medium
         /// </summary>
         Task GetMediaLibraryAsync();
+
+        /// <summary>
+        /// Deletes all media library from the storage medium
+        /// </summary>
+        Task UpdateMediaLibraryAsync();
         #endregion
     }
 }

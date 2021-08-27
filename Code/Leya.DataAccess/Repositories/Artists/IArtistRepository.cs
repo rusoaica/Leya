@@ -19,7 +19,7 @@ namespace Leya.DataAccess.Repositories.Artists
         /// <param name="artistId">The id of the artist whose status will be updated</param>
         /// <param name="isListened">The IsListened status to be set</param>
         /// <returns>The result of updating the IsListened status, wrapped in a generic API container of type <see cref="ApiResponse"/></returns>
-        Task<ApiResponse> UpdateIsListenedStatusAsync(int artistId, bool isListened);
+        Task<ApiResponse> UpdateIsListenedStatusAsync(int artistId, bool? isListened);
 
         /// <summary>
         /// Updates the IsFavorite status of an artist identified by <paramref name="artistId"/> in the storage medium

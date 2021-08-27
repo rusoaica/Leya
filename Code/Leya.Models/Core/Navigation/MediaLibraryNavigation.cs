@@ -392,7 +392,7 @@ namespace Leya.Models.Core.Navigation
             NumberOfSeasons = tvShow.NumberOfSeasons;
             NumberOfEpisodes = tvShow.NumberOfEpisodes;
             CurrentStatus = tvShow.IsEnded ? "Ended" : "Ongoing";
-            Genre = string.Join(" / ", tvShow.Genre.Select(g => g.Genre) ?? Enumerable.Empty<string>());
+            Genre = string.Join(" / ", tvShow.Genres.Select(g => g.Genre) ?? Enumerable.Empty<string>());
             Runtime = TimeSpan.FromSeconds(mediaLibrary.Library.TvShows.SelectMany(t => t.Seasons)
                                                                        .SelectMany(s => s.Episodes)
                                                                        .Where(e => e.TvShowId == tvShowId)
@@ -475,7 +475,7 @@ namespace Leya.Models.Core.Navigation
             Premiered = episode.Aired;
             Synopsis = episode.Synopsis;
             Director = episode.Director;
-            Genre = string.Join(" / ", episode.Genre.Select(g => g.Genre) ?? Enumerable.Empty<string>());
+            Genre = string.Join(" / ", episode.Genres.Select(g => g.Genre) ?? Enumerable.Empty<string>());
             Writers = string.Join(", ", episode.Credits.Select(g => g.Credit) ?? Enumerable.Empty<string>());
             Runtime = TimeSpan.FromSeconds(episode.Runtime);
             NumberOfUnwatchedEpisodes = mediaLibrary.Library.TvShows.SelectMany(t => t.Seasons)
@@ -649,6 +649,7 @@ namespace Leya.Models.Core.Navigation
                 media.Id = tvShow.Id;
                 media.MediaName = tvShow.TvShowTitle;
                 media.IsWatched = tvShow.IsWatched;
+                media.IsFavorite = tvShow.IsFavorite;
                 media.Year = tvShow.Aired.Year;
                 media.Rating = tvShow.Ratings.Where(r => r.Name == "ImDb").First().Value;
                 media.CommonRating = string.Join("\n", tvShow.Ratings.Select(r => r.Name + ": " + r.Value + "/" + r.Max + " (" + r.Votes + " votes)"));
@@ -669,6 +670,7 @@ namespace Leya.Models.Core.Navigation
                 media.Id = season.TvShowId;
                 media.MediaName = season.SeasonName;
                 media.IsWatched = season.IsWatched;
+                media.IsFavorite = season.IsFavorite;
                 media.Year = season.Year;
                 media.SeasonOrAlbumId = season.Id;
                 yield return media;
@@ -688,6 +690,7 @@ namespace Leya.Models.Core.Navigation
                 media.Id = season.TvShowId;
                 media.MediaName = season.SeasonName;
                 media.IsWatched = season.IsWatched;
+                media.IsFavorite = season.IsFavorite;
                 media.Year = season.Year;
                 media.SeasonOrAlbumId = season.Id;
                 yield return media;
@@ -711,6 +714,7 @@ namespace Leya.Models.Core.Navigation
                 media.EpisodeOrSongId = episode.Id;
                 media.MediaName = episode.Title;
                 media.IsWatched = episode.IsWatched;
+                media.IsFavorite = episode.IsFavorite;
                 media.Year = fromSeason.Year;
                 media.Rating = episode.Ratings.Where(r => r.Name == "ImDb").First().Value;
                 media.CommonRating = string.Join("\n", episode.Ratings.Select(r => r.Name + ": " + r.Value + "/" + r.Max + " (" + r.Votes + " votes)"));
@@ -732,6 +736,7 @@ namespace Leya.Models.Core.Navigation
                 media.Id = movie.Id;
                 media.MediaName = movie.MovieTitle;
                 media.IsWatched = movie.IsWatched;
+                media.IsFavorite = movie.IsFavorite;
                 media.Year = movie.Premiered.Year;
                 media.Rating = movie.Ratings.Where(r => r.Name == "ImDb").First().Value;
                 media.CommonRating = string.Join("\n", movie.Ratings.Select(r => r.Name + ": " + r.Value + "/" + r.Max + " (" + r.Votes + " votes)"));
@@ -752,6 +757,7 @@ namespace Leya.Models.Core.Navigation
                 media.Id = artist.Id;
                 media.MediaName = artist.ArtistName;
                 media.IsWatched = artist.IsListened;
+                media.IsFavorite = artist.IsFavorite;
                 media.Year = artist.Formed.Year;
                 yield return media;
             }
@@ -770,6 +776,7 @@ namespace Leya.Models.Core.Navigation
                 media.Id = album.ArtistId;
                 media.MediaName = album.Title;
                 media.IsWatched = album.IsListened;
+                media.IsFavorite = album.IsFavorite;
                 media.Year = album.Year;
                 media.SeasonOrAlbumId = album.Id;
                 yield return media;
@@ -789,6 +796,7 @@ namespace Leya.Models.Core.Navigation
                 media.Id = album.ArtistId;
                 media.MediaName = album.Title;
                 media.IsWatched = album.IsListened;
+                media.IsFavorite = album.IsFavorite;
                 media.Year = album.Year;
                 media.SeasonOrAlbumId = album.Id;
                 yield return media;
@@ -812,6 +820,7 @@ namespace Leya.Models.Core.Navigation
                 media.EpisodeOrSongId = song.Id;
                 media.MediaName = song.Title;
                 media.IsWatched = song.IsListened;
+                media.IsFavorite = song.IsFavorite;
                 media.Year = fromAlbum.Year;
                 media.Rating = song.Rating;
                 media.CommonRating = song.Rating.ToString();

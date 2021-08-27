@@ -45,8 +45,8 @@ namespace Leya.ViewModels.Main
         public IAsyncCommand Search_DropDownClosingAsync_Command { get; private set; }
         public IAsyncCommand ViewOpenedAsync_Command { get; private set; }
         public IAsyncCommand<MediaEntity> ShowMediaCastAsync_Command { get; private set; }
-        public IAsyncCommand<MediaEntity> SetIsWatchedStatusAsync_Command { get; private set; }
-        public IAsyncCommand<MediaEntity> SetIsFavoriteStatusAsync_Command { get; private set; }
+        public IAsyncCommand<IMediaEntity> SetIsWatchedStatusAsync_Command { get; private set; }
+        public IAsyncCommand<IMediaEntity> SetIsFavoriteStatusAsync_Command { get; private set; }
         public IAsyncCommand<MediaTypeEntity> DeleteMediaTypeAsync_Command { get; private set; }
         public ISyncCommand<MediaTypeEntity> GetMediaTypeSources_Command { get; private set; }
         public ISyncCommand<MediaTypeEntity> DisplayMediaTypeInfo_Command { get; private set; }
@@ -499,7 +499,7 @@ namespace Leya.ViewModels.Main
         public IMediaEntity SourceMediaSelectedItem
         {
             get { return sourceMediaSelectedItem; }
-            set { sourceMediaSelectedItem = value; Notify(); }
+            set { sourceMediaSelectedItem = value; Notify(); SelectedMediaChanged(); }
         }
         #endregion
 
@@ -529,17 +529,17 @@ namespace Leya.ViewModels.Main
             //Filter_EnterKeyUp_Command = new SyncCommand(Filter_EnterKeyUp);
             //PlayAllMediaAsync_Command = new AsyncCommand(PlayAllMediaAsync);
             SelectedMediaChanged_Command = new SyncCommand(SelectedMediaChanged);
-            //SaveMediaLibraryAsync_Command = new AsyncCommand(SaveMediaLibraryAsync);
+            SaveMediaLibraryAsync_Command = new AsyncCommand(SaveMediaLibraryAsync);
             //Filter_DropDownClosing_Command = new SyncCommand(Filter_DropDownClosing);
             //Search_EnterKeyUpAsync_Command = new AsyncCommand(Search_EnterKeyUpAsync);
             //ShowMediaCastAsync_Command = new AsyncCommand<MediaDisplayEntity>(ShowMediaCastAsync);
             DisplayMediaTypeInfo_Command = new SyncCommand<MediaTypeEntity>(DisplayMediaTypeStatistics);
-            SetIsWatchedStatusAsync_Command = new AsyncCommand<MediaEntity>(SetIsWatchedStatusAsync);
+            SetIsWatchedStatusAsync_Command = new AsyncCommand<IMediaEntity>(SetIsWatchedStatusAsync);
             ViewOpenedAsync_Command = new AsyncCommand(ViewOpenedAsync);
             ExitMediaTypeSourcesOptions_Command = new SyncCommand(ExitMediaTypeSourcesOptions);
             ExitMediaTypesOptions_Command = new SyncCommand(ExitMediaTypesOptions);
             //Search_DropDownClosingAsync_Command = new AsyncCommand(Search_DropDownClosingAsync);
-            SetIsFavoriteStatusAsync_Command = new AsyncCommand<MediaEntity>(SetIsFavoriteStatusAsync);
+            SetIsFavoriteStatusAsync_Command = new AsyncCommand<IMediaEntity>(SetIsFavoriteStatusAsync);
             //DisplayOffset_ValueChanged_Command = new SyncCommand<decimal>(DisplayOffset_ValueChanged);
             mediaLibraryNavigation.Navigated += InitiateNavigation;
             OpenLoggingDirectory_Command = new SyncCommand(OpenLoggingDirectory);
@@ -609,20 +609,20 @@ namespace Leya.ViewModels.Main
                     case "TV SHOW":
                         TotalMediaCountType = "TV SHOWS:";
                         TotalMediaCount = mediaLibrary.Library.TvShows?.Count() ?? 0;
-                        TotalWatchedCount = mediaLibrary.Library.TvShows?.Where(t => t.IsWatched).Count() ?? 0;
-                        TotalUnwatchedCount = mediaLibrary.Library.TvShows?.Where(t => !t.IsWatched).Count() ?? 0;
+                        TotalWatchedCount = mediaLibrary.Library.TvShows?.Where(t => t.IsWatched == true).Count() ?? 0;
+                        TotalUnwatchedCount = mediaLibrary.Library.TvShows?.Where(t => !t.IsWatched == true).Count() ?? 0;
                         break;
                     case "MOVIE":
                         TotalMediaCountType = "MOVIES:";
                         TotalMediaCount = mediaLibrary.Library.Movies?.Count() ?? 0;
-                        TotalWatchedCount = mediaLibrary.Library.Movies?.Where(m => m.IsWatched).Count() ?? 0;
-                        TotalUnwatchedCount = mediaLibrary.Library.Movies?.Where(m => !m.IsWatched).Count() ?? 0;
+                        TotalWatchedCount = mediaLibrary.Library.Movies?.Where(m => m.IsWatched == true).Count() ?? 0;
+                        TotalUnwatchedCount = mediaLibrary.Library.Movies?.Where(m => !m.IsWatched == true).Count() ?? 0;
                         break;
                     case "MUSIC":
                         TotalMediaCountType = "ARTISTS:";
                         TotalMediaCount = mediaLibrary.Library.Artists?.Count() ?? 0;
-                        TotalWatchedCount = mediaLibrary.Library.Artists?.Where(a => a.IsListened).Count() ?? 0;
-                        TotalUnwatchedCount = mediaLibrary.Library.Artists?.Where(a => !a.IsListened).Count() ?? 0;
+                        TotalWatchedCount = mediaLibrary.Library.Artists?.Where(a => a.IsListened == true).Count() ?? 0;
+                        TotalUnwatchedCount = mediaLibrary.Library.Artists?.Where(a => !a.IsListened == true).Count() ?? 0;
                         break;
                 }
             }
@@ -630,8 +630,8 @@ namespace Leya.ViewModels.Main
             {
                 TotalMediaCountType = "ALL MEDIA:";
                 TotalMediaCount = mediaLibrary.Library.TvShows?.SelectMany(t => t.Seasons)?.SelectMany(s => s.Episodes)?.Count() ?? 0 + mediaLibrary.Library?.Movies?.Count() ?? 0 + mediaLibrary.Library?.Artists?.SelectMany(t => t.Albums)?.SelectMany(s => s.Songs)?.Count() ?? 0;
-                TotalWatchedCount = mediaLibrary.Library.TvShows?.SelectMany(t => t.Seasons)?.SelectMany(s => s.Episodes)?.Where(e => e.IsWatched)?.Count() ?? 0 + mediaLibrary.Library.Movies?.Where(m => m.IsWatched)?.Count() ?? 0;
-                TotalUnwatchedCount = mediaLibrary.Library.TvShows?.SelectMany(t => t.Seasons)?.SelectMany(s => s.Episodes)?.Where(e => !e.IsWatched)?.Count() ?? 0 + mediaLibrary.Library.Movies?.Where(m => !m.IsWatched)?.Count() ?? 0;
+                TotalWatchedCount = mediaLibrary.Library.TvShows?.SelectMany(t => t.Seasons)?.SelectMany(s => s.Episodes)?.Where(e => e.IsWatched == true)?.Count() ?? 0 + mediaLibrary.Library.Movies?.Where(m => m.IsWatched == true)?.Count() ?? 0;
+                TotalUnwatchedCount = mediaLibrary.Library.TvShows?.SelectMany(t => t.Seasons)?.SelectMany(s => s.Episodes)?.Where(e => !e.IsWatched == true)?.Count() ?? 0 + mediaLibrary.Library.Movies?.Where(m => !m.IsWatched == true)?.Count() ?? 0;
             }
         }
 
@@ -639,7 +639,7 @@ namespace Leya.ViewModels.Main
         /// Updates the IsWatched status for <paramref name="mediaEntity"/>
         /// </summary>
         /// <param name="mediaEntity">The media item for which to update the IsWatched status</param>
-        private async Task SetIsWatchedStatusAsync(MediaEntity mediaEntity)
+        private async Task SetIsWatchedStatusAsync(IMediaEntity mediaEntity)
         {
             try
             {
@@ -668,7 +668,7 @@ namespace Leya.ViewModels.Main
         /// Updates the IsFavorite status for <paramref name="mediaEntity"/>
         /// </summary>
         /// <param name="mediaEntity">The media item for which to update the IsFavorite status</param>
-        private async Task SetIsFavoriteStatusAsync(MediaEntity mediaEntity)
+        private async Task SetIsFavoriteStatusAsync(IMediaEntity mediaEntity)
         {
             try
             {
@@ -700,6 +700,40 @@ namespace Leya.ViewModels.Main
         {
             // TODO: replace with cross platform way of opening folders
             Process.Start(AppDomain.CurrentDomain.BaseDirectory + @"Logs");
+        }
+
+        /// <summary>
+        /// Updates all the media library in the database
+        /// </summary>
+        private async Task SaveMediaLibraryAsync()
+        {
+            if (await notificationService.ShowAsync("Are you sure you want to refresh the media library?\nThis could take a while, depending on the size of your library.", "LEYA", NotificationButton.YesNo, NotificationImage.Question) == NotificationResult.Yes)
+            {
+                ShowProgressBar();
+                IsScannerTextVisible = true;
+                try
+                {
+                    ScannerOutput = "Updating media library...";
+                    await mediaLibrary.UpdateMediaLibraryAsync();
+                    ScannerOutput = "Loading media library...";
+                    await mediaLibrary.GetMediaLibraryAsync();
+                    await notificationService.ShowAsync("Media library updated!", "LEYA - Success");
+                    ScannerOutput = "";
+                    IsScannerTextVisible = false;
+                    ScannerOutput = string.Empty;
+                    HideProgressBar();
+                }
+                catch (Exception ex)
+                {
+                    await notificationService.ShowAsync("Error updating the media library: " + ex.Message, "LEYA - Error");
+                    if (!(ex is InvalidOperationException))
+                    {
+                        IsScannerTextVisible = false;
+                        ScannerOutput = string.Empty;
+                        HideProgressBar();
+                    }
+                }
+            }
         }
 
         #region Options Media

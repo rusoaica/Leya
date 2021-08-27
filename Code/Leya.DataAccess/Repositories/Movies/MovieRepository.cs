@@ -338,9 +338,9 @@ namespace Leya.DataAccess.Repositories.Movies
         /// <param name="movieId">The id of the movie whose status will be updated</param>
         /// <param name="isWatched">The IsWatched status to be set</param>
         /// <returns>The result of updating the IsWatched status, wrapped in a generic API container of type <see cref="ApiResponse"/></returns>
-        public async Task<ApiResponse> UpdateIsWatchedStatusAsync(int movieId, bool isWatched)
+        public async Task<ApiResponse> UpdateIsWatchedStatusAsync(int movieId, bool? isWatched)
         {
-            return await dataAccess.UpdateAsync(EntityContainers.Movies, "IsWatched = '" + isWatched + "'", "Id", "'" + movieId + "'");
+            return await dataAccess.UpdateAsync(EntityContainers.Movies, "IsWatched = '" + (isWatched != null ? isWatched.ToString() : "Null") + "'", "Id", "'" + movieId + "'");
         }
 
         /// <summary>

@@ -41,14 +41,14 @@ namespace Leya.Models.Core.TvShows
         /// <summary>
         /// Gets the seasons from the storage medium
         /// </summary>
-        public async Task GetSeasonsAsync()
+        public async Task GetAllAsync()
         {
             await Task.Run(async() =>
             {
                 // get all seasons
                 var result = await seasonRepository.GetAllAsync();
                 // get all episodes
-                await episodes.GetEpisodesAsync();
+                await episodes.GetAllAsync();
                 if (string.IsNullOrEmpty(result.Error))
                 {
                     Seasons = Services.AutoMapper.Map<SeasonEntity[]>(result.Data);
@@ -62,11 +62,20 @@ namespace Leya.Models.Core.TvShows
         }
 
         /// <summary>
+        /// Saves <paramref name="episodeEntity"/> in the storage medium
+        /// </summary>
+        /// <param name="episodeEntity">The episode to be saved</param>
+        public async Task SaveEpisodeAsync(EpisodeEntity episodeEntity)
+        {
+            await episodes.SaveAsync(episodeEntity);
+        }
+
+        /// <summary>
         /// Updates the IsWatched status of a season identified by <paramref name="seasonId"/> in the storage medium
         /// </summary>
         /// <param name="seasonId">The id of the season whose status will be updated</param>
         /// <param name="isWatched">The IsWatched status to be set</param>
-        public async Task UpdateIsWatchedStatusAsync(int seasonId, bool isWatched)
+        public async Task UpdateIsWatchedStatusAsync(int seasonId, bool? isWatched)
         {
             var result = await seasonRepository.UpdateIsWatchedStatusAsync(seasonId, isWatched);
             if (!string.IsNullOrEmpty(result.Error))

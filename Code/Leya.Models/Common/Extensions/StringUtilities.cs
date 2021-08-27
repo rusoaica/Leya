@@ -2,6 +2,7 @@
 /// Creation Date: 25th of June, 2021
 /// Purpose: String extension method to handle conversions between string and securestring
 #region ========================================================================= USING =====================================================================================
+using System;
 using System.Security;
 #endregion
 
@@ -22,6 +23,19 @@ namespace Leya.Models.Common.Extensions
             foreach (char c in chars)
                 secureString.AppendChar(c);
             return secureString;
+        }
+
+        /// <summary>
+        /// Converts a <see cref="string"/> into a <see cref="{T}"/> 
+        /// </summary>
+        /// <typeparam name="T">The type to convert into</typeparam>
+        /// <param name="valueAsString">The <see cref="string"/> to be converted</param>
+        /// <returns>A <see cref="{T}"/> representing the converted value of <param name="valueAsString"></returns>
+        public static T? GetValueOrNull<T>(this string valueAsString) where T : struct
+        {
+            if (string.IsNullOrEmpty(valueAsString) || valueAsString.ToLower() == "null")
+                return null;
+            return (T)Convert.ChangeType(valueAsString, typeof(T));
         }
         #endregion
     }

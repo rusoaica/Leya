@@ -134,9 +134,9 @@ namespace Leya.DataAccess.Repositories.Songs
         /// <param name="songId">The id of the song whose status will be updated</param>
         /// <param name="isListened">The IsListened status to be set</param>
         /// <returns>The result of updating the IsListened status, wrapped in a generic API container of type <see cref="ApiResponse"/></returns>
-        public async Task<ApiResponse> UpdateIsListenedStatusAsync(int songId, bool isListened)
+        public async Task<ApiResponse> UpdateIsListenedStatusAsync(int songId, bool? isListened)
         {
-            return await dataAccess.UpdateAsync(EntityContainers.Songs, "IsListened = '" + isListened + "'", "Id", "'" + songId + "'");
+            return await dataAccess.UpdateAsync(EntityContainers.Songs, "IsListened = '" + (isListened != null ? isListened.ToString() : "Null") + "'", "Id", "'" + songId + "'");
         }
 
         /// <summary>

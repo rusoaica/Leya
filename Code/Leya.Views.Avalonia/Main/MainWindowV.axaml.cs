@@ -7,11 +7,14 @@ using Avalonia.Animation;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.LogicalTree;
 using Avalonia.Markup.Xaml;
 using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
+using Leya.Infrastructure.Configuration;
 using Leya.Infrastructure.Dialog;
 using Leya.Infrastructure.Enums;
 using Leya.Models.Common.Models.Media;
@@ -24,8 +27,10 @@ using Leya.Views.Startup;
 using Leya.ViewsAvalonia;
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using Avalonia.Controls.Templates;
 #endregion
 
 namespace Leya.Views.Main
@@ -38,29 +43,17 @@ namespace Leya.Views.Main
 
         #region ============================================================== FIELD MEMBERS ================================================================================
         Grid grdTransitionMask;
+        Grid grdActors;
+        Grid grdWindowDrag;
+        Grid grdDescription;
+        Image imgBanner;
         private readonly IFolderBrowserService folderBrowserService;
+        private readonly IAppConfig appConfig;
         private static string lastUsedPath;
-        private const int ABM_GETTASKBARPOS = 5;
+        private bool isWindowLoaded;
+        private bool isWindowDragged;
         //private readonly IViewFactory viewFactory;
-        //private readonly IFolderBrowserService folderBrowserService;
         private string currentLibraryName = string.Empty;
-
-        [DllImport("shell32.dll")]
-        private static extern IntPtr SHAppBarMessage(int msg, ref APPBARDATA data);
-        private struct APPBARDATA
-        {
-            public int cbSize;
-            public IntPtr hWnd;
-            public int uCallbackMessage;
-            public int uEdge;
-            public RECT rc;
-            public IntPtr lParam;
-        }
-
-        private struct RECT
-        {
-            public int left, top, right, bottom;
-        }
         #endregion
 
         #region ================================================================== CTOR =====================================================================================
@@ -71,21 +64,24 @@ namespace Leya.Views.Main
         {
         }
 
-        public MainWindowV(IFolderBrowserService folderBrowserService)
+        public MainWindowV(IFolderBrowserService folderBrowserService, IAppConfig appConfig)
         {
             AvaloniaXamlLoader.Load(this);
 #if DEBUG
             this.AttachDevTools();
 #endif
             grdTransitionMask = this.FindControl<Grid>("grdTransitionMask");
-       
+            grdActors = this.FindControl<Grid>("grdActors");
+            imgBanner = this.FindControl<Image>("imgBanner");
+            grdDescription = this.FindControl<Grid>("grdDescription");
+            
             grdTransitionMask.Clock = animationPlaybackClock;
             CreateOpacityFadeInAnimation();
             CreateOpacityFadeOutAnimation();
             this.folderBrowserService = folderBrowserService;
+            this.appConfig = appConfig;
             //opacityAnimation.RunAsync(grdMask, animationPlaybackClock);
             //animationPlaybackClock.PlayState = PlayState.Run;
-
         }
         #endregion
 
@@ -107,7 +103,7 @@ namespace Leya.Views.Main
                 await (DataContext as MainWindowVM).NavigateMediaLibraryDownAsync(mediaEntity);
             }
             else
-                await(DataContext as MainWindowVM).NavigateMediaLibraryDownAsync(mediaEntity);
+                await (DataContext as MainWindowVM).NavigateMediaLibraryDownAsync(mediaEntity);
         }
 
         /// <summary>
@@ -215,28 +211,56 @@ namespace Leya.Views.Main
         {
             // subscribe to the navigation event
             (DataContext as MainWindowVM).Navigated += MainWindowV_Navigated;
-            //// get the size of the structure that contains the information about the system appbar message
-            //APPBARDATA _data = new APPBARDATA();
-            //_data.cbSize = Marshal.SizeOf(_data);
-            //// send an appbar message to the system and retrieve the bounding rectangle of the Windows taskbar
-            //SHAppBarMessage(ABM_GETTASKBARPOS, ref _data);
-            //int _screen_index = 1;
-            //double _horizontal_offset = 0;
-            //// get the sum of the horizontal resolutions of all displays with a lower index than the index on which the window is displayed
-            //// (this will take the horizontal width by taking into account windows scaling)
-            //for (int i = 0; i < _screen_index; i++)
-            //    _horizontal_offset += WinForms.Screen.AllScreens[i].Bounds.Width / (GetDpiForScreen(i).Width / 96);
-            //// get the current screen
-            //WinForms.Screen _screen = WinForms.Screen.AllScreens[_screen_index];
-            //Top = _screen.Bounds.Top;
-            //// the left position of the window starts at the horizontal offset (Edit: replaced by user setting!)
-            //Left = MainWindowVM.config.Settings.DisplayOffset; // = _horizontal_offset;
-            //Width = _screen.Bounds.Width / (GetDpiForScreen(_screen_index).Width / 96);
-            //// for height, take into account the taskbar too
-            //Height = _screen.Bounds.Height / (GetDpiForScreen(_screen_index).Height / 96) - ((_data.rc.bottom - _data.rc.top) / (GetDpiForScreen(_screen_index).Height / 96));
-            //// if there is a weather.com specified in settings, get the weather info from that link
-            //if (!string.IsNullOrEmpty(MainWindowVM.config.Settings.WeatherUrl))
-            //    await (DataContext as MainWindowVM).GetWeatherInfoAsync(MainWindowVM.config.Settings.WeatherUrl);
+            // set the size and position to the values saved in the application's configuration, if any
+            if (appConfig.Settings.MainWindowPositionX != null)
+                Position = Position.WithX((int)appConfig.Settings.MainWindowPositionX);
+            if (appConfig.Settings.MainWindowPositionY != null)
+                Position = Position.WithY((int)appConfig.Settings.MainWindowPositionY);
+            if (appConfig.Settings.MainWindowWidth != null)
+                Width = (int)appConfig.Settings.MainWindowWidth;
+            if (appConfig.Settings.MainWindowHeight != null)
+                Height = (int)appConfig.Settings.MainWindowHeight;
+            isWindowLoaded = true;
+            BoundsProperty.Changed.AddClassHandler<Window>((s, e) => Window_SizeChanged());
+
+
+            // Avalonia bug: for some reason, neither of these work for finding a child control inside a template
+            //grdWindowDrag = this.FindControl<Grid>("grdWindowDrag");
+            //grdWindowDrag = ((IControl)this.GetVisualChildren().FirstOrDefault())?.FindControl<Grid>("grdWindowDrag");
+
+            grdWindowDrag = (((VisualChildren[0] as Grid).Children[0] as DockPanel).Children[0] as Grid).Children[1] as Grid;
+            grdWindowDrag.PointerPressed += (s, e) => isWindowDragged = true;
+            grdWindowDrag.PointerReleased += (s, e) => isWindowDragged = false;
+        }
+
+        /// <summary>
+        /// Handles window's SizeChanged event
+        /// </summary>
+        private async void Window_SizeChanged()
+        {
+            appConfig.Settings.MainWindowHeight = (int)Height;
+            appConfig.Settings.MainWindowWidth = (int)Width;
+            await appConfig.UpdateConfigurationAsync();
+            if (imgBanner.Bounds.Width > 0 && grdDescription.Bounds.Width > 0)
+            {
+                imgBanner.Width = grdDescription.Bounds.Width - 30;
+                imgBanner.Height = (grdDescription.Bounds.Width - 30) / 5.4;
+            }
+        }
+
+        /// <summary>
+        /// Handles Window's PositionChanged event
+        /// </summary>
+        private async void Window_PositionChanged(object? sender, PixelPointEventArgs e)
+        {
+            // do not allow the application's configuration to be updated with the new position
+            // unless the window is loaded and the user is the one changing it
+            if (isWindowLoaded && isWindowDragged)
+            {
+                appConfig.Settings.MainWindowPositionX = Position.X;
+                appConfig.Settings.MainWindowPositionY = Position.Y;
+                await appConfig.UpdateConfigurationAsync();
+            }
         }
 
         /// <summary>
@@ -255,21 +279,6 @@ namespace Leya.Views.Main
                 e.Handled = true;
             }
         }
-
-        ///// <summary>
-        ///// Handles media SizeChanged event
-        ///// </summary>
-        //private void MediaSizeChanged(object sender, SizeChangedEventArgs e)
-        //{
-        //    ListView listview = sender as ListView;
-        //    GridView gridview = listview.View as GridView;
-        //    double width = listview.ActualWidth - 35;
-        //    gridview.Columns[0].Width = width * 0.10;
-        //    gridview.Columns[1].Width = width * 0.63;
-        //    gridview.Columns[2].Width = width * 0.10;
-        //    gridview.Columns[3].Width = width * 0.08;
-        //    gridview.Columns[4].Width = width * 0.08;
-        //}
 
         ///// <summary>
         ///// Handles Banner SizeChanged event
@@ -347,7 +356,7 @@ namespace Leya.Views.Main
         }
 
         /// <summary>
-        /// Handle's main menu's items Click event
+        /// Handles main menu's items Click event
         /// </summary>
         /// <param name="sender">The main menu item that initiated the Click event</param>
         private async void MainMenu_Click(MediaTypeEntity sender)
@@ -357,9 +366,55 @@ namespace Leya.Views.Main
             (DataContext as MainWindowVM).BeginMainMenuNavigation(sender);
         }
 
+        /// <summary>
+        /// Handles main menu's items MouseEnter event
+        /// </summary>
+        /// <param name="sender">The main menu item that initiated the MouseEnter event</param>
+        private void MainMenu_MouseEnter(MediaTypeEntity sender)
+        {
+            (DataContext as MainWindowVM).DisplayMediaTypeInfo_Command.ExecuteSync(sender);
+        }
+
+        /// <summary>
+        /// Handles media items PointerReleased event
+        /// </summary>
         private void MediaItem_PointerReleased(object? sender, PointerReleasedEventArgs e)
         {
-            IMediaEntity mediaEntity = (sender as Label).Tag as IMediaEntity;
+            (DataContext as MainWindowVM).SourceMediaSelectedItem = (sender as Label).Tag as IMediaEntity;
+        }
+
+        /// <summary>
+        /// Handles media item IsWatched Click event
+        /// </summary>
+        private async void IsWatched_Click(object? sender, RoutedEventArgs e)
+        {
+            if ((sender as CheckBox).Tag != null && (sender as CheckBox).Tag is IMediaEntity mediaEntity)
+            {
+                mediaEntity.IsWatched = (sender as CheckBox).IsChecked;
+                await(DataContext as MainWindowVM).SetIsWatchedStatusAsync_Command.ExecuteAsync((sender as CheckBox).Tag as IMediaEntity);
+            }
+        }
+
+        /// <summary>
+        /// Handles media item IsWatched Click event
+        /// </summary>
+        private async void IsFavorite_Click(object? sender, RoutedEventArgs e)
+        {
+            if ((sender as CheckBox).Tag != null && (sender as CheckBox).Tag is IMediaEntity mediaEntity)
+            {
+                mediaEntity.IsFavorite = (sender as CheckBox).IsChecked == true;
+                await (DataContext as MainWindowVM).SetIsFavoriteStatusAsync_Command.ExecuteAsync((sender as CheckBox).Tag as IMediaEntity);
+            }
+        }
+
+        /// <summary>
+        /// Handles ShowCast PointerReleased event
+        /// </summary>
+        private void ShowCast_PointerReleased(object? sender, PointerReleasedEventArgs e)
+        {
+            NavigationLevel currentNavigationLevel = (DataContext as MainWindowVM).CurrentNavigationLevel;
+            if (currentNavigationLevel == NavigationLevel.Episode || currentNavigationLevel == NavigationLevel.Movie)
+                grdActors.IsVisible = true;
         }
 
         /// <summary>
@@ -370,7 +425,7 @@ namespace Leya.Views.Main
             // start the fade in animation of the black mask
             grdTransitionMask.IsVisible = true;
             await opacityFadeInAnimation.RunAsync(grdTransitionMask, animationPlaybackClock);
-            await(DataContext as MainWindowVM).NavigateMediaLibraryUpAsync();
+            await (DataContext as MainWindowVM).NavigateMediaLibraryUpAsync();
         }
 
         public async Task<bool?> ShowDialog()
@@ -473,14 +528,6 @@ namespace Leya.Views.Main
                     await (DataContext as MainWindowVM).AddMediaSourceAsync_Command.ExecuteAsync(filename);
             }
         }
-
-        ///// <summary>
-        ///// Handles AddNewMedia button Click event
-        ///// </summary>
-        //private void AddNewMedia_Click(object sender, RoutedEventArgs e)
-        //{
-        //    grdMediaSources.Visibility = Visibility.Visible;
-        //}
         #endregion
     }
 }

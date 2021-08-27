@@ -5,12 +5,16 @@
         xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
         xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"        
         xmlns:iac="using:Avalonia.Xaml.Interactions.Custom"
+        xmlns:converters="clr-namespace:Leya.Views.Common.Converters"
         xmlns:controls="clr-namespace:Leya.Views.Common.Controls;assembly=Leya.ViewsAvalonia"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Leya.Views.Main.MainWindowV"
-        Title="MainWindowV" Classes="styledWindow" HasSystemDecorations="False" Opened="Window_Opened" KeyUp="Window_KeyUp" Width="1000" Height="800" MinWidth="1024" MinHeight="768">
+        Title="MainWindowV" Classes="styledWindow" FontFamily="Arial" HasSystemDecorations="False" Opened="Window_Opened" KeyUp="Window_KeyUp" Width="1000" Height="800" MinWidth="1024" MinHeight="768" PositionChanged="Window_PositionChanged">
   <Window.Resources>
-    <!--<converters:NullImageConverter x:Key="NullImageConverter"/>-->    
+    <converters:NumberToColorConverter x:Key="NumberToColorConverter"/>
+    <converters:NullImageConverter x:Key="NullImageConverter"/>
+    <converters:TimeSpanFormatConverter x:Key="TimeSpanFormatConverter"/>
+    <converters:DateTimeFormatConverter x:Key="DateTimeFormatConverter"/>
   </Window.Resources>
   <i:Interaction.Behaviors>
     <ia:EventTriggerBehavior EventName="Opened">
@@ -45,35 +49,21 @@
         <TextBlock Foreground="{DynamicResource WindowForeColor}" Text="{Binding CurrentTime, StringFormat='{}{0:dddd, dd.MM.yyyy}'}" FontStyle="Italic" FontWeight="Bold" FontSize="20" Padding="0" HorizontalAlignment="Right" Width="221" Margin="0,0,219,0"/>
         <TextBlock Foreground="{DynamicResource WindowForeColor}" Text="|" FontStyle="Italic" FontWeight="Bold" FontSize="20" Padding="0" HorizontalAlignment="Right" Width="7" Margin="0,0,212,0"/>
         <TextBlock Foreground="{DynamicResource textForeground}" Text="{Binding CurrentTime, StringFormat='{}{0:HH:mm:ss}'}" FontStyle="Italic" FontWeight="Bold" FontSize="20" Padding="0" HorizontalAlignment="Right" Width="87" Margin="0,0,115,0"/>
-        <Polygon Points="0,0 30,0 60,30 0,30" StrokeThickness="0" Fill="{DynamicResource MainMenuGlassGradient}" HorizontalAlignment="Right" Width="150">
-          <!--<Polygon.Effect>
-            <DropShadowEffect BlurRadius="10" Color="#000" Direction="270" Opacity="1" RenderingBias="Quality" ShadowDepth="4"/>
-          </Polygon.Effect>-->
-        </Polygon>
-        <Rectangle Fill="{DynamicResource MainMenuGlassGradient}" Margin="0,0,150,0" StrokeThickness="0">
-          <!--<Rectangle.Effect>
-            <DropShadowEffect BlurRadius="10" Color="#000" Direction="270" Opacity="1" RenderingBias="Quality" ShadowDepth="4"/>
-          </Rectangle.Effect>-->
-        </Rectangle>
+        <Polygon Points="0,0 30,0 60,30 0,30" StrokeThickness="0" Fill="{DynamicResource MainMenuGlassGradient}" HorizontalAlignment="Right" Width="150"/>
+        <Rectangle Fill="{DynamicResource MainMenuGlassGradient}" Margin="0,0,150,0" StrokeThickness="0"/>
       </Grid>
       <Grid Grid.Row="1">
-        <controls:HorizontalList x:Name="mainMenu" Background="{DynamicResource MainMenuBackgroundGradiend}" Items="{Binding SourceMediaTypes}" ItemsOffset="520" ScrollSpeed="50" FontSize="100" Foreground="{DynamicResource MainMenuForeground}" Click="MainMenu_Click"/>
+        <controls:HorizontalList x:Name="mainMenu" Background="{DynamicResource MainMenuBackgroundGradiend}" Items="{Binding SourceMediaTypes}" ItemsOffset="520" ScrollSpeed="100" FontSize="100" Foreground="{DynamicResource MainMenuForeground}" Click="MainMenu_Click" MouseEnter="MainMenu_MouseEnter"/>
       </Grid>
       <Grid Grid.Row="2">
-        <Polygon Points="0,0 60,0 60,30 30,30" StrokeThickness="0" HorizontalAlignment="Left" Fill="{DynamicResource MainMenuGlassGradient}" Margin="35,0,0,0" Width="60">
-          <!--<Polygon.Effect>
-            <DropShadowEffect BlurRadius="10" Color="#000" Direction="270" Opacity="1" RenderingBias="Quality" ShadowDepth="4"/>
-          </Polygon.Effect>-->
-        </Polygon>
-        <Rectangle Fill="{DynamicResource MainMenuGlassGradient}" Margin="95,0,0,0" StrokeThickness="0">
-          <!--<Rectangle.Effect>
-            <DropShadowEffect BlurRadius="10" Color="#000" Direction="270" Opacity="1" RenderingBias="Quality" ShadowDepth="4"/>
-          </Rectangle.Effect>-->
-        </Rectangle>
-        <Label Content="REFRESH LIBRARY" Foreground="{DynamicResource textForeground}" Cursor="Hand" FontStyle="Italic" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="20" Padding="0" HorizontalAlignment="Left" Width="175" Margin="73,0,0,0">
-          <!--<Label.InputBindings>
-            <MouseBinding Gesture="LeftClick" Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SaveMediaLibraryAsync_Command}"/>
-          </Label.InputBindings>-->
+        <Polygon Points="0,0 60,0 60,30 30,30" StrokeThickness="0" HorizontalAlignment="Left" Fill="{DynamicResource MainMenuGlassGradient}" Margin="35,0,0,0" Width="60"/>
+        <Rectangle Fill="{DynamicResource MainMenuGlassGradient}" Margin="95,0,0,0" StrokeThickness="0"/>
+        <Label Content="REFRESH LIBRARY" Foreground="{DynamicResource textForeground}" Cursor="Hand" FontStyle="Italic" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="20" Padding="0" HorizontalAlignment="Left" Width="185" Margin="73,0,0,0">
+          <i:Interaction.Behaviors>
+            <ia:EventTriggerBehavior EventName="PointerReleased">
+              <ia:InvokeCommandAction Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SaveMediaLibraryAsync_Command}"/>
+            </ia:EventTriggerBehavior>
+          </i:Interaction.Behaviors>
         </Label>
         <Label Content="UNWATCHED" Foreground="{DynamicResource WindowForeColor}" Cursor="Hand" FontStyle="Italic" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="20" Padding="0" HorizontalAlignment="Left" Width="145" Margin="295,0,0,0" Opacity="0.7"/>
         <Label Content="RECENTLY ADDED" Foreground="{DynamicResource WindowForeColor}" Cursor="Hand" FontStyle="Italic" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="20" Padding="0" HorizontalAlignment="Left" Width="189" Margin="482,0,0,0" Opacity="0.7"/>
@@ -111,22 +101,20 @@
         <ColumnDefinition Width="30*"/>
         <ColumnDefinition Width="30*"/>
       </Grid.ColumnDefinitions>
-      <ListBox Items="{Binding SourceMedia}" SelectedItem="{Binding SourceMediaSelectedItem, Mode=TwoWay}" x:Name="lstMedia" Foreground="Black" Margin="9,10,10,60" Grid.Column="0" BorderThickness="0">
+      <ListBox Items="{Binding SourceMedia}" SelectedItem="{Binding SourceMediaSelectedItem, Mode=TwoWay}" x:Name="lstMedia" Margin="9,10,10,60" Grid.Column="0" Background="{DynamicResource contentBackground}" Classes="ListBox" VirtualizationMode="Simple" Foreground="Black" BorderThickness="0" Opacity="0.9">
         <i:Interaction.Behaviors>
+          <iac:NthChildBehavior />
+        </i:Interaction.Behaviors>
+        <!--<i:Interaction.Behaviors>
           <ia:EventTriggerBehavior EventName="SelectionChanged">
             <ia:InvokeCommandAction Command="{Binding SelectedMediaChanged_Command}"/>
           </ia:EventTriggerBehavior>
-        </i:Interaction.Behaviors>
+        </i:Interaction.Behaviors>-->
         <ListBox.ItemsPanel>
           <ItemsPanelTemplate>
             <VirtualizingStackPanel/>
           </ItemsPanelTemplate>
         </ListBox.ItemsPanel>
-        <!--<i:Interaction.Triggers>
-          <i:EventTrigger EventName="SelectionChanged">
-            <i:InvokeCommandAction Command="{Binding SelectedMediaChanged_Command}"/>
-          </i:EventTrigger>
-        </i:Interaction.Triggers>-->
         <!--<i:Interaction.Behaviors>
           <sort:SortingBehavior />
         </i:Interaction.Behaviors>-->
@@ -134,96 +122,20 @@
           <DataTemplate>
             <Grid Margin="0,2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
               <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="20*" />
-                <ColumnDefinition Width="50*" />
                 <ColumnDefinition Width="10*" />
-                <ColumnDefinition Width="10*" />
-                <ColumnDefinition Width="10*" />
+                <ColumnDefinition Width="73*" />
+                <ColumnDefinition Width="7*" />
+                <ColumnDefinition Width="5*" />
+                <ColumnDefinition Width="5*" />
               </Grid.ColumnDefinitions>
-              <Label Content="{Binding Year, Mode=OneWay}" Foreground="#74BCFF" Cursor="IBeam" FontStyle="Italic" FontSize="16" Background="Lime" BorderThickness="0" MinWidth="50" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="0" Tag="{Binding}" DoubleTapped="MediaItem_DoubleTapped" PointerReleased="MediaItem_PointerReleased"/>
-              <Label Content="{Binding MediaName, Mode=OneWay}" ToolTip.Tip="{Binding MediaName}" Foreground="{DynamicResource ListTextNormal}" FontWeight="Bold" FontSize="20" Cursor="Hand" Background="Gray" BorderThickness="0" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="1" Tag="{Binding}" DoubleTapped="MediaItem_DoubleTapped" PointerReleased="MediaItem_PointerReleased"/>
-              <Label Content="{Binding Rating, Mode=OneWay, StringFormat='{}{0:#,##0.00}'}" ToolTip.Tip="{Binding CommonRating}" Foreground="{DynamicResource ListTextHighlighted}" FontSize="18" Background="Purple" BorderThickness="0" Margin="-6,0" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="2" Tag="{Binding}" DoubleTapped="MediaItem_DoubleTapped" PointerReleased="MediaItem_PointerReleased"/>
-              <CheckBox IsChecked="{Binding IsFavorite}" Background="Green" VerticalAlignment="Center" HorizontalAlignment="Right" Height="20" Width="20" Cursor="Hand" Opacity="0.4" Grid.Column="3">
-                <i:Interaction.Behaviors>
-                  <ia:EventTriggerBehavior EventName="Checked">
-                    <ia:InvokeCommandAction Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SetIsFavoriteStatusAsync_Command}" CommandParameter="{Binding Content, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}}"/>
-                  </ia:EventTriggerBehavior>
-                  <ia:EventTriggerBehavior EventName="Unchecked">
-                    <ia:InvokeCommandAction Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SetIsFavoriteStatusAsync_Command}" CommandParameter="{Binding Content, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}}"/>
-                  </ia:EventTriggerBehavior>
-                </i:Interaction.Behaviors>
-              </CheckBox>
-              <CheckBox IsChecked="{Binding IsWatched}" Background="Red" VerticalAlignment="Center" HorizontalAlignment="Right" Height="30" Width="30" Cursor="Hand" Grid.Column="4">
-                <i:Interaction.Behaviors>
-                  <ia:EventTriggerBehavior EventName="Checked">
-                    <ia:InvokeCommandAction Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SetIsWatchedStatusAsync_Command}" CommandParameter="{Binding Content, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}}"/>
-                  </ia:EventTriggerBehavior>
-                  <ia:EventTriggerBehavior EventName="Unchecked">
-                    <ia:InvokeCommandAction Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SetIsWatchedStatusAsync_Command}" CommandParameter="{Binding Content, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}}"/>
-                  </ia:EventTriggerBehavior>
-                </i:Interaction.Behaviors>
-              </CheckBox>
+              <Label Content="{Binding Year, Mode=OneWay}" Foreground="#74BCFF" FontStyle="Italic" FontSize="16" BorderThickness="0" MinWidth="50" VerticalContentAlignment="Center" HorizontalContentAlignment="Right" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="0" Tag="{Binding}" DoubleTapped="MediaItem_DoubleTapped" PointerReleased="MediaItem_PointerReleased"/>
+              <Label Content="{Binding MediaName, Mode=OneWay}" Background="#01000000" ToolTip.Tip="{Binding MediaName}" Foreground="{DynamicResource ListTextNormal}" FontWeight="Bold" FontSize="20" Cursor="Hand" BorderThickness="0" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="1" Tag="{Binding}" DoubleTapped="MediaItem_DoubleTapped" PointerReleased="MediaItem_PointerReleased"/>
+              <Label Content="{Binding Rating, Mode=OneWay, StringFormat='{}{0:#,##0.00}'}" ToolTip.Tip="{Binding CommonRating}" Foreground="{Binding Rating, Converter={StaticResource NumberToColorConverter}}" FontSize="18" BorderThickness="0" Margin="6,0" VerticalContentAlignment="Center" HorizontalContentAlignment="Right" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="2" Tag="{Binding}" DoubleTapped="MediaItem_DoubleTapped" PointerReleased="MediaItem_PointerReleased"/>
+              <CheckBox IsChecked="{Binding IsFavorite, Mode=TwoWay}" Classes="favorite" Tag="{Binding .}" ToolTip.Tip="Favorite" VerticalAlignment="Center" HorizontalAlignment="Center" Height="20" Width="20" Cursor="Hand" Grid.Column="3" Click="IsFavorite_Click"/>
+              <CheckBox IsChecked="{Binding IsWatched, Mode=TwoWay}" Classes="checkBox" Tag="{Binding .}" ToolTip.Tip="Watched" VerticalAlignment="Center" HorizontalAlignment="Center" Height="20" Width="20" Cursor="Hand" Grid.Column="4" Click="IsWatched_Click"/>
             </Grid>
           </DataTemplate>
         </ListBox.ItemTemplate>
-          
-        <!--<ListBox.View>
-          <GridView>
-            <GridViewColumn Header="Year" Width="50">
-              <GridViewColumn.CellTemplate>
-                <DataTemplate>
-                  <TextBox Text="{Binding Year, Mode=OneWay}" Foreground="#74BCFF" Cursor="IBeam" FontStyle="Italic" FontSize="16" Background="Transparent" IsReadOnly="True" BorderThickness="0" Margin="-6,0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" TextAlignment="Right" PreviewMouseUp="MediaItem_MouseUp" PreviewMouseDoubleClick="MediaItem_MouseDoubleClick"/>
-                </DataTemplate>
-              </GridViewColumn.CellTemplate>
-            </GridViewColumn>
-            <GridViewColumn Header="Name" Width="110">
-              <GridViewColumn.CellTemplate>
-                <DataTemplate>
-                  <Label Content="{Binding MediaName, Mode=OneWay}" ToolTip="{Binding MediaName}" Foreground="{DynamicResource ListTextNormal}" FontWeight="Bold" FontSize="20" Cursor="Hand" Background="Transparent" BorderThickness="0" Margin="-6,0" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" PreviewMouseUp="MediaItem_MouseUp" PreviewMouseDoubleClick="MediaItem_MouseDoubleClick"/>
-                </DataTemplate>
-              </GridViewColumn.CellTemplate>
-            </GridViewColumn>
-            <GridViewColumn Header="Rating" Width="110">
-              <GridViewColumn.CellTemplate>
-                <DataTemplate>
-                  <TextBox Text="{Binding Rating, Mode=OneWay, StringFormat='{}{0:#,##0.00}'}" ToolTip="{Binding CommonRating}" Foreground="{DynamicResource ListTextHighlighted}" FontSize="18" IsReadOnly="True" Background="Transparent" BorderThickness="0" Margin="-6,0" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" TextAlignment="Right" PreviewMouseUp="MediaItem_MouseUp" PreviewMouseDoubleClick="MediaItem_MouseDoubleClick"/>
-                </DataTemplate>
-              </GridViewColumn.CellTemplate>
-            </GridViewColumn>
-            <GridViewColumn Header="Favorite" Width="70">
-              <GridViewColumn.CellTemplate>
-                <DataTemplate>
-                  <CheckBox IsChecked="{Binding IsFavorite}" Style="{DynamicResource styleRatingCheckBox}" VerticalAlignment="Center" HorizontalAlignment="Right" Height="20" Width="20" Cursor="Hand" Opacity="0.4" PreviewMouseUp="MediaItem_MouseUp">
-                    <i:Interaction.Triggers>
-                      <i:EventTrigger EventName="Checked">
-                        <i:InvokeCommandAction Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SetIsFavoriteStatusAsync_Command}" CommandParameter="{Binding Content, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}}"/>
-                      </i:EventTrigger>
-                      <i:EventTrigger EventName="Unchecked">
-                        <i:InvokeCommandAction Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SetIsFavoriteStatusAsync_Command}" CommandParameter="{Binding Content, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}}"/>
-                      </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                  </CheckBox>
-                </DataTemplate>
-              </GridViewColumn.CellTemplate>
-            </GridViewColumn>
-            <GridViewColumn Header="Watched" Width="80">
-              <GridViewColumn.CellTemplate>
-                <DataTemplate>
-                  <CheckBox IsChecked="{Binding IsWatched}" Style="{DynamicResource CheckBoxStyle}" VerticalAlignment="Center" HorizontalAlignment="Right" Height="30" Width="30" Cursor="Hand" PreviewMouseUp="MediaItem_MouseUp">
-                    <i:Interaction.Triggers>
-                      <i:EventTrigger EventName="Checked">
-                        <i:InvokeCommandAction Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SetIsWatchedStatusAsync_Command}" CommandParameter="{Binding Content, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}}"/>
-                      </i:EventTrigger>
-                      <i:EventTrigger EventName="Unchecked">
-                        <i:InvokeCommandAction Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SetIsWatchedStatusAsync_Command}" CommandParameter="{Binding Content, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}}"/>
-                      </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                  </CheckBox>
-                </DataTemplate>
-              </GridViewColumn.CellTemplate>
-            </GridViewColumn>
-          </GridView>
-        </ListBox.View>-->
         <ListBox.ContextMenu>
           <ContextMenu x:Name="cntMedia" DataContext="{Binding RelativeSource={RelativeSource Self}, Path=PlacementTarget.DataContext}">
             <MenuItem Header="Play all" Command="{Binding PlayAllMediaAsync_Command}"/>
@@ -253,7 +165,7 @@
           </i:EventTrigger>
         </i:Interaction.Triggers>-->
       </AutoCompleteBox>
-      <Image Cursor="Hand" x:Name="imgNavigateUp" ToolTip.Tip="Up one level" Grid.Column="1" Margin="0,10,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Source="avares://Leya.ViewsAvalonia/Assets/Previous-icon.png" Height="20" Width="20" RenderTransformOrigin="0.5,0.5" PointerReleased="NavigateUp_PointerReleased">
+      <Image Cursor="Hand" x:Name="imgNavigateUp" ToolTip.Tip="Up one level" Grid.Column="1" Margin="10,10,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Source="avares://Leya.ViewsAvalonia/Assets/Previous-icon.png" Height="20" Width="20" RenderTransformOrigin="0.5,0.5" PointerReleased="NavigateUp_PointerReleased">
         <Image.RenderTransform>
           <TransformGroup>
             <RotateTransform Angle="90"/>
@@ -271,214 +183,87 @@
           <ColumnDefinition Width="300*"/>
           <ColumnDefinition Width="18*"/>
         </Grid.ColumnDefinitions>
-        <Label Content="{Binding TagLine}" Foreground="{DynamicResource textForeground}" Margin="10,28,11,0" FontSize="18" FontWeight="Bold" FontStyle="Italic" Height="28" VerticalAlignment="Top" Padding="0" Grid.Row="0" Grid.ColumnSpan="3" HorizontalContentAlignment="Center">
-          <!--<Label.Effect>
-            <DropShadowEffect BlurRadius="5" Color="#000" Direction="300" Opacity=".8" RenderingBias="Quality" ShadowDepth="3" />
-          </Label.Effect>-->
-        </Label>
 
-        <Label Content="Runtime:" Foreground="#FF00B4FF" Margin="4.5,69,0,0" FontSize="12" FontWeight="Bold" Height="17" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" Width="55" Grid.Column="1">
-          <!--<Label.Effect>
-            <DropShadowEffect BlurRadius="5" Color="#444" Direction="300" Opacity=".8" RenderingBias="Quality" ShadowDepth="3" />
-          </Label.Effect>-->
-        </Label>
-        <TextBlock Text="{Binding Runtime, Mode=OneWay, StringFormat='{}{0:dd:hh:mm:ss}'}" Foreground="{DynamicResource MainMenuForeground}" FontSize="12" FontWeight="Bold" Margin="59.5,69,5,0" Height="17" VerticalAlignment="Top" Padding="0" Grid.Column="1">
-          <!--<TextBlock.Effect>
-            <DropShadowEffect BlurRadius="5" Color="#444" Direction="300" Opacity=".8" RenderingBias="Quality" ShadowDepth="3" />
-          </TextBlock.Effect>-->
-        </TextBlock>
-
-        <Image Source="avares://Leya.ViewsAvalonia/Assets/bg-mask.png" Grid.Row="0" Grid.RowSpan="3" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,0,1,49" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
-        <!--<Image Source="{Binding Poster, FallbackValue='avares://Leya.ViewsAvalonia/Assets/tp.png', Converter={StaticResource NullImageConverter}}" Grid.Row="1" Grid.Column="1" Margin="0,20,1,0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="Auto" Height="Auto"/>
-        <Image Source="{Binding MediaCase, Converter={StaticResource ImageSourceConverter}}" Grid.Row="0" Grid.RowSpan="3" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,2,1,47" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="Auto" Height="Auto"/>-->
+        <Image Source="avares://Leya.ViewsAvalonia/Assets/bg-mask.png" Grid.Row="0" Grid.RowSpan="3" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,0,1,49" Width="NaN" Height="NaN" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+        <Image Source="{Binding Poster, FallbackValue='avares://Leya.ViewsAvalonia/Assets/tp.png', Converter={StaticResource NullImageConverter}}" Grid.Row="1" Grid.Column="1" Width="NaN" Height="NaN" Margin="0,20,1,0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" />
+        <Image Source="{Binding MediaCase, Converter={StaticResource ImageSourceConverter}}" Grid.Row="0" Grid.RowSpan="3" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,2,1,47" Width="NaN" Height="NaN" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
         <!--poster art size 480x720-->
 
-        <Label Content="Seasons:" IsVisible="{Binding IsNumberOfSeasonsVisible}" Grid.Column="1" Foreground="#FF00B4FF" Margin="84.5,47,0,0" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" Width="102" Grid.Row="2">
-          <!--<Label.Effect>
-            <DropShadowEffect BlurRadius="5" Color="#444" Direction="300" Opacity=".8" RenderingBias="Quality" ShadowDepth="3" />
-          </Label.Effect>-->
-        </Label>
-        <Label Content="{Binding NumberOfSeasons}" Foreground="{DynamicResource MainMenuForeground}" IsVisible="{Binding IsNumberOfSeasonsVisible}" FontSize="18" FontWeight="Bold" Margin="192.5,47,10,0" Height="28" VerticalAlignment="Top" Padding="0" Grid.Column="1" Grid.Row="2">
-          <!--<Label.Effect>
-            <DropShadowEffect BlurRadius="5" Color="#444" Direction="300" Opacity=".8" RenderingBias="Quality" ShadowDepth="3" />
-          </Label.Effect>-->
-        </Label>
+        <Label Content="{Binding TagLine}" Foreground="{DynamicResource textForeground}" Margin="0,18,0,0" FontSize="38" FontWeight="Bold" FontStyle="Italic" VerticalAlignment="Top" Padding="0" Grid.Row="0" Grid.ColumnSpan="3" HorizontalContentAlignment="Center" FontFamily="avares://Leya.ViewsAvalonia/Assets/LCARS.ttf#Swiss911 UCm BT"/>
+        <Label Content="Runtime:" Foreground="#FF00B4FF" Margin="4.5,69,0,0" FontSize="20" FontWeight="Bold" Height="20" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" Grid.Column="1" />
+        <Label Content="{Binding Runtime, Converter={StaticResource TimeSpanFormatConverter}}" Foreground="{DynamicResource textForeground}" Margin="0,69,0,0" FontSize="20" FontWeight="Bold" FontStyle="Italic" VerticalAlignment="Top" Padding="0" Grid.Row="0" Grid.ColumnSpan="3" HorizontalContentAlignment="Center"/>
+        
+        <Label Content="Seasons:" IsVisible="{Binding IsNumberOfSeasonsVisible}" Grid.Column="1" Foreground="#FF00B4FF" Margin="84.5,47,0,0" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" Width="102" Grid.Row="2"/>
+        <Label Content="{Binding NumberOfSeasons}" Foreground="{DynamicResource MainMenuForeground}" IsVisible="{Binding IsNumberOfSeasonsVisible}" FontSize="18" FontWeight="Bold" Margin="192.5,47,10,0" Height="28" VerticalAlignment="Top" Padding="0" Grid.Column="1" Grid.Row="2"/>
 
-        <Label Content="Director:" IsVisible="{Binding IsDirectorVisible}" Grid.Column="1" Foreground="#FF00B4FF" Margin="10.5,18,0,0" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" Width="78" Grid.Row="2">
-          <!--<Label.Effect>
-            <DropShadowEffect BlurRadius="5" Color="#444" Direction="300" Opacity=".8" RenderingBias="Quality" ShadowDepth="3" />
-          </Label.Effect>-->
-        </Label>
-        <controls:Marquee SetText="{Binding DataContext.Director, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" IsVisible="{Binding DataContext.IsDirectorVisible, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Foreground="{DynamicResource MainMenuForeground}" FontSize="18" FontWeight="Bold" Margin="93.5,19,10,0" Height="28" VerticalAlignment="Top" Padding="0" Grid.Column="1" Grid.Row="2">
-          <!--<controls:Marquee.Effect>
-            <DropShadowEffect BlurRadius="5" Color="#444" Direction="300" Opacity=".8" RenderingBias="Quality" ShadowDepth="3" />
-          </controls:Marquee.Effect>-->
-        </controls:Marquee>
+        <Label Content="Director:" IsVisible="{Binding IsDirectorVisible}" Grid.Column="1" Foreground="#FF00B4FF" Margin="10.5,18,0,0" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" Width="78" Grid.Row="2"/>
+        <controls:Marquee SetText="{Binding DataContext.Director, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" IsVisible="{Binding DataContext.IsDirectorVisible, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Foreground="{DynamicResource MainMenuForeground}" FontSize="18" FontWeight="Bold" Margin="93.5,19,10,0" Height="28" VerticalAlignment="Top" Padding="0" Grid.Column="1" Grid.Row="2"/>
 
-        <Label Content="Writers:" IsVisible="{Binding IsWritersVisible}" Grid.Column="1" Foreground="#FF00B4FF" Margin="10.5,47,0,0" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" Width="70" Grid.Row="2">
-          <!--<Label.Effect>
-            <DropShadowEffect BlurRadius="5" Color="#444" Direction="300" Opacity=".8" RenderingBias="Quality" ShadowDepth="3" />
-          </Label.Effect>-->
-        </Label>
-        <controls:Marquee SetText="{Binding DataContext.Writers, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" IsVisible="{Binding DataContext.IsWritersVisible, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Foreground="{DynamicResource MainMenuForeground}" FontSize="18" FontWeight="Bold" Margin="84.5,47,10,0" Height="28" VerticalAlignment="Top" Padding="0" Grid.Column="1" Grid.Row="2">
-          <!--<controls:Marquee.Effect>
-            <DropShadowEffect BlurRadius="5" Color="#444" Direction="300" Opacity=".8" RenderingBias="Quality" ShadowDepth="3" />
-          </controls:Marquee.Effect>-->
-        </controls:Marquee>
-        <Label Content="Episodes:" IsVisible="{Binding IsTvShow}" Grid.Column="1" Foreground="#FF00B4FF" Margin="84.5,75,0,0" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" Width="102" Grid.Row="2">
-          <!--<Label.Effect>
-            <DropShadowEffect BlurRadius="5" Color="#444" Direction="300" Opacity=".8" RenderingBias="Quality" ShadowDepth="3" />
-          </Label.Effect>-->
-        </Label>
-        <Label Content="{Binding NumberOfEpisodes}" Foreground="{DynamicResource MainMenuForeground}" IsVisible="{Binding IsTvShow}" FontSize="18" FontWeight="Bold" Margin="192.5,75,10,0" Height="28" VerticalAlignment="Top" Padding="0" Grid.Column="1" Grid.Row="2">
-          <!--<Label.Effect>
-            <DropShadowEffect BlurRadius="5" Color="#444" Direction="300" Opacity=".8" RenderingBias="Quality" ShadowDepth="3" />
-          </Label.Effect>-->
-        </Label>
+        <Label Content="Writers:" IsVisible="{Binding IsWritersVisible}" Grid.Column="1" Foreground="#FF00B4FF" Margin="10.5,47,0,0" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" Width="70" Grid.Row="2"/>
+        <controls:Marquee SetText="{Binding DataContext.Writers, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" IsVisible="{Binding DataContext.IsWritersVisible, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Foreground="{DynamicResource MainMenuForeground}" FontSize="18" FontWeight="Bold" Margin="84.5,47,10,0" Height="28" VerticalAlignment="Top" Padding="0" Grid.Column="1" Grid.Row="2"/>
+        <Label Content="Episodes:" IsVisible="{Binding IsTvShow}" Grid.Column="1" Foreground="#FF00B4FF" Margin="84.5,75,0,0" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" Width="102" Grid.Row="2"/>
+        <Label Content="{Binding NumberOfEpisodes}" Foreground="{DynamicResource MainMenuForeground}" IsVisible="{Binding IsTvShow}" FontSize="18" FontWeight="Bold" Margin="192.5,75,10,0" Height="28" VerticalAlignment="Top" Padding="0" Grid.Column="1" Grid.Row="2"/>
 
-        <Label Content="Unwatched:" IsVisible="{Binding IsTvShow}" Grid.Column="1" Foreground="#FF00B4FF" Margin="84.5,103,0,0" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" Width="102" Grid.Row="2">
-          <!--<Label.Effect>
-            <DropShadowEffect BlurRadius="5" Color="#444" Direction="300" Opacity=".8" RenderingBias="Quality" ShadowDepth="3" />
-          </Label.Effect>-->
-        </Label>
-        <Label Content="{Binding NumberOfUnwatchedEpisodes}" Foreground="{DynamicResource MainMenuForeground}" IsVisible="{Binding IsTvShow}" FontSize="18" FontWeight="Bold" Margin="192.5,103,10,0" Height="28" VerticalAlignment="Top" Padding="0" Grid.Column="1" Grid.Row="2">
-          <!--<Label.Effect>
-            <DropShadowEffect BlurRadius="5" Color="#444" Direction="300" Opacity=".8" RenderingBias="Quality" ShadowDepth="3" />
-          </Label.Effect>-->
-        </Label>
+        <Label Content="Unwatched:" IsVisible="{Binding IsTvShow}" Grid.Column="1" Foreground="#FF00B4FF" Margin="84.5,103,0,0" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" Width="102" Grid.Row="2"/>
+        <Label Content="{Binding NumberOfUnwatchedEpisodes}" Foreground="{DynamicResource MainMenuForeground}" IsVisible="{Binding IsTvShow}" FontSize="18" FontWeight="Bold" Margin="192.5,103,10,0" Height="28" VerticalAlignment="Top" Padding="0" Grid.Column="1" Grid.Row="2"/>
       </Grid>
       <Grid x:Name="grdDescription" Grid.Column="2" Margin="0" IsVisible="{Binding IsMediaCoverVisible}">
-        <!--<Image Source="/Resources/description-mask.png" VerticalAlignment="Stretch" Margin="0" HorizontalAlignment="Stretch" Stretch="Fill" Height="Auto" Width="Auto" Opacity="0.7"/>
-        <Image Source="{Binding Banner, FallbackValue='pack://application:,,,/Leya;component/Resources/tp.png', Converter={StaticResource NullImageConverter}}" x:Name="imgBanner" Margin="10,25,15.5,0" Height="71" Width="Auto" Opacity="0.7" VerticalAlignment="Top">
+        <Image Source="avares://Leya.ViewsAvalonia/Assets/description-mask.png" VerticalAlignment="Stretch" Margin="0" HorizontalAlignment="Stretch" Stretch="Fill" Width="NaN" Height="NaN" Opacity="0.7"/>
+        <Image Source="{Binding Banner, FallbackValue='avares://Leya.ViewsAvalonia/Assets/tp.png', Converter={StaticResource NullImageConverter}}" x:Name="imgBanner" Margin="10,25,15.5,0" Height="71" Width="NaN" Opacity="0.7" VerticalAlignment="Top">
           <Image.OpacityMask>
-            <ImageBrush Source="/Resources/banner-mask.png" Stretch="Fill"/>
+            <ImageBrush Source="avares://Leya.ViewsAvalonia/Assets/banner-mask.png" Stretch="Fill"/>
           </Image.OpacityMask>
         </Image>
-        <Image Source="/Resources/bg-description.png" Margin="0,0,-0.5,0" HorizontalAlignment="Stretch" Stretch="Fill" Height="Auto" Width="Auto" Opacity="0.7"/>-->
+        <Image Source="avares://Leya.ViewsAvalonia/Assets/bg-description.png" ZIndex="-1" Margin="0,0,-0.5,0" HorizontalAlignment="Stretch" Stretch="Fill" Width="NaN" Height="NaN" Opacity="0.7"/>
 
-        <Label Content="Current status:" Foreground="#FF00B4FF" Margin="17,124,0,0" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" Width="128">
-          <!--<Label.Effect>
-            <DropShadowEffect BlurRadius="5" Color="#444" Direction="300" Opacity=".8" RenderingBias="Quality" ShadowDepth="3" />
-          </Label.Effect>-->
-        </Label>
-        <Label Content="{Binding CurrentStatus}" Foreground="{DynamicResource MainMenuForeground}" FontSize="18" FontWeight="Bold" Margin="150,124,0,0" Height="28" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" Width="79">
-          <!--<Label.Effect>
-            <DropShadowEffect BlurRadius="5" Color="#444" Direction="300" Opacity=".8" RenderingBias="Quality" ShadowDepth="3" />
-          </Label.Effect>-->
-        </Label>
+        <Label Content="Current status:" Foreground="#FF00B4FF" Margin="17,124,0,0" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" Width="128"/>
+        <Label Content="{Binding CurrentStatus}" Foreground="{DynamicResource MainMenuForeground}" FontSize="18" FontWeight="Bold" Margin="150,124,0,0" Height="28" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" Width="79"/>
 
-        <Label Content="Rated:" Foreground="#FF00B4FF" Margin="234,124,0,0" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" Width="54">
-          <!--<Label.Effect>
-            <DropShadowEffect BlurRadius="5" Color="#444" Direction="300" Opacity=".8" RenderingBias="Quality" ShadowDepth="3" />
-          </Label.Effect>-->
-        </Label>
-        <Label Content="{Binding MPAA}" Foreground="{DynamicResource MainMenuForeground}" FontSize="18" FontWeight="Bold" Margin="293,124,16.5,0" Height="28" VerticalAlignment="Top" Padding="0">
-          <!--<Label.Effect>
-            <DropShadowEffect BlurRadius="5" Color="#444" Direction="300" Opacity=".8" RenderingBias="Quality" ShadowDepth="3" />
-          </Label.Effect>-->
-        </Label>
+        <Label Content="Rated:" Foreground="#FF00B4FF" Margin="234,124,0,0" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" Width="54"/>
+        <Label Content="{Binding MPAA}" Foreground="{DynamicResource MainMenuForeground}" FontSize="18" FontWeight="Bold" Margin="293,124,16.5,0" Height="28" VerticalAlignment="Top" Padding="0"/>
 
-        <Label Content="Premiered:" Foreground="#FF00B4FF" Margin="17,152,0,0" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" Width="128">
-          <!--<Label.Effect>
-            <DropShadowEffect BlurRadius="5" Color="#444" Direction="300" Opacity=".8" RenderingBias="Quality" ShadowDepth="3" />
-          </Label.Effect>-->
-        </Label>
-        <Label Content="{Binding Premiered, StringFormat='d'}" Foreground="{DynamicResource MainMenuForeground}" FontSize="18" FontWeight="Bold" Margin="150,152,0,0" Height="28" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" Width="105">
-          <!--<Label.Effect>
-            <DropShadowEffect BlurRadius="5" Color="#444" Direction="300" Opacity=".8" RenderingBias="Quality" ShadowDepth="3" />
-          </Label.Effect>-->
-        </Label>
+        <Label Content="Premiered:" Foreground="#FF00B4FF" Margin="17,152,0,0" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" Width="128"/>
+        <Label Content="{Binding Premiered, Converter={StaticResource DateTimeFormatConverter}}" Foreground="{DynamicResource MainMenuForeground}" FontSize="18" FontWeight="Bold" Margin="150,152,16.5,0" Height="28" VerticalAlignment="Top" Padding="0"/>
 
-        <Label Content="Date added:" Foreground="#FF00B4FF" Margin="17,180,0,0" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" Width="128">
-          <!--<Label.Effect>
-            <DropShadowEffect BlurRadius="5" Color="#444" Direction="300" Opacity=".8" RenderingBias="Quality" ShadowDepth="3" />
-          </Label.Effect>-->
-        </Label>
-        <Label Content="{Binding Added, StringFormat='d'}" Foreground="{DynamicResource MainMenuForeground}" FontSize="18" FontWeight="Bold" Margin="150,180,0,0" Height="28" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" Width="105">
-          <!--<Label.Effect>
-            <DropShadowEffect BlurRadius="5" Color="#444" Direction="300" Opacity=".8" RenderingBias="Quality" ShadowDepth="3" />
-          </Label.Effect>-->
-        </Label>
+        <Label Content="Date added:" Foreground="#FF00B4FF" Margin="17,180,0,0" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" Width="128"/>
+        <Label Content="{Binding Added, Converter={StaticResource DateTimeFormatConverter}}" Foreground="{DynamicResource MainMenuForeground}" FontSize="18" FontWeight="Bold" Margin="150,180,16.5,0" Height="28" VerticalAlignment="Top" Padding="0"/>
 
-        <Label Content="Path:" Foreground="#FF00B4FF" Margin="17,208,0,0" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" Width="48">
-          <!--<Label.Effect>
-            <DropShadowEffect BlurRadius="5" Color="#444" Direction="300" Opacity=".8" RenderingBias="Quality" ShadowDepth="3" />
-          </Label.Effect>-->
-        </Label>
-        <controls:Marquee SetText="{Binding DataContext.LocalPath, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"  Foreground="{DynamicResource MainMenuForeground}" FontSize="18" FontWeight="Bold" Margin="81,208,15.5,0" Height="28" VerticalAlignment="Top" Padding="0">
-          <!--<controls:Marquee.Effect>
-            <DropShadowEffect BlurRadius="5" Color="#444" Direction="300" Opacity=".8" RenderingBias="Quality" ShadowDepth="3" />
-          </controls:Marquee.Effect>-->
-        </controls:Marquee>
+        <Label Content="Path:" Foreground="#FF00B4FF" Margin="17,208,0,0" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" Width="48"/>
+        <controls:Marquee SetText="{Binding DataContext.LocalPath, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"  Foreground="{DynamicResource MainMenuForeground}" FontSize="18" FontWeight="Bold" Margin="81,208,15.5,0" Height="28" VerticalAlignment="Top" Padding="0"/>
 
-        <Label Content="Genre:" Foreground="#FF00B4FF" Margin="17,237,0,0" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" Width="59">
-          <!--<Label.Effect>
-            <DropShadowEffect BlurRadius="5" Color="#444" Direction="300" Opacity=".8" RenderingBias="Quality" ShadowDepth="3" />
-          </Label.Effect>-->
-        </Label>
-        <controls:Marquee SetText="{Binding DataContext.Genre, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"  Foreground="{DynamicResource MainMenuForeground}" FontSize="18" FontWeight="Bold" Margin="81,237,15.5,0" Height="28" VerticalAlignment="Top" Padding="0">
-          <!--<controls:Marquee.Effect>
-            <DropShadowEffect BlurRadius="5" Color="#444" Direction="300" Opacity=".8" RenderingBias="Quality" ShadowDepth="3" />
-          </controls:Marquee.Effect>-->
-        </controls:Marquee>
+        <Label Content="Genre:" Foreground="#FF00B4FF" Margin="17,237,0,0" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" Width="59"/>
+        <controls:Marquee SetText="{Binding DataContext.Genre, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"  Foreground="{DynamicResource MainMenuForeground}" FontSize="18" FontWeight="Bold" Margin="81,237,15.5,0" Height="28" VerticalAlignment="Top" Padding="0"/>
 
-        <!--<Separator Height="4" Width="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="#FF0093E7" Margin="17,271,22.5,0" />
-        <Separator Height="4" Width="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="#FF0093E7" Margin="17,311,22.5,0" />-->
-        <!--<Image Cursor="Hand" ToolTip="Open media location" Margin="0,276,175.5,0" Height="39" Width="40" HorizontalAlignment="Right" Source="/Resources/folder.png" VerticalAlignment="Top">
-          <i:Interaction.Triggers>
-            <i:EventTrigger EventName="MouseUp">
-              <i:InvokeCommandAction Command="{Binding DataContext.OpenMediaFolder_Command, RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}}"/>
-            </i:EventTrigger>
-          </i:Interaction.Triggers>
-          <Image.Effect>
-            <DropShadowEffect BlurRadius="5" Color="#444" Direction="300" Opacity=".8" RenderingBias="Quality" ShadowDepth="3" />
-          </Image.Effect>
-        </Image>-->
-        <!--<Image Cursor="Hand" ToolTip="Show cast" Margin="0,277,135.5,0" Height="32" Width="40" HorizontalAlignment="Right" Source="/Resources/cast.png" VerticalAlignment="Top" MouseUp="ShowCast_MouseUp">
-          <i:Interaction.Triggers>
-            <i:EventTrigger EventName="MouseUp">
-              <i:InvokeCommandAction Command="{Binding DataContext.ShowMediaCastAsync_Command, RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}}" CommandParameter="{Binding SelectedItem, ElementName='lstMedia'}"/>
-            </i:EventTrigger>
-          </i:Interaction.Triggers>
-          <Image.Effect>
-            <DropShadowEffect BlurRadius="5" Color="#444" Direction="300" Opacity=".8" RenderingBias="Quality" ShadowDepth="3" />
-          </Image.Effect>
-        </Image>-->
-        <!--<Image Cursor="Hand" ToolTip="Show media information" Margin="0,276,95.5,0" Height="34" Width="40" HorizontalAlignment="Right" Source="/Resources/get_info.png" VerticalAlignment="Top">
-          <Image.Effect>
-            <DropShadowEffect BlurRadius="5" Color="#444" Direction="300" Opacity=".8" RenderingBias="Quality" ShadowDepth="3" />
-          </Image.Effect>
-        </Image>-->
-        <!--<Image Cursor="Hand" ToolTip="Refresh" Margin="0,276,58.5,0" Height="34" Width="34" HorizontalAlignment="Right" Source="/Resources/update.png" VerticalAlignment="Top">
-          <Image.Effect>
-            <DropShadowEffect BlurRadius="5" Color="#444" Direction="300" Opacity=".8" RenderingBias="Quality" ShadowDepth="3" />
-          </Image.Effect>
-        </Image>-->
-        <!--<Image Cursor="Hand" ToolTip="Extras" Margin="0,276,22.5,0" Height="34" Width="34" HorizontalAlignment="Right" Source="/Resources/extras.png" VerticalAlignment="Top">
-          <Image.Effect>
-            <DropShadowEffect BlurRadius="5" Color="#444" Direction="300" Opacity=".8" RenderingBias="Quality" ShadowDepth="3" />
-          </Image.Effect>
-        </Image>-->
-
-        <!--<Image Source="{Binding Fanart, FallbackValue='pack://application:,,,/Leya;component/Resources/tp.png', Converter={StaticResource NullImageConverter}}" IsVisible="{Binding IsFanartVisible}" Margin="17,449,22.5,32" Height="Auto" Width="Auto" Opacity="0.5"/>-->
-
-        <!--<Label Content="Synopsis:" Foreground="#FF00B4FF" Margin="17,320,0,0" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" Width="81">
-                  <Label.Effect>
-                      <DropShadowEffect BlurRadius="5" Color="#444" Direction="300" Opacity=".8" RenderingBias="Quality" ShadowDepth="3" />
-                  </Label.Effect>
-              </Label>-->
+        <Image Source="{Binding Fanart, FallbackValue='avares://Leya.ViewsAvalonia/Assets/tp.png', Converter={StaticResource NullImageConverter}}" IsVisible="{Binding IsFanartVisible}" Width="NaN" Height="NaN" Margin="17,449,22.5,32" Opacity="0.5"/>
+        
+        <Label Content="Synopsis:" Foreground="#FF00B4FF" Margin="17,320,0,0" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" Width="81"/>
         <Expander x:Name="ExpanderControl" FontSize="22" FontWeight="Bold" Foreground="#FF009CFE" Header="Synopsis:" Margin="17,320,22.5,0" Cursor="Hand" VerticalAlignment="Top">
-          <TextBlock Text="{Binding Synopsis}" Margin="0" TextWrapping="Wrap" FontSize="22" Foreground="#FF009CFE" VerticalAlignment="Top">
-            <!--<TextBlock.Effect>
-              <DropShadowEffect BlurRadius="5" Color="#444" Direction="300" Opacity=".8" RenderingBias="Quality" ShadowDepth="3" />
-            </TextBlock.Effect>-->
-          </TextBlock>
-          <!--<Expander.Effect>
-            <DropShadowEffect BlurRadius="5" Color="#444" Direction="300" Opacity=".8" RenderingBias="Quality" ShadowDepth="3" />
-          </Expander.Effect>-->
+          <TextBlock Text="{Binding Synopsis}" Margin="0" TextWrapping="Wrap" FontSize="22" Foreground="#FF009CFE" VerticalAlignment="Top"/>
         </Expander>
+        
+        <Separator Height="4" HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="#FF0093E7" Width="NaN" Margin="17,271,22.5,0" />
+        <Separator Height="4" HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="#FF0093E7" Width="NaN" Margin="17,311,22.5,0" />
+        <Image Cursor="Hand" ToolTip.Tip="Open media location" Margin="0,276,175.5,0" Height="39" Width="40" HorizontalAlignment="Right" Source="avares://Leya.ViewsAvalonia/Assets/folder.png" VerticalAlignment="Top">
+          <i:Interaction.Behaviors>
+            <ia:EventTriggerBehavior EventName="PointerReleased">
+              <ia:InvokeCommandAction Command="{Binding DataContext.OpenMediaFolder_Command, RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}}"/>
+            </ia:EventTriggerBehavior>
+          </i:Interaction.Behaviors>
+        </Image>
+        <Image Cursor="Hand" ToolTip.Tip="Show cast" Margin="0,277,135.5,0" Height="32" Width="40" HorizontalAlignment="Right" Source="avares://Leya.ViewsAvalonia/Assets/cast.png" VerticalAlignment="Top" PointerReleased="ShowCast_PointerReleased">
+          <i:Interaction.Behaviors>
+            <ia:EventTriggerBehavior EventName="PointerReleased">
+              <ia:InvokeCommandAction Command="{Binding DataContext.ShowMediaCastAsync_Command, RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}}" CommandParameter="{Binding SelectedItem, ElementName='lstMedia'}"/>
+            </ia:EventTriggerBehavior>
+          </i:Interaction.Behaviors>
+        </Image>
+        <Image Cursor="Hand" ToolTip.Tip="Show media information" ZIndex="2" Margin="0,276,95.5,0" Height="34" Width="40" HorizontalAlignment="Right" Source="avares://Leya.ViewsAvalonia/Assets/get_info.png" VerticalAlignment="Top"/>
+        <Image Cursor="Hand" ToolTip.Tip="Refresh" Margin="0,276,58.5,0" Height="34" Width="34" HorizontalAlignment="Right" Source="avares://Leya.ViewsAvalonia/Assets/update.png" VerticalAlignment="Top"/>
+        <Image Cursor="Hand" ToolTip.Tip="Extras" Margin="0,276,22.5,0" Height="34" Width="34" HorizontalAlignment="Right" Source="avares://Leya.ViewsAvalonia/Assets/extras.png" VerticalAlignment="Top"/>
+
+
       </Grid>
-      <Grid x:Name="grdActors" Grid.Column="0" Grid.ColumnSpan="3" Margin="0" Background="#CC000000" IsVisible="{Binding AreActorsVisible}">
+      <!--<Grid x:Name="grdActors" Grid.Column="0" Grid.ColumnSpan="3" Margin="0" Background="#CC000000" IsVisible="{Binding AreActorsVisible}">
         <Grid Margin="50,50,50,100">
           <ListBox Items="{Binding SourceActors}" HorizontalAlignment="Stretch" Margin="0">
             <ItemsControl.ItemsPanel>
@@ -495,14 +280,14 @@
             </ListBox.ItemTemplate>
           </ListBox>
         </Grid>
-        <!--<Image Cursor="Hand" ToolTip.Tip="Close Cast Panel" Margin="0,18,19,0" VerticalAlignment="Top" HorizontalAlignment="Right" Source="/Resources/mb_iconhand.png" Height="20" Width="20" RenderTransformOrigin="0.5,0.5">
+        --><!--<Image Cursor="Hand" ToolTip.Tip="Close Cast Panel" Margin="0,18,19,0" VerticalAlignment="Top" HorizontalAlignment="Right" Source="/Resources/mb_iconhand.png" Height="20" Width="20" RenderTransformOrigin="0.5,0.5">
           <Image.RenderTransform>
             <TransformGroup>
               <RotateTransform Angle="90"/>
             </TransformGroup>
           </Image.RenderTransform>
-        </Image>-->
-      </Grid>
+        </Image>--><!--
+      </Grid>-->
     </Grid>
 
     <controls:Marquee x:Name="scannerOutput" SetText="{Binding DataContext.ScannerOutput, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" IsVisible="{Binding DataContext.IsScannerTextVisible, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Foreground="{DynamicResource ScannerTextForeground}" FontSize="40" Height="68" VerticalAlignment="Top" Margin="10,243,10,0"/>

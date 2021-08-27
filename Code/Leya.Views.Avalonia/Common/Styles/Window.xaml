@@ -40,7 +40,7 @@
                 <ColumnDefinition Width="100"/>
               </Grid.ColumnDefinitions>
               <Image Grid.Column="0" Margin="10,0,0,0" Height="20" Width="20" Source="avares://Leya.ViewsAvalonia/Assets/icon.ico"/>
-              <Grid Grid.Column="0" Margin="0" Grid.ColumnSpan="4" Width="360" Cursor="SizeAll" behaviors:DragBehavior.Command=""
+              <Grid Name="grdWindowDrag" Grid.Column="0" Margin="0" Grid.ColumnSpan="4" Width="360" Cursor="SizeAll" behaviors:DragBehavior.Command=""
                     behaviors:DragBehavior.CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}">
                 <Polygon Points="0,0 360,0 330,30 30,30" StrokeThickness="0" Fill="{DynamicResource titleBackgroundGradient}"/>
                 <Path StrokeThickness="3" Stroke="{DynamicResource titleSlantGradient}">

@@ -27,8 +27,8 @@ namespace Leya.ViewModels.Common.Models.Media
         #endregion
 
         #region ============================================================ BINDING PROPERTIES ============================================================================= 
-        private bool isWatched;
-        public bool IsWatched
+        private bool? isWatched;
+        public bool? IsWatched
         {
             get { return isWatched; }
             set { isWatched = value; Notify(); }

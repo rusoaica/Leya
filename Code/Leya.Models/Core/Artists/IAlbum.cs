@@ -21,11 +21,17 @@ namespace Leya.Models.Core.Artists
         Task GetAlbumsAsync();
 
         /// <summary>
+        /// Saves <paramref name="songEntity"/> in the storage medium
+        /// </summary>
+        /// <param name="songEntity">The song to be saved</param>
+        Task SaveSongAsync(SongEntity songEntity);
+
+        /// <summary>
         /// Updates the IsListened status of an album identified by <paramref name="albumId"/> in the storage medium
         /// </summary>
         /// <param name="albumId">The id of the album whose status will be updated</param>
         /// <param name="isListened">The IsListened status to be set</param>
-        Task UpdateIsListenedStatusAsync(int albumId, bool isListened);
+        Task UpdateIsListenedStatusAsync(int albumId, bool? isListened);
 
         /// <summary>
         /// Updates the IsFavorite status of an album identified by <paramref name="albumId"/> in the storage medium

@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 using Leya.Models.Common.Infrastructure;
 using Leya.Models.Common.Models.TvShows;
 using Leya.DataAccess.Repositories.TvShows;
+using Leya.Models.Common.Models.Media;
+using System.IO;
+using Newtonsoft.Json;
 #endregion
 
 namespace Leya.Models.Core.TvShows
@@ -39,16 +42,16 @@ namespace Leya.Models.Core.TvShows
 
         #region ================================================================= METHODS ===================================================================================
         /// <summary>
-        /// Gets the tv shows from the storage medium
+        /// Gets all tv shows from the storage medium
         /// </summary>
-        public async Task GetTvShowsAsync()
+        public async Task GetAllAsync()
         {
             await Task.Run(async () =>
             {
                 // get all tv shows
                 var result = await tvShowRepository.GetAllAsync();
                 // get all seasons
-                await seasons.GetSeasonsAsync();
+                await seasons.GetAllAsync();
                 if (string.IsNullOrEmpty(result.Error))
                 {
                     TvShows = Services.AutoMapper.Map<TvShowEntity[]>(result.Data);
@@ -62,11 +65,68 @@ namespace Leya.Models.Core.TvShows
         }
 
         /// <summary>
+        /// Deletes all tv shows from the storage medium
+        /// </summary>
+        public async Task DeleteAllAsync()
+        {
+            var result = await tvShowRepository.DeleteAllAsync();
+            if (!string.IsNullOrEmpty(result.Error))
+                throw new InvalidOperationException("Error deleting the tv shows from the repository: " + result.Error);
+        }
+
+        /// <summary>
+        /// Saves a TV Show in the storage medium
+        /// </summary>
+        /// <param name="mediaTypeSource">The media type source of the TV show</param>
+        /// <param name="mediaTypeId">The media type id of the TV show</param>
+        public async Task SaveAsync(MediaTypeSourceEntity mediaTypeSource, int mediaTypeId)
+        {
+            // read the tv show details, if any
+            if (File.Exists(mediaTypeSource.MediaSourcePath + Path.DirectorySeparatorChar + "tvshow.nfo"))
+            {
+                using (StreamReader tvShowStream = new StreamReader(mediaTypeSource.MediaSourcePath + Path.DirectorySeparatorChar + "tvshow.nfo"))
+                {
+                    // deserialize the tv show info json
+                    TvShowEntity tvShowEntity = JsonConvert.DeserializeObject<TvShowEntity>(await tvShowStream.ReadToEndAsync());
+                    // assign the media type source 
+                    tvShowEntity.MediaTypeSourceId = mediaTypeSource.Id;
+                    tvShowEntity.MediaTypeId = mediaTypeId;
+                    // store the tv show storage entity for later, it contains the ids of its seasons, no reason to ask the storage for them yet again
+                    var tvShowStorageEntity = tvShowEntity.ToStorageEntity();
+                    // save the tv show
+                    var result = await tvShowRepository.InsertAsync(tvShowStorageEntity);
+                    if (!string.IsNullOrEmpty(result.Error))
+                        throw new InvalidOperationException("Error inserting the tv show in the repository: " + result.Error);
+                    else
+                    {
+                        // iterate all the seasons and save their episodes by reading their info json files
+                        foreach (SeasonEntity season in tvShowEntity.Seasons)
+                        {
+                            foreach (string episodePath in Directory.EnumerateFiles(mediaTypeSource.MediaSourcePath + Path.DirectorySeparatorChar + season.SeasonName).Where(f => f.EndsWith(".nfo")))
+                            {
+                                using (StreamReader episodeStream = new StreamReader(episodePath))
+                                {
+                                    // deserialize the episode info json
+                                    EpisodeEntity episodeEntity = JsonConvert.DeserializeObject<EpisodeEntity>(episodeStream.ReadToEnd());
+                                    // assign the media type source 
+                                    episodeEntity.TvShowId = result.Data[0].Id;
+                                    episodeEntity.SeasonId = tvShowStorageEntity.Seasons.Where(s => s.SeasonNumber == season.SeasonNumber).First().Id;
+                                    // save the episode
+                                    await seasons.SaveEpisodeAsync(episodeEntity);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Updates the IsWatched status of a tv show identified by <paramref name="tvShowId"/> in the storage medium
         /// </summary>
         /// <param name="tvShowId">The id of the tv show whose status will be updated</param>
         /// <param name="isWatched">The IsWatched status to be set</param>
-        public async Task UpdateIsWatchedStatusAsync(int tvShowId, bool isWatched)
+        public async Task UpdateIsWatchedStatusAsync(int tvShowId, bool? isWatched)
         {
             var result = await tvShowRepository.UpdateIsWatchedStatusAsync(tvShowId, isWatched);
             if (!string.IsNullOrEmpty(result.Error))

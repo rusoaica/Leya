@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 using Leya.Models.Common.Infrastructure;
 using Leya.Models.Common.Models.Artists;
 using Leya.DataAccess.Repositories.Artists;
+using Leya.Models.Common.Models.Media;
+using System.IO;
+using Newtonsoft.Json;
 #endregion
 
 namespace Leya.Models.Core.Artists
@@ -40,7 +43,7 @@ namespace Leya.Models.Core.Artists
         /// <summary>
         /// Gets the artists from the storage medium
         /// </summary>
-        public async Task GetArtistsAsync()
+        public async Task GetAllAsync()
         {
             await Task.Run(async () =>
             {
@@ -61,11 +64,68 @@ namespace Leya.Models.Core.Artists
         }
 
         /// <summary>
+        /// Deletes the artists from the storage medium
+        /// </summary>
+        public async Task DeleteAllAsync()
+        {
+            var result = await artistRepository.DeleteAllAsync();
+            if (!string.IsNullOrEmpty(result.Error))
+                throw new InvalidOperationException("Error deleting the artists from the repository: " + result.Error);
+        }
+
+        /// <summary>
+        /// Saves an artist in the storage medium
+        /// </summary>
+        /// <param name="mediaTypeSource">The media type source of the TV show</param>
+        /// <param name="mediaTypeId">The media type id of the TV show</param>
+        public async Task SaveAsync(MediaTypeSourceEntity mediaTypeSource, int mediaTypeId)
+        {
+            // read the tv show details, if any
+            if (File.Exists(mediaTypeSource.MediaSourcePath + Path.DirectorySeparatorChar + "artist.nfo"))
+            {
+                using (StreamReader artistStream = new StreamReader(mediaTypeSource.MediaSourcePath + Path.DirectorySeparatorChar + "artist.nfo"))
+                {
+                    // deserialize the artist info json
+                    ArtistEntity artistEntity = JsonConvert.DeserializeObject<ArtistEntity>(await artistStream.ReadToEndAsync());
+                    // assign the media type source 
+                    artistEntity.MediaTypeSourceId = mediaTypeSource.Id;
+                    artistEntity.MediaTypeId = mediaTypeId;
+                    // store the artist storage entity for later, it contains the ids of its albums, no reason to ask the storage for them yet again
+                    var artistStorageEntity = artistEntity.ToStorageEntity();
+                    // save the artist
+                    var result = await artistRepository.InsertAsync(artistStorageEntity);
+                    if (!string.IsNullOrEmpty(result.Error))
+                        throw new InvalidOperationException("Error inserting the artist in the repository: " + result.Error);
+                    else
+                    {
+                        // iterate all the albums and save their songs by reading their info json files
+                        foreach (AlbumEntity album in artistEntity.Albums)
+                        {
+                            foreach (string songPath in Directory.EnumerateFiles(mediaTypeSource.MediaSourcePath + Path.DirectorySeparatorChar + album.NamedTitle).Where(f => f.EndsWith(".nfo")))
+                            {
+                                using (StreamReader songStream = new StreamReader(songPath))
+                                {
+                                    // deserialize the song info json
+                                    SongEntity songEntity = JsonConvert.DeserializeObject<SongEntity>(songStream.ReadToEnd());
+                                    // assign the media type source 
+                                    songEntity.ArtistId = result.Data[0].Id;
+                                    songEntity.AlbumId = artistStorageEntity.Albums.Where(s => s.NamedTitle == album.NamedTitle).First().Id;
+                                    // save the song
+                                    await albums.SaveSongAsync(songEntity);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Updates the IsListened status of an artist identified by <paramref name="artistId"/> in the storage medium
         /// </summary>
         /// <param name="artistId">The id of the artist whose status will be updated</param>
         /// <param name="isListened">The IsListened status to be set</param>
-        public async Task UpdateIsListenedStatusAsync(int artistId, bool isListened)
+        public async Task UpdateIsListenedStatusAsync(int artistId, bool? isListened)
         {
             var result = await artistRepository.UpdateIsListenedStatusAsync(artistId, isListened);
             if (!string.IsNullOrEmpty(result.Error))

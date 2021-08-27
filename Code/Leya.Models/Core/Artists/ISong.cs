@@ -16,16 +16,22 @@ namespace Leya.Models.Core.Artists
 
         #region ================================================================= METHODS ===================================================================================
         /// <summary>
-        /// Gets the songs from the storage medium
+        /// Gets all songs from the storage medium
         /// </summary>
-        Task GetSongsAsync();
+        Task GetAllAsync();
+
+        /// <summary>
+        /// Saves <paramref name="songEntity"/> in the storage medium
+        /// </summary>
+        /// <param name="songEntity">The song to be saved</param>
+        Task SaveAsync(SongEntity songEntity);
 
         /// <summary>
         /// Updates the IsListened status of a song identified by <paramref name="songId"/> in the storage medium
         /// </summary>
         /// <param name="songId">The id of the song whose status will be updated</param>
         /// <param name="isListened">The IsListened status to be set</param>
-        Task UpdateIsListenedStatusAsync(int songId, bool isListened);
+        Task UpdateIsListenedStatusAsync(int songId, bool? isListened);
 
         /// <summary>
         /// Updates the IsFavorite status of a song identified by <paramref name="songId"/> in the storage medium

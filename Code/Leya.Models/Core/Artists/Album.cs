@@ -48,7 +48,7 @@ namespace Leya.Models.Core.Artists
                 // get all albums
                 var result = await albumRepository.GetAllAsync();
                 // get all songs
-                await songs.GetSongsAsync();
+                await songs.GetAllAsync();
                 if (string.IsNullOrEmpty(result.Error))
                 {
                     Albums = Services.AutoMapper.Map<AlbumEntity[]>(result.Data);
@@ -62,11 +62,20 @@ namespace Leya.Models.Core.Artists
         }
 
         /// <summary>
+        /// Saves <paramref name="songEntity"/> in the storage medium
+        /// </summary>
+        /// <param name="songEntity">The song to be saved</param>
+        public async Task SaveSongAsync(SongEntity songEntity)
+        {
+            await songs.SaveAsync(songEntity);
+        }
+
+        /// <summary>
         /// Updates the IsListened status of an album identified by <paramref name="albumId"/> in the storage medium
         /// </summary>
         /// <param name="albumId">The id of the album whose status will be updated</param>
         /// <param name="isListened">The IsListened status to be set</param>
-        public async Task UpdateIsListenedStatusAsync(int albumId, bool isListened)
+        public async Task UpdateIsListenedStatusAsync(int albumId, bool? isListened)
         {
             var result = await albumRepository.UpdateIsListenedStatusAsync(albumId, isListened);
             if (!string.IsNullOrEmpty(result.Error))

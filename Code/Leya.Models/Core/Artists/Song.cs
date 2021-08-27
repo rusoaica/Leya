@@ -37,7 +37,7 @@ namespace Leya.Models.Core.Artists
         /// <summary>
         /// Gets the songs from the storage medium
         /// </summary>
-        public async Task GetSongsAsync()
+        public async Task GetAllAsync()
         {
             var result = await songRepository.GetAllAsync();
             if (string.IsNullOrEmpty(result.Error))
@@ -47,11 +47,22 @@ namespace Leya.Models.Core.Artists
         }
 
         /// <summary>
+        /// Saves <paramref name="songEntity"/> in the storage medium
+        /// </summary>
+        /// <param name="songEntity">The song to be saved</param>
+        public async Task SaveAsync(SongEntity songEntity)
+        {
+            var result = await songRepository.InsertAsync(songEntity.ToStorageEntity());
+            if (!string.IsNullOrEmpty(result.Error))
+                throw new InvalidOperationException("Error inserting the song in the storage medium!");
+        }
+
+        /// <summary>
         /// Updates the IsListened status of a song identified by <paramref name="songId"/> in the storage medium
         /// </summary>
         /// <param name="songId">The id of the song whose status will be updated</param>
         /// <param name="isListened">The IsListened status to be set</param>
-        public async Task UpdateIsListenedStatusAsync(int songId, bool isListened)
+        public async Task UpdateIsListenedStatusAsync(int songId, bool? isListened)
         {
             var result = await songRepository.UpdateIsListenedStatusAsync(songId, isListened);
             if (!string.IsNullOrEmpty(result.Error))

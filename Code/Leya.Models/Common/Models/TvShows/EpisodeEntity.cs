@@ -3,6 +3,7 @@
 /// Purpose: Data transfer object for the episodes 
 #region ========================================================================= USING =====================================================================================
 using System;
+using Leya.Models.Common.Infrastructure;
 #endregion
 
 namespace Leya.Models.Common.Models.TvShows
@@ -24,11 +25,11 @@ namespace Leya.Models.Common.Models.TvShows
         public string Director { get; set; }
         public string Synopsis { get; set; }
         public string NamedTitle { get; set; }
-        public EpisodeGenreEntity[] Genre { get; set; }
+        public EpisodeGenreEntity[] Genres { get; set; }
         public EpisodeActorEntity[] Actors { get; set; }
         public EpisodeCreditEntity[] Credits { get; set; }
         public EpisodeRatingEntity[] Ratings { get; set; }
-        public bool IsWatched { get; set; }
+        public bool? IsWatched { get; set; }
         public bool IsFavorite { get; set; }
         public DateTime Aired { get; set; }
         public DateTime Created { get; set; }
@@ -43,6 +44,15 @@ namespace Leya.Models.Common.Models.TvShows
         public override string ToString()
         {
             return Id + " :: " + Title;
+        }
+
+        /// <summary>
+        /// Maps between this entity and the coresponding persistance entity
+        /// </summary>
+        /// <returns>A data storage entity representation of this entity</returns>
+        public DataAccess.Common.Models.Episodes.EpisodeEntity ToStorageEntity()
+        {
+            return Services.AutoMapper.Map<DataAccess.Common.Models.Episodes.EpisodeEntity>(this);
         }
         #endregion
     }

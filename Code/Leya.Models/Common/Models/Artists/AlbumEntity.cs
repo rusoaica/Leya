@@ -14,7 +14,7 @@ namespace Leya.Models.Common.Models.Artists
         public string NamedTitle { get; set; }
         public string Description { get; set; }
         public float Rating { get; set; }
-        public bool IsListened { get; set; }
+        public bool? IsListened { get; set; }
         public bool IsFavorite { get; set; }
         public SongEntity[] Songs { get; set; }
         #endregion

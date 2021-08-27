@@ -19,7 +19,7 @@ namespace Leya.DataAccess.Repositories.Seasons
         /// <param name="seasonId">The id of the season whose status will be updated</param>
         /// <param name="isWatched">The IsWatched status to be set</param>
         /// <returns>The result of updating the IsWatched status, wrapped in a generic API container of type <see cref="ApiResponse"/></returns>
-        Task<ApiResponse> UpdateIsWatchedStatusAsync(int seasonId, bool isWatched);
+        Task<ApiResponse> UpdateIsWatchedStatusAsync(int seasonId, bool? isWatched);
 
         /// <summary>
         /// Updates the IsFavorite status of a season identified by <paramref name="seasonId"/> in the storage medium

@@ -33,9 +33,9 @@ namespace Leya.DataAccess.Common.Models.TvShows
         [IgnoreOnInsert]
         public TvShowRatingEntity[] Ratings { get; set; }
         [IgnoreOnInsert]
-        public TvShowGenreEntity[] Genre { get; set; }
+        public TvShowGenreEntity[] Genres { get; set; }
         public bool IsEnded { get; set; }
-        public bool IsWatched { get; set; }
+        public string IsWatched { get; set; }
         public bool IsFavorite { get; set; }
         [IgnoreOnInsert]
         public TvShowActorEntity[] Actors { get; set; }

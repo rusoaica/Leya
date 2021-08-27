@@ -143,9 +143,9 @@ namespace Leya.DataAccess.Repositories.Seasons
         /// <param name="seasonId">The id of the season whose status will be updated</param>
         /// <param name="isWatched">The IsWatched status to be set</param>
         /// <returns>The result of updating the IsWatched status, wrapped in a generic API container of type <see cref="ApiResponse"/></returns>
-        public async Task<ApiResponse> UpdateIsWatchedStatusAsync(int seasonId, bool isWatched)
+        public async Task<ApiResponse> UpdateIsWatchedStatusAsync(int seasonId, bool? isWatched)
         {
-            return await dataAccess.UpdateAsync(EntityContainers.Seasons, "IsWatched = '" + isWatched + "'", "Id", "'" + seasonId + "'");
+            return await dataAccess.UpdateAsync(EntityContainers.Seasons, "IsWatched = '" + (isWatched != null ? isWatched.ToString() : "Null") + "'", "Id", "'" + seasonId + "'");
         }
 
         /// <summary>

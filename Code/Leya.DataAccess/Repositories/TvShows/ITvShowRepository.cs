@@ -19,7 +19,7 @@ namespace Leya.DataAccess.Repositories.TvShows
         /// <param name="tvShowId">The id of the tv show whose status will be updated</param>
         /// <param name="isWatched">The IsWatched status to be set</param>
         /// <returns>The result of updating the IsWatched status, wrapped in a generic API container of type <see cref="ApiResponse"/></returns>
-        Task<ApiResponse> UpdateIsWatchedStatusAsync(int tvShowId, bool isWatched);
+        Task<ApiResponse> UpdateIsWatchedStatusAsync(int tvShowId, bool? isWatched);
 
         /// <summary>
         /// Updates the IsFavorite status of a tv show identified by <paramref name="tvShowId"/> in the storage medium

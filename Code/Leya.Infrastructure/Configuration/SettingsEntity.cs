@@ -11,6 +11,12 @@ namespace Leya.Infrastructure.Configuration
     {
         #region =============================================================== PROPERTIES ==================================================================================
         public int DialogNavigationFilterSelectedIndex { get; set; }
+        public int? MainWindowPositionX { get; set; }
+        public int? MainWindowPositionY { get; set; }
+        public int? StartupWindowPositionX { get; set; }
+        public int? StartupWindowPositionY { get; set; }
+        public int? MainWindowWidth { get; set; }
+        public int? MainWindowHeight { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
         public string PlayerPath { get; set; }
@@ -20,7 +26,6 @@ namespace Leya.Infrastructure.Configuration
         public string PlayerArguments { get; set; }
         public string BackgroundImagePath { get; set; }
         public double DialogsWidth { get; set; }
-        public double DisplayOffset { get; set; }
         public double DialogsHeight { get; set; }
         public double PreviewPanelWidth { get; set; }
         public double NavigationPanelWidth { get; set; }

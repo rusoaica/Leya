@@ -11,6 +11,9 @@ using Leya.Infrastructure.Security;
 using Leya.DataAccess.StorageAccess;
 using Leya.Models.Common.Extensions;
 using Leya.Models.Common.Models.Users;
+using Leya.Models.Common.Models.TvShows;
+using Leya.Models.Common.Models.Movies;
+using Leya.Models.Common.Models.Artists;
 #endregion
 
 namespace Leya.Models.Common.Configuration
@@ -54,6 +57,55 @@ namespace Leya.Models.Common.Configuration
                             cfg.CreateMap(typeof(UserEntity), dataAccessModelType, MemberList.Destination)
                                .ForMember("Password", opt => opt.MapFrom(src => Uri.EscapeDataString(PasswordHash.Hash(Crypto.Encrypt((src as UserEntity).Password)))))
                                .ForMember("SecurityAnswer", opt => opt.MapFrom(src => Uri.EscapeDataString(PasswordHash.Hash(Crypto.Encrypt((src as UserEntity).SecurityAnswer))))); 
+                        }
+                        else if (domainModelType.Name == nameof(EpisodeEntity))
+                        {
+                            cfg.CreateMap(dataAccessModelType, typeof(EpisodeEntity), MemberList.Source)
+                               .ForMember("IsWatched", opt => opt.MapFrom(src => (src as DataAccess.Common.Models.Episodes.EpisodeEntity).IsWatched.GetValueOrNull<bool>()));
+                            cfg.CreateMap(typeof(EpisodeEntity), dataAccessModelType, MemberList.Destination)
+                               .ForMember("IsWatched", opt => opt.MapFrom(src =>  (src as EpisodeEntity).IsWatched.ToString()));
+                        }
+                        else if (domainModelType.Name == nameof(SeasonEntity))
+                        {
+                            cfg.CreateMap(dataAccessModelType, typeof(SeasonEntity), MemberList.Source)
+                               .ForMember("IsWatched", opt => opt.MapFrom(src => (src as DataAccess.Common.Models.Seasons.SeasonEntity).IsWatched.GetValueOrNull<bool>()));
+                            cfg.CreateMap(typeof(SeasonEntity), dataAccessModelType, MemberList.Destination)
+                               .ForMember("IsWatched", opt => opt.MapFrom(src => (src as SeasonEntity).IsWatched.ToString()));
+                        }
+                        else if (domainModelType.Name == nameof(TvShowEntity))
+                        {
+                            cfg.CreateMap(dataAccessModelType, typeof(TvShowEntity), MemberList.Source)
+                               .ForMember("IsWatched", opt => opt.MapFrom(src => (src as DataAccess.Common.Models.TvShows.TvShowEntity).IsWatched.GetValueOrNull<bool>()));
+                            cfg.CreateMap(typeof(TvShowEntity), dataAccessModelType, MemberList.Destination)
+                               .ForMember("IsWatched", opt => opt.MapFrom(src => (src as TvShowEntity).IsWatched.ToString()));
+                        }
+                        else if (domainModelType.Name == nameof(SongEntity))
+                        {
+                            cfg.CreateMap(dataAccessModelType, typeof(SongEntity), MemberList.Source)
+                               .ForMember("IsListened", opt => opt.MapFrom(src => (src as DataAccess.Common.Models.Songs.SongEntity).IsListened.GetValueOrNull<bool>()));
+                            cfg.CreateMap(typeof(SongEntity), dataAccessModelType, MemberList.Destination)
+                               .ForMember("IsListened", opt => opt.MapFrom(src => (src as SongEntity).IsListened.ToString()));
+                        }
+                        else if (domainModelType.Name == nameof(AlbumEntity))
+                        {
+                            cfg.CreateMap(dataAccessModelType, typeof(AlbumEntity), MemberList.Source)
+                               .ForMember("IsListened", opt => opt.MapFrom(src => (src as DataAccess.Common.Models.Albums.AlbumEntity).IsListened.GetValueOrNull<bool>()));
+                            cfg.CreateMap(typeof(AlbumEntity), dataAccessModelType, MemberList.Destination)
+                               .ForMember("IsListened", opt => opt.MapFrom(src => (src as AlbumEntity).IsListened.ToString()));
+                        }
+                        else if (domainModelType.Name == nameof(ArtistEntity))
+                        {
+                            cfg.CreateMap(dataAccessModelType, typeof(ArtistEntity), MemberList.Source)
+                               .ForMember("IsListened", opt => opt.MapFrom(src => (src as DataAccess.Common.Models.Artists.ArtistEntity).IsListened.GetValueOrNull<bool>()));
+                            cfg.CreateMap(typeof(ArtistEntity), dataAccessModelType, MemberList.Destination)
+                               .ForMember("IsListened", opt => opt.MapFrom(src => (src as ArtistEntity).IsListened.ToString()));
+                        }
+                        else if (domainModelType.Name == nameof(MovieEntity))
+                        {
+                            cfg.CreateMap(dataAccessModelType, typeof(MovieEntity), MemberList.Source)
+                               .ForMember("IsWatched", opt => opt.MapFrom(src => (src as DataAccess.Common.Models.Movies.MovieEntity).IsWatched.GetValueOrNull<bool>()));
+                            cfg.CreateMap(typeof(MovieEntity), dataAccessModelType, MemberList.Destination)
+                               .ForMember("IsWatched", opt => opt.MapFrom(src => (src as MovieEntity).IsWatched.ToString()));
                         }
                         else
                         {

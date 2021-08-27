@@ -3,6 +3,7 @@
 /// Purpose: Interface business model for movies
 #region ========================================================================= USING =====================================================================================
 using System.Threading.Tasks;
+using Leya.Models.Common.Models.Media;
 using Leya.Models.Common.Models.Movies;
 #endregion
 
@@ -16,16 +17,28 @@ namespace Leya.Models.Core.Movies
 
         #region ================================================================= METHODS ===================================================================================
         /// <summary>
-        /// Gets the tv shows from the storage medium
+        /// Gets all movies from the storage medium
         /// </summary>
-        Task GetMoviesAsync();
+        Task GetAllAsync();
+
+        /// <summary>
+        /// Saves a movie in the storage medium
+        /// </summary>
+        /// <param name="mediaTypeSource">The media type source of the movie</param>
+        /// <param name="mediaTypeId">The media type id of the movie</param>
+        Task SaveAsync(MediaTypeSourceEntity mediaTypeSource, int mediaTypeId);
+
+        /// <summary>
+        /// Deletes the movies from the storage medium
+        /// </summary>
+        Task DeleteAllAsync();
 
         /// <summary>
         /// Updates the IsWatched status of a movie identified by <paramref name="movieId"/> in the storage medium
         /// </summary>
         /// <param name="movieId">The id of the movie whose status will be updated</param>
         /// <param name="isWatched">The IsWatched status to be set</param>
-        Task UpdateIsWatchedStatusAsync(int movieId, bool isWatched);
+        Task UpdateIsWatchedStatusAsync(int movieId, bool? isWatched);
 
         /// <summary>
         /// Updates the IsFavorite status of a movie identified by <paramref name="movieId"/> in the storage medium

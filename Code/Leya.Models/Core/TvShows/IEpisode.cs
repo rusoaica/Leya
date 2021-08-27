@@ -18,14 +18,20 @@ namespace Leya.Models.Core.TvShows
         /// <summary>
         /// Gets the tv shows from the storage medium
         /// </summary>
-        Task GetEpisodesAsync();
+        Task GetAllAsync();
+
+        /// <summary>
+        /// Saves <paramref name="episodeEntity"/> in the storage medium
+        /// </summary>
+        /// <param name="episodeEntity">The episode to be saved</param>
+        Task SaveAsync(EpisodeEntity episodeEntity);
 
         /// <summary>
         /// Updates the IsWatched status of an episode identified by <paramref name="episodeId"/> in the storage medium
         /// </summary>
         /// <param name="episodeId">The id of the episode whose status will be updated</param>
         /// <param name="isWatched">The IsWatched status to be set</param>
-        Task UpdateIsWatchedStatusAsync(int episodeId, bool isWatched);
+        Task UpdateIsWatchedStatusAsync(int episodeId, bool? isWatched);
 
         /// <summary>
         /// Updates the IsFavorite status of an episode identified by <paramref name="episodeId"/> in the storage medium

@@ -6,7 +6,7 @@
         xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
         xmlns:iac="clr-namespace:Avalonia.Xaml.Interactions.Custom;assembly=Avalonia.Xaml.Interactions.Custom"
         x:Class="Leya.Views.Startup.StartupV"
-        Title="{Binding WindowTitle}" Classes="styledWindow" HasSystemDecorations="False" WindowStartupLocation="CenterScreen" Height="240" Width="550" MinWidth="520" MinHeight="240" Opened="Window_Opened">
+        Title="{Binding WindowTitle}" Classes="styledWindow" HasSystemDecorations="False" WindowStartupLocation="CenterScreen" Height="240" Width="550" MinWidth="520" MinHeight="240" Opened="Window_Opened" PositionChanged="Window_PositionChanged">
 
   <i:Interaction.Behaviors>
     <ia:EventTriggerBehavior EventName="Opened">

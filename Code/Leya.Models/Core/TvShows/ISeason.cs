@@ -16,16 +16,22 @@ namespace Leya.Models.Core.TvShows
 
         #region ================================================================= METHODS ===================================================================================
         /// <summary>
-        /// Gets the tv shows from the storage medium
+        /// Gets the seasons from the storage medium
         /// </summary>
-        Task GetSeasonsAsync();
+        Task GetAllAsync();
+
+        /// <summary>
+        /// Saves <paramref name="episodeEntity"/> in the storage medium
+        /// </summary>
+        /// <param name="episodeEntity">The episode to be saved</param>
+        Task SaveEpisodeAsync(EpisodeEntity episodeEntity);
 
         /// <summary>
         /// Updates the IsWatched status of a season identified by <paramref name="seasonId"/> in the storage medium
         /// </summary>
         /// <param name="seasonId">The id of the season whose status will be updated</param>
         /// <param name="isWatched">The IsWatched status to be set</param>
-        Task UpdateIsWatchedStatusAsync(int seasonId, bool isWatched);
+        Task UpdateIsWatchedStatusAsync(int seasonId, bool? isWatched);
 
         /// <summary>
         /// Updates the IsFavorite status of a season identified by <paramref name="seasonId"/> in the storage medium

@@ -37,7 +37,7 @@ namespace Leya.Models.Core.TvShows
         /// <summary>
         /// Gets the episodes from the storage medium
         /// </summary>
-        public async Task GetEpisodesAsync()
+        public async Task GetAllAsync()
         {
             var result = await episodeRepository.GetAllAsync();
             if (string.IsNullOrEmpty(result.Error))
@@ -47,11 +47,22 @@ namespace Leya.Models.Core.TvShows
         }
 
         /// <summary>
+        /// Saves <paramref name="episodeEntity"/> in the storage medium
+        /// </summary>
+        /// <param name="episodeEntity">The episode to be saved</param>
+        public async Task SaveAsync(EpisodeEntity episodeEntity)
+        {
+            var result = await episodeRepository.InsertAsync(episodeEntity.ToStorageEntity());
+            if (!string.IsNullOrEmpty(result.Error))            
+                throw new InvalidOperationException("Error inserting the episode in the storage medium!");
+        }
+
+        /// <summary>
         /// Updates the IsWatched status of an episode identified by <paramref name="episodeId"/> in the storage medium
         /// </summary>
         /// <param name="episodeId">The id of the episode whose status will be updated</param>
         /// <param name="isWatched">The IsWatched status to be set</param>
-        public async Task UpdateIsWatchedStatusAsync(int episodeId, bool isWatched)
+        public async Task UpdateIsWatchedStatusAsync(int episodeId, bool? isWatched)
         {
             var result = await episodeRepository.UpdateIsWatchedStatusAsync(episodeId, isWatched);
             if (!string.IsNullOrEmpty(result.Error))

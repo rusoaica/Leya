@@ -4,6 +4,7 @@
 #region ========================================================================= USING =====================================================================================
 using System.Threading.Tasks;
 using Leya.Models.Common.Models.Artists;
+using Leya.Models.Common.Models.Media;
 #endregion
 
 namespace Leya.Models.Core.Artists
@@ -16,16 +17,28 @@ namespace Leya.Models.Core.Artists
 
         #region ================================================================= METHODS ===================================================================================
         /// <summary>
-        /// Gets the artists from the storage medium
+        /// Gets all artists from the storage medium
         /// </summary>
-        Task GetArtistsAsync();
+        Task GetAllAsync();
+
+        /// <summary>
+        /// Saves an artist in the storage medium
+        /// </summary>
+        /// <param name="mediaTypeSource">The media type source of the artist</param>
+        /// <param name="mediaTypeId">The media type id of the artist</param>
+        Task SaveAsync(MediaTypeSourceEntity mediaTypeSource, int mediaTypeId);
+
+        /// <summary>
+        /// Deletes all artists from the storage medium
+        /// </summary>
+        Task DeleteAllAsync();
 
         /// <summary>
         /// Updates the IsListened status of an artist identified by <paramref name="artistId"/> in the storage medium
         /// </summary>
         /// <param name="artistId">The id of the artist whose status will be updated</param>
         /// <param name="isListened">The IsListened status to be set</param>
-        Task UpdateIsListenedStatusAsync(int artistId, bool isListened);
+        Task UpdateIsListenedStatusAsync(int artistId, bool? isListened);
 
         /// <summary>
         /// Updates the IsFavorite status of an artist identified by <paramref name="artistId"/> in the storage medium

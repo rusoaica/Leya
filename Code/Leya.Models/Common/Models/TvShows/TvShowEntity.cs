@@ -2,6 +2,7 @@
 /// Creation Date: 20th of November, 2020
 /// Purpose: Data transfer object for the tv shows
 #region ========================================================================= USING =====================================================================================
+using Leya.Models.Common.Infrastructure;
 using System;
 #endregion
 
@@ -27,11 +28,11 @@ namespace Leya.Models.Common.Models.TvShows
         public string TvShowTitle { get; set; }
         public string TvShowNamedTitle { get; set; }
         public bool IsEnded { get; set; }
-        public bool IsWatched { get; set; }
+        public bool? IsWatched { get; set; }
         public bool IsFavorite { get; set; }
         public SeasonEntity[] Seasons { get; set; }
         public TvShowResumeEntity Resume { get; set; }
-        public TvShowGenreEntity[] Genre { get; set; }
+        public TvShowGenreEntity[] Genres { get; set; }
         public TvShowActorEntity[] Actors { get; set; }
         public TvShowRatingEntity[] Ratings { get; set; }
         public DateTime Aired { get; set; }
@@ -47,6 +48,15 @@ namespace Leya.Models.Common.Models.TvShows
         public override string ToString()
         {
             return Id + " :: " + TvShowTitle;
+        }
+
+        /// <summary>
+        /// Maps between this entity and the coresponding persistance entity
+        /// </summary>
+        /// <returns>A data storage entity representation of this entity</returns>
+        public DataAccess.Common.Models.TvShows.TvShowEntity ToStorageEntity()
+        {
+            return Services.AutoMapper.Map<DataAccess.Common.Models.TvShows.TvShowEntity>(this);
         }
         #endregion
     }

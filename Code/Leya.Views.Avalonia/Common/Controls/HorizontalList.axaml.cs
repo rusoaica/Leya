@@ -20,6 +20,7 @@ namespace Leya.Views.Common.Controls
     {
         #region ============================================================== FIELD MEMBERS ================================================================================
         public event Action<MediaTypeEntity> Click;
+        public event Action<MediaTypeEntity> MouseEnter;
 
         private readonly Grid container;
         #endregion
@@ -164,6 +165,7 @@ namespace Leya.Views.Common.Controls
         private void ChildItem_PointerEnter(object? sender, PointerEventArgs e)
         {
             (sender as Label).Foreground = Brushes.White;
+            MouseEnter?.Invoke((sender as Label).Tag as MediaTypeEntity);
         }
         #endregion
     }

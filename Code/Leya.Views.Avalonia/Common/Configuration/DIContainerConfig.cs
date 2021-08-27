@@ -233,7 +233,8 @@ namespace Leya.Views.Common.Configuration
                    .OnActivating(e => e.Instance.GetType()
                                                 .GetProperty("ConnectionString")
                                                 .SetValue(e.Instance, e.Context.Resolve<IAppConfig>().ConnectionStrings["SqLite"]))
-                   .InstancePerDependency();
+                   .SingleInstance();
+                   //.InstancePerDependency();
 
             builder.RegisterType(repositoryFactoryType).As(iRepositoryFactoryType).SingleInstance();
             // get all classes implementing IRepository (all repository classes) and register them as their corresponding repository interface
@@ -368,9 +369,6 @@ namespace Leya.Views.Common.Configuration
         {
             Type[] dataAccessLayerTypes = Assembly.Load("Leya.DataAccess").GetTypes();
             Type genericRepositoryType = Type.GetType("Leya.DataAccess.Repositories.Common.IRepository`1, Leya.DataAccess");
-            Type sqlDataAccessType = Type.GetType("Leya.DataAccess.StorageAccess.SqlDataAccess, Leya.DataAccess");
-            Type iDataAccessType = Type.GetType("Leya.DataAccess.StorageAccess.IDataAccess, Leya.DataAccess");
-            Type iConnectionStringType = Type.GetType("Leya.DataAccess.StorageAccess.IConnectionString, Leya.DataAccess");
             Type iRepositoryFactoryType = Type.GetType("Leya.DataAccess.Repositories.Common.IRepositoryFactory, Leya.DataAccess");
 
 

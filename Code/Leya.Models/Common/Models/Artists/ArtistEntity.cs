@@ -2,6 +2,7 @@
 /// Creation Date: 09th of December, 2020
 /// Purpose: Data transfer object for the music artists
 #region ========================================================================= USING =====================================================================================
+using Leya.Models.Common.Infrastructure;
 using System;
 #endregion
 
@@ -19,7 +20,7 @@ namespace Leya.Models.Common.Models.Artists
         public string VideoClipLink { get; set; }
         public string ArtistNamedName { get; set; }
         public string MusicBrainzArtistID { get; set; }
-        public bool IsListened { get; set; }
+        public bool? IsListened { get; set; }
         public bool IsFavorite { get; set; }
         public bool IsDisbanded { get; set; }
         public AlbumEntity[] Albums { get; set; }
@@ -38,6 +39,15 @@ namespace Leya.Models.Common.Models.Artists
         public override string ToString()
         {
             return Id + " :: " + ArtistName;
+        }
+
+        /// <summary>
+        /// Maps between this entity and the coresponding persistance entity
+        /// </summary>
+        /// <returns>A data storage entity representation of this entity</returns>
+        public DataAccess.Common.Models.Artists.ArtistEntity ToStorageEntity()
+        {
+            return Services.AutoMapper.Map<DataAccess.Common.Models.Artists.ArtistEntity>(this);
         }
         #endregion
     }

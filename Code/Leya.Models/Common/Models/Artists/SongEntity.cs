@@ -1,7 +1,8 @@
-﻿/// Written by: Yulia Danilova
+﻿
+using Leya.Models.Common.Infrastructure;
+/// Written by: Yulia Danilova
 /// Creation Date: 09th of December, 2020
 /// Purpose: Data transfer object for the songs 
-
 namespace Leya.Models.Common.Models.Artists
 {
     public class SongEntity
@@ -15,7 +16,7 @@ namespace Leya.Models.Common.Models.Artists
         public string Title { get; set; }
         public string NamedTitle { get; set; }
         public decimal Rating { get; set; }
-        public bool IsListened { get; set; }
+        public bool? IsListened { get; set; }
         public bool IsFavorite { get; set; }
         #endregion
 
@@ -27,6 +28,15 @@ namespace Leya.Models.Common.Models.Artists
         public override string ToString()
         {
             return Id + " :: " + Title;
+        }
+
+        /// <summary>
+        /// Maps between this entity and the coresponding persistance entity
+        /// </summary>
+        /// <returns>A data storage entity representation of this entity</returns>
+        public DataAccess.Common.Models.Songs.SongEntity ToStorageEntity()
+        {
+            return Services.AutoMapper.Map<DataAccess.Common.Models.Songs.SongEntity>(this);
         }
         #endregion
     }

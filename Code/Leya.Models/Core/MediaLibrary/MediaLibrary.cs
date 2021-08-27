@@ -9,6 +9,7 @@ using Leya.Models.Core.Artists;
 using Leya.Models.Core.TvShows;
 using Leya.Models.Common.Broadcasting;
 using Leya.Models.Common.Models.Media;
+using System.Linq;
 #endregion
 
 namespace Leya.Models.Core.MediaLibrary
@@ -47,7 +48,7 @@ namespace Leya.Models.Core.MediaLibrary
             this.artists = artists;
             this.mediaState = mediaState;
             this.mediaTypes = mediaTypes;
-        }
+    }
         #endregion
 
         #region ================================================================= METHODS ===================================================================================
@@ -62,13 +63,35 @@ namespace Leya.Models.Core.MediaLibrary
             Library.MediaTypes = mediaTypes.MediaTypes;
             MediaTypesLoaded?.Invoke();
             // load the rest of the media library and notify an eventual UI when done
-            await tvShows.GetTvShowsAsync();
-            await movies.GetMoviesAsync();
-            await artists.GetArtistsAsync();
+            await tvShows.GetAllAsync();
+            await movies.GetAllAsync();
+            await artists.GetAllAsync();
             Library.TvShows = tvShows.TvShows;
             Library.Movies = movies.Movies;
             Library.Artists = artists.Artists;
             LibraryLoaded?.Invoke();
+        }
+
+        /// <summary>
+        /// Updates all media library in the storage medium
+        /// </summary>
+        public async Task UpdateMediaLibraryAsync()
+        {
+            await tvShows.DeleteAllAsync();
+            await movies.DeleteAllAsync();
+            await artists.DeleteAllAsync();
+            foreach (MediaTypeEntity mediaType in mediaTypes.MediaTypes.Where(mt => mt.IsMedia))
+            {
+                foreach (MediaTypeSourceEntity mediaTypeSource in mediaType.MediaTypeSources)
+                {
+                    if (mediaType.MediaType == "TV SHOW")
+                        await tvShows.SaveAsync(mediaTypeSource, mediaType.Id);
+                    else if (mediaType.MediaType == "MOVIE")
+                        await movies.SaveAsync(mediaTypeSource, mediaType.Id);
+                    else if (mediaType.MediaType == "MUSIC")
+                        await artists.SaveAsync(mediaTypeSource, mediaType.Id);
+                }
+            }
         }
         #endregion
     }

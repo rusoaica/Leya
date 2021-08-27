@@ -20,7 +20,7 @@ namespace Leya.DataAccess.Common.Models.Songs
         public string Title { get; set; }
         public string NamedTitle { get; set; }
         public decimal Rating { get; set; }
-        public bool IsListened { get; set; }
+        public string IsListened { get; set; }
         public bool IsFavorite { get; set; }
         #endregion
 
