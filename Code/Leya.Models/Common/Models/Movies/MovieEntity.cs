@@ -37,7 +37,7 @@ namespace Leya.Models.Common.Models.Movies
         public MovieCountryEntity[] Country { get; set; }
         public MovieDirectorEntity[] Director { get; set; }
         public bool IsEnded { get; set; }
-        public bool? IsWatched { get; set; }
+        public bool? IsWatched { get; set; } = false;
         public bool IsFavorite { get; set; }
         public DateTime Created { get; set; }
         public DateTime Premiered { get; set; }

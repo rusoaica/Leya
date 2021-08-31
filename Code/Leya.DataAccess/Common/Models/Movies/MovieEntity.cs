@@ -48,7 +48,7 @@ namespace Leya.DataAccess.Common.Models.Movies
         public MovieActorEntity[] Actors { get; set; }
         [IgnoreOnInsert]
         public MovieResumeEntity Resume { get; set; }
-        public string IsWatched { get; set; }
+        public string IsWatched { get; set; } = "False";
         public bool IsFavorite { get; set; }
         public DateTime Created { get; set; }
         public DateTime Premiered { get; set; }

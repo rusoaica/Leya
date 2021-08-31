@@ -12,6 +12,7 @@ namespace Leya.ViewModels.Common.Models.Media
     {
         #region ================================================================ PROPERTIES =================================================================================
         public int Id { get; set; }
+        public int Index { get; set; }
         /// <summary>
         /// Some media elements require storing multiple id's: 
         /// Id - first level id (tv show, artist); 

@@ -17,6 +17,7 @@ namespace Leya.Models.Core.MediaLibrary
         #endregion
 
         #region ================================================================ PROPERTIES =================================================================================
+        IMediaCast MediaCast { get; }
         IMediaState MediaState { get; }
         MediaLibraryEntity Library { get; set; }
         #endregion

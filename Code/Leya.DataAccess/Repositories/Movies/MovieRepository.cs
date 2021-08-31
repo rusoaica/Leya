@@ -142,31 +142,31 @@ namespace Leya.DataAccess.Repositories.Movies
         {
             dataAccess.OpenTransaction();
             // get the movie data
-            ApiResponse<MovieEntity> _output = await dataAccess.SelectAsync<MovieEntity>(EntityContainers.Movies,
+            ApiResponse<MovieEntity> output = await dataAccess.SelectAsync<MovieEntity>(EntityContainers.Movies,
                 "Id, MediaTypeSourceId, MediaTypeId, MovieTitle, OriginalTitle, NamedTitle, Synopsis, TagLine, Runtime, MPAA, LastPlayed, ImDbId, " +
                 "TmDbId, Set, Premiered, IsEnded, Studio, Trailer, TvShowLink, IsWatched, IsFavorite, Created", new { MediaTypeSourceId = id });
-            if (_output.Data != null && _output.Data.Length > 0)
+            if (output.Data != null && output.Data.Length > 0)
             {
                 await Task.Run(async () =>
                 {
                     // get the data associated with the movie
-                    _output.Data[0].Ratings = (await dataAccess.SelectAsync<MovieRatingEntity>(EntityContainers.MovieRatings, "Id, MovieId, Name, Max, Value, Votes", new { MovieId = _output.Data[0].Id })).Data;
-                    _output.Data[0].Genre = (await dataAccess.SelectAsync<MovieGenreEntity>(EntityContainers.MovieGenre, "Genre, MovieId, Id", new { MovieId = _output.Data[0].Id })).Data;
-                    _output.Data[0].Country = (await dataAccess.SelectAsync<MovieCountryEntity>(EntityContainers.MovieCountry, "Country, MovieId, Id", new { MovieId = _output.Data[0].Id })).Data;
-                    _output.Data[0].Credits = (await dataAccess.SelectAsync<MovieCreditEntity>(EntityContainers.MovieCredits, "Credit, MovieId, Id", new { MovieId = _output.Data[0].Id })).Data;
-                    _output.Data[0].Director = (await dataAccess.SelectAsync<MovieDirectorEntity>(EntityContainers.MovieDirectors, "Director, MovieId, Id", new { MovieId = _output.Data[0].Id })).Data;
-                    _output.Data[0].Tags = (await dataAccess.SelectAsync<MovieTagEntity>(EntityContainers.MovieTags, "Tag, MovieId, Id", new { MovieId = _output.Data[0].Id })).Data;
-                    _output.Data[0].FileInfo = (await dataAccess.SelectAsync<FileInfoEntity>(EntityContainers.MovieFileInfo, "MovieId, Id", new { MovieId = _output.Data[0].Id })).Data[0];
-                    _output.Data[0].FileInfo.StreamDetails = (await dataAccess.SelectAsync<StreamDetailEntity>(EntityContainers.MovieStreamDetails, "MovieId, Id", new { MovieId = _output.Data[0].Id })).Data[0];
-                    _output.Data[0].FileInfo.StreamDetails.Audio = (await dataAccess.SelectAsync<AudioEntity>(EntityContainers.MovieAudioInfo, "Id, MovieId, Codec, Language, Channels", new { MovieId = _output.Data[0].Id })).Data[0];
-                    _output.Data[0].FileInfo.StreamDetails.Video = (await dataAccess.SelectAsync<VideoEntity>(EntityContainers.MovieVideoInfo, "Id, MovieId, Codec, Aspect, Width, Height, Is3D", new { MovieId = _output.Data[0].Id })).Data[0];
-                    _output.Data[0].FileInfo.StreamDetails.Subtitle = (await dataAccess.SelectAsync<SubtitleEntity>(EntityContainers.MovieSubtitles, "Id, MovieId, Language", new { MovieId = _output.Data[0].Id })).Data[0];
-                    _output.Data[0].Actors = (await dataAccess.SelectAsync<MovieActorEntity>(EntityContainers.MovieActors, "Id, MovieId, Name, Role, `Order`, Thumb", new { MovieId = _output.Data[0].Id })).Data;
-                    _output.Data[0].Resume = (await dataAccess.SelectAsync<MovieResumeEntity>(EntityContainers.MovieResume, "Id, MovieId, Position, Total", new { MovieId = _output.Data[0].Id })).Data[0];
+                    output.Data[0].Ratings = (await dataAccess.SelectAsync<MovieRatingEntity>(EntityContainers.MovieRatings, "Id, MovieId, Name, Max, Value, Votes", new { MovieId = output.Data[0].Id })).Data;
+                    output.Data[0].Genre = (await dataAccess.SelectAsync<MovieGenreEntity>(EntityContainers.MovieGenre, "Genre, MovieId, Id", new { MovieId = output.Data[0].Id })).Data;
+                    output.Data[0].Country = (await dataAccess.SelectAsync<MovieCountryEntity>(EntityContainers.MovieCountry, "Country, MovieId, Id", new { MovieId = output.Data[0].Id })).Data;
+                    output.Data[0].Credits = (await dataAccess.SelectAsync<MovieCreditEntity>(EntityContainers.MovieCredits, "Credit, MovieId, Id", new { MovieId = output.Data[0].Id })).Data;
+                    output.Data[0].Director = (await dataAccess.SelectAsync<MovieDirectorEntity>(EntityContainers.MovieDirectors, "Director, MovieId, Id", new { MovieId = output.Data[0].Id })).Data;
+                    output.Data[0].Tags = (await dataAccess.SelectAsync<MovieTagEntity>(EntityContainers.MovieTags, "Tag, MovieId, Id", new { MovieId = output.Data[0].Id })).Data;
+                    output.Data[0].FileInfo = (await dataAccess.SelectAsync<FileInfoEntity>(EntityContainers.MovieFileInfo, "MovieId, Id", new { MovieId = output.Data[0].Id })).Data[0];
+                    output.Data[0].FileInfo.StreamDetails = (await dataAccess.SelectAsync<StreamDetailEntity>(EntityContainers.MovieStreamDetails, "MovieId, Id", new { MovieId = output.Data[0].Id })).Data[0];
+                    output.Data[0].FileInfo.StreamDetails.Audio = (await dataAccess.SelectAsync<AudioEntity>(EntityContainers.MovieAudioInfo, "Id, MovieId, Codec, Language, Channels", new { MovieId = output.Data[0].Id })).Data[0];
+                    output.Data[0].FileInfo.StreamDetails.Video = (await dataAccess.SelectAsync<VideoEntity>(EntityContainers.MovieVideoInfo, "Id, MovieId, Codec, Aspect, Width, Height, Is3D", new { MovieId = output.Data[0].Id })).Data[0];
+                    output.Data[0].FileInfo.StreamDetails.Subtitle = (await dataAccess.SelectAsync<SubtitleEntity>(EntityContainers.MovieSubtitles, "Id, MovieId, Language", new { MovieId = output.Data[0].Id })).Data[0];
+                    output.Data[0].Actors = (await dataAccess.SelectAsync<MovieActorEntity>(EntityContainers.MovieActors, "Id, MovieId, Name, Role, `Order`, Thumb", new { MovieId = output.Data[0].Id })).Data;
+                    output.Data[0].Resume = (await dataAccess.SelectAsync<MovieResumeEntity>(EntityContainers.MovieResume, "Id, MovieId, Position, Total", new { MovieId = output.Data[0].Id })).Data[0];
                 });
             }
             dataAccess.CloseTransaction();
-            return _output;
+            return output;
         }
 
         /// <summary>

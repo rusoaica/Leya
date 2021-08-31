@@ -23,12 +23,14 @@ namespace Leya.Models.Core.MediaLibrary
         private readonly IMovie movies;
         private readonly IArtist artists;
         private readonly ITvShow tvShows;
+        private readonly IMediaCast mediaCast;
         private readonly IMediaType mediaTypes;
         private readonly IMediaState mediaState;
         #endregion
 
         #region ================================================================ PROPERTIES =================================================================================
         public IMediaState MediaState => mediaState;
+        public IMediaCast MediaCast => mediaCast;
         public MediaLibraryEntity Library { get; set; } = new MediaLibraryEntity();
         #endregion
 
@@ -40,12 +42,14 @@ namespace Leya.Models.Core.MediaLibrary
         /// <param name="movies">Injected movie business model</param>
         /// <param name="artists">Injected artist business model</param>
         /// <param name="mediaState">Injected media state business model</param>
+        /// <param name="mediaCast">Injected media cast business model</param>
         /// </summary>
-        public MediaLibrary(IMediaType mediaTypes, ITvShow tvShows, IMovie movies, IArtist artists, IMediaState mediaState)
+        public MediaLibrary(IMediaType mediaTypes, ITvShow tvShows, IMovie movies, IArtist artists, IMediaState mediaState, IMediaCast mediaCast)
         {
             this.movies = movies;
             this.tvShows = tvShows;
             this.artists = artists;
+            this.mediaCast = mediaCast;
             this.mediaState = mediaState;
             this.mediaTypes = mediaTypes;
     }

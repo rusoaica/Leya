@@ -3,10 +3,12 @@
 /// Purpose: Converter for image sources from strings
 #region ========================================================================= USING =====================================================================================
 using System;
-using System.Windows;
-using System.Windows.Data;
+using Avalonia;
+using Avalonia.Media;
+using Avalonia.Platform;
 using System.Globalization;
-using System.Windows.Media.Imaging;
+using Avalonia.Media.Imaging;
+using Avalonia.Data.Converters;
 #endregion
 
 namespace Leya.Views.Common.Converters
@@ -26,9 +28,23 @@ namespace Leya.Views.Common.Converters
         /// </returns>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (!string.IsNullOrEmpty(value as string))
-                return new BitmapImage(new Uri(@"pack://application:,,,/Leya;component/Resources/" + (value as string), UriKind.Absolute));
-            return DependencyProperty.UnsetValue;
+            if (value is string path && (targetType == typeof(IBitmap) || targetType == typeof(IImage)))
+            {
+                Uri uri = new Uri("avares://Leya/Assets/" + path, UriKind.RelativeOrAbsolute);
+                string scheme = uri.IsAbsoluteUri ? uri.Scheme : "file";
+                switch (scheme)
+                {
+                    case "file":
+                        return new Bitmap(path);
+                    default:
+                        IAssetLoader assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
+                        return new Bitmap(assets.Open(uri));
+                }
+            }
+            throw new NotSupportedException();
+            //if (!string.IsNullOrEmpty(value as string))
+            //    return new BitmapImage(new Uri(@"pack://application:,,,/Leya;component/Resources/" + (value as string), UriKind.Absolute));
+            //return DependencyProperty.UnsetValue;
         }
 
         /// <summary>
@@ -43,11 +59,7 @@ namespace Leya.Views.Common.Converters
         /// </returns>
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            // According to https://msdn.microsoft.com/en-us/library/system.windows.data.ivalueconverter.convertback(v=vs.110).aspx#Anchor_1
-            // (kudos Scott Chamberlain), if you do not support a conversion back you should return a Binding.DoNothing or a DependencyProperty.UnsetValue
-            return Binding.DoNothing;
-            // Original code:
-            // throw new NotImplementedException();
+            throw new NotSupportedException();
         }
         #endregion
     }

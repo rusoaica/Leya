@@ -24,6 +24,7 @@ namespace Leya.Models.Core.Options
         public bool IsMediaTypeSourceUpdate { get; set; }
         #endregion
 
+        #region ================================================================ PROPERTIES =================================================================================
         public int Id { get; set; }
 
         private string mediaName;
@@ -33,7 +34,6 @@ namespace Leya.Models.Core.Options
             set { mediaName = value?.ToUpper(); Notify(); }
         }
 
-
         private List<MediaTypeSourceEntity> sourceMediaCategorySources = new List<MediaTypeSourceEntity>();
         public List<MediaTypeSourceEntity> SourceMediaCategorySources
         {
@@ -41,13 +41,13 @@ namespace Leya.Models.Core.Options
             set { sourceMediaCategorySources = value; Notify(); }
         }
 
-
         private SearchEntity selectedMediaCategoryType;
         public SearchEntity SelectedMediaCategoryType
         {
             get { return selectedMediaCategoryType; }
             set { selectedMediaCategoryType = value; Notify(); }
         }
+        #endregion
 
         #region ================================================================== CTOR =====================================================================================
         public OptionsMedia(IMediaType mediaType, IMediaTypeSource mediaTypeSource)
@@ -59,24 +59,36 @@ namespace Leya.Models.Core.Options
 
         #region ================================================================= METHODS ===================================================================================
         /// <summary>
-        /// Deletes an entity identified by <paramref name="id"/> from the storage medium
+        /// Deletes a media type entity identified by <paramref name="id"/> from the storage medium
         /// </summary>
-        /// <param name="id">The id of the entity to be deleted</param>
+        /// <param name="id">The id of the media type entity to be deleted</param>
         public async Task DeleteMediaTypeAsync(int id)
         {
             await mediaType.DeleteMediaTypeAsync(id);
         }
 
+        /// <summary>
+        /// Saves <paramref name="media"/> in the storage medium
+        /// </summary>
+        /// <param name="media">The media type entity to be stored</param>
         public async Task<int> SaveMediaTypeAsync(MediaTypeEntity media)
         {
             return await mediaType.AddMediaTypeAsync(media);
         }
 
+        /// <summary>
+        /// Saves <paramref name="media"/> in the storage medium
+        /// </summary>
+        /// <param name="media">The media type source to be stored</param>
         public async Task SaveMediaTypeSourceAsync(MediaTypeSourceEntity media)
         {            
             await mediaTypeSource.InsertMediaTypeSource(media);
         }
 
+        /// <summary>
+        /// Gets the list of media types from the storage medium
+        /// </summary>
+        /// <param name="mediaLibrary">That media library whose list of media types is refreshed</param>
         public async Task RefreshMediaTypes(IMediaLibrary mediaLibrary)
         {
             await mediaType.GetMediaTypesAsync();
@@ -87,6 +99,8 @@ namespace Leya.Models.Core.Options
         /// Adds a new media source to the selected media
         /// </summary>
         /// <param name="selectedDirectories">The paths of the selected directories representing the media sources to be added</param>
+        /// <param name="selectedDirectories">Indicates whether <paramref name="selectedDirectories"/> should be used, or the directories contained inside them</param>
+        /// <returns>A list of directories representing the media type sources in <paramref name="selectedDirectories"/></returns>
         public IEnumerable<string> AddMediaTypeSource(string selectedDirectories, bool containsSingleMedia)
         {
             string[] directories = Regex.Split(selectedDirectories, "\""); // better way!
@@ -110,7 +124,7 @@ namespace Leya.Models.Core.Options
         /// <summary>
         /// Resets the fields required to create a new media type to their default values
         /// </summary>
-        public void ResetAddMediaSourceElements()
+        public void ResetAddMediaTypeSourceElements()
         {
             Id = 0;
             MediaName = null;
@@ -121,12 +135,12 @@ namespace Leya.Models.Core.Options
         }
 
         /// <summary>
-        /// Inserts media type paths for the specified media type
-        /// <param name="mediaTypeId">The Id of the media type for which to add the media type paths</param>
+        /// Inserts media type source paths for the specified media type in the storage medium
+        /// <param name="mediaTypeId">The Id of the media type for which to add the media type sources</param>
         /// </summary>
-        public async Task SaveMediaLibrarySourcesAsync(int mediaTypeId)
+        public async Task SaveMediaTypeSourcesAsync(int mediaTypeId)
         {
-            // iterate all media type sources and send them to the API
+            // iterate all media type sources and send them to the storage medium
             foreach (MediaTypeSourceEntity source in SourceMediaCategorySources)
             {
                 source.MediaTypeId = mediaTypeId;
@@ -134,12 +148,11 @@ namespace Leya.Models.Core.Options
             }
         }
 
-
         /// <summary>
         /// Opens the location of the <paramref name="item"/> path
         /// </summary>
         /// <param name="item">The item containing the path to the location to be opened</param>
-        public void OpenMediaSourceLocation(MediaTypeSourceEntity item)
+        public void OpenMediaTypeSourceLocation(MediaTypeSourceEntity item)
         {
             if (!string.IsNullOrEmpty(item.MediaSourcePath) && Directory.Exists(item.MediaSourcePath))
                 Process.Start(item.MediaSourcePath); // TODO: cross-platform explorer process!
@@ -147,17 +160,12 @@ namespace Leya.Models.Core.Options
                 throw new IOException("The directory does not exist!");
         }
 
-
-
-
-
-
-
-
-
-
-
-        public IEnumerable<MediaTypeEntity> GetMediaTypesAsync(IMediaLibrary mediaLibrary) // ```0
+        /// <summary>
+        /// Gets the media types that are media items
+        /// </summary>
+        /// <param name="mediaLibrary">The media library from which to take the media types</param>
+        /// <returns>A list of media type entities</returns>
+        public IEnumerable<MediaTypeEntity> GetMediaTypesAsync(IMediaLibrary mediaLibrary) 
         {
             foreach (MediaTypeEntity mediaType in mediaLibrary.Library.MediaTypes.Where(mt => mt.IsMedia))
                 yield return mediaType;

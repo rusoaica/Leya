@@ -15,7 +15,7 @@ namespace Leya.Models.Core.Options
     public interface IOptionsMedia
     {
         #region ============================================================== FIELD MEMBERS ================================================================================
-        event Action<string, string> PropertyChanged;
+        event Action<string> PropertyChanged;
         #endregion
 
         #region ================================================================ PROPERTIES =================================================================================
@@ -33,9 +33,9 @@ namespace Leya.Models.Core.Options
         Task RefreshMediaTypes(IMediaLibrary mediaLibrary);
         IEnumerable<string> AddMediaTypeSource(string selectedDirectories, bool containsSingleMedia);
 
-        void ResetAddMediaSourceElements();
-        Task SaveMediaLibrarySourcesAsync(int mediaTypeId);
-        void OpenMediaSourceLocation(MediaTypeSourceEntity _item);
+        void ResetAddMediaTypeSourceElements();
+        Task SaveMediaTypeSourcesAsync(int mediaTypeId);
+        void OpenMediaTypeSourceLocation(MediaTypeSourceEntity _item);
 
         IEnumerable<MediaTypeEntity> GetMediaTypesAsync(IMediaLibrary mediaLibrary);
         #endregion

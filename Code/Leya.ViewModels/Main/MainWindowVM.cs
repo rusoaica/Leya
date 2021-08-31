@@ -7,7 +7,6 @@ using System.Linq;
 using System.Reflection;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Leya.ViewModels.Options;
 using Leya.Infrastructure.Enums;
 using System.Collections.Generic;
 using Leya.Models.Core.Navigation;
@@ -32,10 +31,10 @@ namespace Leya.ViewModels.Main
         public event Action Navigated;
         public event Action<bool> ValidationChanged;
 
-        private readonly IViewFactory viewFactory;
         private readonly IMediaLibrary mediaLibrary;
         private readonly IMediaLibraryNavigation mediaLibraryNavigation;
-        private readonly IOptionsMedia optionsMedia;
+        private readonly IAppOptions appOptions;
+        private readonly IMediaStatistics mediaStatistics;
         #endregion
 
         #region ============================================================= BINDING COMMANDS ==============================================================================
@@ -44,7 +43,7 @@ namespace Leya.ViewModels.Main
         public IAsyncCommand Search_EnterKeyUpAsync_Command { get; private set; }
         public IAsyncCommand Search_DropDownClosingAsync_Command { get; private set; }
         public IAsyncCommand ViewOpenedAsync_Command { get; private set; }
-        public IAsyncCommand<MediaEntity> ShowMediaCastAsync_Command { get; private set; }
+        public IAsyncCommand<IMediaEntity> ShowMediaCastAsync_Command { get; private set; }
         public IAsyncCommand<IMediaEntity> SetIsWatchedStatusAsync_Command { get; private set; }
         public IAsyncCommand<IMediaEntity> SetIsFavoriteStatusAsync_Command { get; private set; }
         public IAsyncCommand<MediaTypeEntity> DeleteMediaTypeAsync_Command { get; private set; }
@@ -54,17 +53,32 @@ namespace Leya.ViewModels.Main
         public ISyncCommand<MediaTypeSourceEntity> OpenMediaSourceLocation_Command { get; private set; }
         public IAsyncCommand<string> AddMediaSourceAsync_Command { get; private set; }
         public ISyncCommand<decimal> DisplayOffset_ValueChanged_Command { get; private set; }
-        public SyncCommand ShowMediaOptions_Command { get; private set; }
-        public SyncCommand OpenMediaFolder_Command { get; private set; }
-        public SyncCommand Filter_EnterKeyUp_Command { get; private set; }
-        public SyncCommand SelectedMediaChanged_Command { get; private set; }
-        public SyncCommand Filter_DropDownClosing_Command { get; private set; }
-        public SyncCommand OpenLoggingDirectory_Command { get; private set; }
-        public SyncCommand ResetAddMediaSourceElements_Command { get; private set; }
-        public AsyncCommand RefreshMediaSourcesAsync_Command { get; private set; }
+        public ISyncCommand ShowMediaOptions_Command { get; private set; }
+        public ISyncCommand ShowPlayerOptions_Command { get; private set; }
+        public ISyncCommand ShowInterfaceOptions_Command { get; private set; }
+        public ISyncCommand OpenMediaFolder_Command { get; private set; }
+        public ISyncCommand Filter_EnterKeyUp_Command { get; private set; }
+        public ISyncCommand SelectedMediaChanged_Command { get; private set; }
+        public ISyncCommand Filter_DropDownClosing_Command { get; private set; }
+        public ISyncCommand OpenLoggingDirectory_Command { get; private set; }
+        public ISyncCommand ResetAddMediaSourceElements_Command { get; private set; }
+        public IAsyncCommand UpdatePlayerOptionsAsync_Command { get; private set; }
+        public IAsyncCommand UpdateInterfaceOptionsAsync_Command { get; private set; }
+        public IAsyncCommand RefreshMediaSourcesAsync_Command { get; private set; }
         public ISyncCommand ExitMediaTypeSourcesOptions_Command { get; private set; }
         public ISyncCommand ExitMediaTypesOptions_Command { get; private set; }
+        public ISyncCommand ExitPlayerOptions_Command { get; private set; }
+        public ISyncCommand ExitInterfaceOptions_Command { get; set; }
+        public ISyncCommand ExitMediaCast_Command { get; private set; }
         //public AutoCompleteFilterPredicate<object> SearchMediaLibrary_Command { get; private set; }
+        public ISyncCommand<bool> ChangeRepeatArgument_Command { get; private set; }
+        public ISyncCommand<bool> ChangeShuffleArgument_Command { get; private set; }
+        public ISyncCommand<bool> ChangeAutoscaleArgument_Command { get; private set; }
+        public ISyncCommand<bool> ChangeFullScreenArgument_Command { get; private set; }
+        public ISyncCommand<bool> ChangeAlwaysOnTopArgument_Command { get; private set; }
+        public ISyncCommand<bool> ChangePlayAndStopArgument_Command { get; private set; }
+        public ISyncCommand<bool> ChangeSingleInstanceArgument_Command { get; private set; }
+        public ISyncCommand<bool> ChangeEnqueueFilesInSingleInstanceModeArgument_Command { get; private set; }
         #endregion
 
         #region ============================================================ BINDING PROPERTIES ============================================================================= 
@@ -82,39 +96,34 @@ namespace Leya.ViewModels.Main
             set { scannerOutput = value; Notify(); }
         }
 
-        private string fanart;
         public string Fanart
         {
-            get { return fanart; }
-            set { fanart = value; Notify(); }
+            get { return mediaLibraryNavigation.Fanart; }
+            set { mediaLibraryNavigation.Fanart = value; Notify(); }
         }
 
-        private string banner = string.Empty;
         public string Banner
         {
-            get { return banner; }
-            set { banner = value; Notify(); }
+            get { return mediaLibraryNavigation.Banner; }
+            set { mediaLibraryNavigation.Banner = value; Notify(); }
         }
 
-        private string poster;
         public string Poster
         {
-            get { return poster; }
-            set { poster = value; Notify(); IsMediaCoverVisible = value != null; }
+            get { return mediaLibraryNavigation.Poster; }
+            set { mediaLibraryNavigation.Poster = value; Notify(); IsMediaCoverVisible = value != null; }
         }
 
-        private string tagLine;
         public string TagLine
         {
-            get { return tagLine; }
-            set { tagLine = value; Notify(); }
+            get { return mediaLibraryNavigation.TagLine; }
+            set { mediaLibraryNavigation.TagLine = value; Notify(); }
         }
 
-        private string mpaa = string.Empty;
         public string MPAA
         {
-            get { return mpaa; }
-            set { mpaa = value; Notify(); }
+            get { return mediaLibraryNavigation.MPAA; }
+            set { mediaLibraryNavigation.MPAA = value; Notify(); }
         }
 
         private string mediaCase = "bg-bluray.png";
@@ -124,18 +133,16 @@ namespace Leya.ViewModels.Main
             set { mediaCase = value; Notify(); }
         }
 
-        private string writers = string.Empty;
         public string Writers
         {
-            get { return writers; }
-            set { writers = value; Notify(); }
+            get { return mediaLibraryNavigation.Writers; }
+            set { mediaLibraryNavigation.Writers = value; Notify(); }
         }
 
-        private string director = string.Empty;
         public string Director
         {
-            get { return director; }
-            set { director = value; Notify(); }
+            get { return mediaLibraryNavigation.Director; }
+            set { mediaLibraryNavigation.Director = value; Notify(); }
         }
 
         private string filterText;
@@ -145,110 +152,124 @@ namespace Leya.ViewModels.Main
             set { filterText = value; Notify(); }
         }
 
-
-        private string currentStatus = "Ended";
         public string CurrentStatus
         {
-            get { return currentStatus; }
-            set { currentStatus = value; Notify(); }
+            get { return mediaLibraryNavigation.CurrentStatus; }
+            set { mediaLibraryNavigation.CurrentStatus = value; Notify(); }
         }
 
-        private string localPath = @"D:\MULTIMEDIA\TV SHOWS\";
         public string LocalPath
         {
-            get { return localPath; }
-            set { localPath = value; Notify(); }
+            get { return mediaLibraryNavigation.LocalPath; }
+            set { mediaLibraryNavigation.LocalPath = value; Notify(); }
         }
 
-        private string synopsis = string.Empty;
         public string Synopsis
         {
-            get { return synopsis; }
-            set { synopsis = value; Notify(); }
+            get { return mediaLibraryNavigation.Synopsis; }
+            set { mediaLibraryNavigation.Synopsis = value; Notify(); }
         }
 
-        private string genre = string.Empty;
         public string Genre
         {
-            get { return genre; }
-            set { genre = value; Notify(); }
+            get { return mediaLibraryNavigation.Genre; }
+            set { mediaLibraryNavigation.Genre = value; Notify(); }
         }
 
-        private string forecast;
         public string Forecast
         {
-            get { return forecast; }
-            set { forecast = value; Notify(); }
+            get { return mediaStatistics.Forecast; }
+            set { mediaStatistics.Forecast = value; Notify(); }
         }
 
-        private string totalMediaCountType = "TV SHOWS:";
         public string TotalMediaCountType
         {
-            get { return totalMediaCountType; }
-            set { totalMediaCountType = value; Notify(); }
+            get { return mediaStatistics.TotalMediaCountType; }
+            set { mediaStatistics.TotalMediaCountType = value; Notify(); }
         }
 
-        private string mediaName;
         public string MediaName
         {
-            get { return mediaName; }
-            set { mediaName = value?.ToUpper(); Notify(); RefreshMediaSourcesAsync_Command?.RaiseCanExecuteChanged(); }
+            get { return appOptions.OptionsMedia.MediaName; }
+            set { appOptions.OptionsMedia.MediaName = value?.ToUpper(); Notify(); RefreshMediaSourcesAsync_Command?.RaiseCanExecuteChanged(); }
         }
 
-        private int totalMediaCount = 0;
+        public string PlayerPath
+        {
+            get { return appOptions.OptionsPlayer.PlayerPath; }
+            set { appOptions.OptionsPlayer.PlayerPath = value; Notify(); UpdatePlayerOptionsAsync_Command.RaiseCanExecuteChanged(); }
+        }
+
+        public string PlayerArguments
+        {
+            get { return appOptions.OptionsPlayer.PlayerArguments; }
+            set { appOptions.OptionsPlayer.PlayerArguments = value; Notify(); }
+        }
+
+        public string BackgroundImagePath
+        {
+            get { return appOptions.OptionsInterface.BackgroundImagePath; }
+            set { appOptions.OptionsInterface.BackgroundImagePath = value; Notify(); }
+        }
+
+        public string WeatherUrl
+        {
+            get { return appOptions.OptionsInterface.WeatherUrl; }
+            set { appOptions.OptionsInterface.WeatherUrl = value; Notify(); }
+        }
+
+        public int SelectedThemeIndex
+        {
+            get { return appOptions.OptionsInterface.SelectedThemeIndex; }
+            set { appOptions.OptionsInterface.SelectedThemeIndex = value; Notify(); }
+        }
+
         public int TotalMediaCount
         {
-            get { return totalMediaCount; }
-            set { totalMediaCount = value; Notify(); }
+            get { return mediaStatistics.TotalMediaCount; }
+            set { mediaStatistics.TotalMediaCount = value; Notify(); }
         }
 
-        private int totalWatchedCount = 0;
         public int TotalWatchedCount
         {
-            get { return totalWatchedCount; }
-            set { totalWatchedCount = value; Notify(); }
+            get { return mediaStatistics.TotalWatchedCount; }
+            set { mediaStatistics.TotalWatchedCount = value; Notify(); }
         }
 
-        private int totalUnwatchedCount = 0;
         public int TotalUnwatchedCount
         {
-            get { return totalUnwatchedCount; }
-            set { totalUnwatchedCount = value; Notify(); }
+            get { return mediaStatistics.TotalUnwatchedCount; }
+            set { mediaStatistics.TotalUnwatchedCount = value; Notify(); }
         }
 
-        private int numberOfSeasons = 0;
         public int NumberOfSeasons
         {
-            get { return numberOfSeasons; }
-            set { numberOfSeasons = value; Notify(); }
+            get { return mediaLibraryNavigation.NumberOfSeasons; }
+            set { mediaLibraryNavigation.NumberOfSeasons = value; Notify(); }
         }
 
-        private int numberOfUnwatchedEpisodes = 0;
         public int NumberOfUnwatchedEpisodes
         {
-            get { return numberOfUnwatchedEpisodes; }
-            set { numberOfUnwatchedEpisodes = value; Notify(); }
+            get { return mediaLibraryNavigation.NumberOfUnwatchedEpisodes; }
+            set { mediaLibraryNavigation.NumberOfUnwatchedEpisodes = value; Notify(); }
         }
 
-        private int numberOfEpisodes = 0;
         public int NumberOfEpisodes
         {
-            get { return numberOfEpisodes; }
-            set { numberOfEpisodes = value; Notify(); }
+            get { return mediaLibraryNavigation.NumberOfEpisodes; }
+            set { mediaLibraryNavigation.NumberOfEpisodes = value; Notify(); }
         }
 
-        private double celsius;
         public double Celsius
         {
-            get { return celsius; }
-            set { celsius = value; Notify(); }
+            get { return mediaStatistics.Celsius; }
+            set { mediaStatistics.Celsius = value; Notify(); }
         }
 
-        private double fahrenheit;
         public double Fahrenheit
         {
-            get { return fahrenheit; }
-            set { fahrenheit = value; Notify(); }
+            get { return mediaStatistics.Fahrenheit; }
+            set { mediaStatistics.Fahrenheit = value; Notify(); }
         }
 
         private bool isMediaOptionsPanelVisible;
@@ -272,11 +293,10 @@ namespace Leya.ViewModels.Main
             set { areActorsVisible = value; Notify(); }
         }
 
-        private bool isNumberOfSeasonsVisible;
         public bool IsNumberOfSeasonsVisible
         {
-            get { return isNumberOfSeasonsVisible; }
-            set { isNumberOfSeasonsVisible = value; Notify(); }
+            get { return mediaLibraryNavigation.IsNumberOfSeasonsVisible; }
+            set { mediaLibraryNavigation.IsNumberOfSeasonsVisible = value; Notify(); }
         }
 
         private bool isScannerTextVisible = true;
@@ -286,11 +306,10 @@ namespace Leya.ViewModels.Main
             set { isScannerTextVisible = value; Notify(); }
         }
 
-        private bool isTvShow;
         public bool IsTvShow
         {
-            get { return isTvShow; }
-            set { isTvShow = value; Notify(); }
+            get { return mediaLibraryNavigation.IsTvShow; }
+            set { mediaLibraryNavigation.IsTvShow = value; Notify(); }
         }
 
         private bool isMediaBluray = true;
@@ -300,25 +319,22 @@ namespace Leya.ViewModels.Main
             set { isMediaBluray = value; Notify(); }
         }
 
-        private bool isFanartVisible = false;
         public bool IsFanartVisible
         {
-            get { return isFanartVisible; }
-            set { isFanartVisible = value; Notify(); }
+            get { return mediaLibraryNavigation.IsFanartVisible; }
+            set { mediaLibraryNavigation.IsFanartVisible = value; Notify(); }
         }
 
-        private bool isMediaCoverVisible = false;
         public bool IsMediaCoverVisible
         {
-            get { return isMediaCoverVisible; }
-            set { isMediaCoverVisible = value; Notify(); }
+            get { return mediaLibraryNavigation.IsMediaCoverVisible; }
+            set { mediaLibraryNavigation.IsMediaCoverVisible = value; Notify(); }
         }
 
-        private bool isBackNavigationPossible = false;
         public bool IsBackNavigationPossible
         {
-            get { return isBackNavigationPossible; }
-            set { isBackNavigationPossible = value; Notify(); }
+            get { return mediaLibraryNavigation.IsBackNavigationPossible; }
+            set { mediaLibraryNavigation.IsBackNavigationPossible = value; Notify(); }
         }
 
         private bool isMediaContainerVisible = false;
@@ -342,6 +358,20 @@ namespace Leya.ViewModels.Main
             set { isMediaTypesOptionVisible = value; Notify(); }
         }
 
+        private bool isPlayerOptionVisible = false;
+        public bool IsPlayerOptionVisible
+        {
+            get { return isPlayerOptionVisible; }
+            set { isPlayerOptionVisible = value; Notify(); }
+        }
+
+        private bool isInterfaceOptionVisible = false;
+        public bool IsInterfaceOptionVisible
+        {
+            get { return isInterfaceOptionVisible; }
+            set { isInterfaceOptionVisible = value; Notify(); }
+        }
+
         private bool isOptionsContainerVisible = false;
         public bool IsOptionsContainerVisible
         {
@@ -356,19 +386,72 @@ namespace Leya.ViewModels.Main
             set { isMaskBackgroundVisible = value; Notify(); }
         }
 
-        private bool isWritersVisible;
         public bool IsWritersVisible
         {
-            get { return isWritersVisible; }
-            set { isWritersVisible = value; Notify(); }
+            get { return mediaLibraryNavigation.IsWritersVisible; }
+            set { mediaLibraryNavigation.IsWritersVisible = value; Notify(); }
         }
 
-        private bool isDirectorVisible;
         public bool IsDirectorVisible
         {
-            get { return isDirectorVisible; }
-            set { isDirectorVisible = value; Notify(); }
+            get { return mediaLibraryNavigation.IsDirectorVisible; }
+            set { mediaLibraryNavigation.IsDirectorVisible = value; Notify(); }
         }
+
+        public bool UsesFullScreenArgument
+        {
+            get { return appOptions.OptionsPlayer.UsesFullScreenArgument; }
+            set { appOptions.OptionsPlayer.UsesFullScreenArgument = value; Notify(); }
+        }
+
+        public bool IsSingleInstanceArgument
+        {
+            get { return appOptions.OptionsPlayer.IsSingleInstanceArgument; }
+            set { appOptions.OptionsPlayer.IsSingleInstanceArgument = value; Notify(); }
+        }
+
+        public bool EnquesFilesInSingleInstanceModeArgument
+        {
+            get { return appOptions.OptionsPlayer.EnquesFilesInSingleInstanceModeArgument; }
+            set { appOptions.OptionsPlayer.EnquesFilesInSingleInstanceModeArgument = value; Notify(); }
+        }
+
+        public bool IsAlwaysOnTopArgument
+        {
+            get { return appOptions.OptionsPlayer.IsAlwaysOnTopArgument; }
+            set { appOptions.OptionsPlayer.IsAlwaysOnTopArgument = value; Notify(); }
+        }
+
+        public bool UsesAutoscaleArgument
+        {
+            get { return appOptions.OptionsPlayer.UsesAutoscaleArgument; }
+            set { appOptions.OptionsPlayer.UsesAutoscaleArgument = value; Notify(); }
+        }
+
+        public bool ResumesFromLastTimeIndexArgument
+        {
+            get { return appOptions.OptionsPlayer.ResumesFromLastTimeIndexArgument; }
+            set { appOptions.OptionsPlayer.ResumesFromLastTimeIndexArgument = value; Notify(); }
+        }
+
+        public bool RepeatsPlaylistArgument
+        {
+            get { return appOptions.OptionsPlayer.RepeatsPlaylistArgument; }
+            set { appOptions.OptionsPlayer.RepeatsPlaylistArgument = value; Notify(); }
+        }
+
+        public bool ShufflesPlaylistArgument
+        {
+            get { return appOptions.OptionsPlayer.ShufflesPlaylistArgument; }
+            set { appOptions.OptionsPlayer.ShufflesPlaylistArgument = value; Notify(); }
+        }
+
+        public bool PlayAndStopArgument
+        {
+            get { return appOptions.OptionsPlayer.PlayAndStopArgument; }
+            set { appOptions.OptionsPlayer.PlayAndStopArgument = value; Notify(); }
+        }
+
 
         //private bool isMediaContextMenuOpen;
         //public bool IsMediaContextMenuOpen
@@ -388,30 +471,22 @@ namespace Leya.ViewModels.Main
         //    }
         //}
 
-        private DateTime premiered = DateTime.Now;
         public DateTime Premiered
         {
-            get { return premiered; }
-            set { premiered = value; Notify(); }
+            get { return mediaLibraryNavigation.Premiered; }
+            set { mediaLibraryNavigation.Premiered = value; Notify(); }
         }
 
-        private DateTime added = DateTime.Now;
         public DateTime Added
         {
-            get { return added; }
-            set { added = value; Notify(); }
+            get { return mediaLibraryNavigation.Added; }
+            set { mediaLibraryNavigation.Added = value; Notify(); }
         }
 
-        private TimeSpan runtime = TimeSpan.FromSeconds(0);
         public TimeSpan Runtime
         {
-            get { return runtime; }
-            set { runtime = value; Notify(); }
-        }
-
-        public DateTime CurrentTime
-        {
-            get { return DateTime.Now; }
+            get { return mediaLibraryNavigation.Runtime; }
+            set { mediaLibraryNavigation.Runtime = value; Notify(); }
         }
 
         private ObservableCollection<MediaTypeEntity> sourceMediaCategories = new ObservableCollection<MediaTypeEntity>();
@@ -421,19 +496,12 @@ namespace Leya.ViewModels.Main
             set { sourceMediaCategories = value; Notify(); }
         }
 
-        //private ObservableCollection<MediaTypeSourceEntity> sourceMediaCategorySources = new ObservableCollection<MediaTypeSourceEntity>();
-        //public ObservableCollection<MediaTypeSourceEntity> SourceMediaCategorySources
-        //{
-        //    get { return sourceMediaCategorySources; }
-        //    set { sourceMediaCategorySources = value; Notify(); RefreshMediaSourcesAsync_Command?.RaiseCanExecuteChanged(); }
-        //}
-
         public ObservableCollection<MediaTypeSourceEntity> SourceMediaCategorySources
         {
-            get { return new ObservableCollection<MediaTypeSourceEntity>(optionsMedia.SourceMediaCategorySources); }
+            get { return new ObservableCollection<MediaTypeSourceEntity>(appOptions.OptionsMedia.SourceMediaCategorySources); }
             set
             {
-                optionsMedia.SourceMediaCategorySources = value.ToList();
+                appOptions.OptionsMedia.SourceMediaCategorySources = value.ToList();
                 Notify();
                 RefreshMediaSourcesAsync_Command?.RaiseCanExecuteChanged();
             }
@@ -453,8 +521,8 @@ namespace Leya.ViewModels.Main
             set { sourceMediaCategoryTypes = value; Notify(); }
         }
 
-        private ObservableCollection<SearchEntity> sourceActors;
-        public ObservableCollection<SearchEntity> SourceActors
+        private ObservableCollection<CastEntity> sourceActors;
+        public ObservableCollection<CastEntity> SourceActors
         {
             get { return sourceActors; }
             set { sourceActors = value; Notify(); }
@@ -511,17 +579,18 @@ namespace Leya.ViewModels.Main
         /// <summary>
         /// Overload C-tor
         /// </summary>
-        /// <param name="viewFactory">Injected abstract factory for creating views</param>
         /// <param name="mediaLibrary">Injected media library business model</param>
         /// <param name="mediaLibraryNavigation">Injected media library navigation business model</param>
+        /// <param name="appOptions">Injected application options</param>
+        /// <param name="mediaStatistics">Injected media library statistics</param>
         /// <param name="notificationService">Injected notification service</param>
-        public MainWindowVM(IViewFactory viewFactory, IMediaLibrary mediaLibrary, IMediaLibraryNavigation mediaLibraryNavigation, INotificationService notificationService, IOptionsMedia optionsMedia)
+        public MainWindowVM(IMediaLibrary mediaLibrary, IMediaLibraryNavigation mediaLibraryNavigation, IAppOptions appOptions, IMediaStatistics mediaStatistics, INotificationService notificationService)
         {
-            this.viewFactory = viewFactory;
             this.mediaLibrary = mediaLibrary;
             this.notificationService = notificationService;
             this.mediaLibraryNavigation = mediaLibraryNavigation;
-            this.optionsMedia = optionsMedia;
+            this.appOptions = appOptions;
+            this.mediaStatistics = mediaStatistics;
             this.mediaLibrary.MediaTypesLoaded += MediaLibrary_MediaTypesLoaded;
             this.mediaLibrary.LibraryLoaded += MediaLibrary_LibraryLoaded;
             //IsOptionsContainerVisible = true;
@@ -532,28 +601,48 @@ namespace Leya.ViewModels.Main
             SaveMediaLibraryAsync_Command = new AsyncCommand(SaveMediaLibraryAsync);
             //Filter_DropDownClosing_Command = new SyncCommand(Filter_DropDownClosing);
             //Search_EnterKeyUpAsync_Command = new AsyncCommand(Search_EnterKeyUpAsync);
-            //ShowMediaCastAsync_Command = new AsyncCommand<MediaDisplayEntity>(ShowMediaCastAsync);
+            ShowMediaCastAsync_Command = new AsyncCommand<IMediaEntity>(ShowMediaCastAsync);
             DisplayMediaTypeInfo_Command = new SyncCommand<MediaTypeEntity>(DisplayMediaTypeStatistics);
             SetIsWatchedStatusAsync_Command = new AsyncCommand<IMediaEntity>(SetIsWatchedStatusAsync);
             ViewOpenedAsync_Command = new AsyncCommand(ViewOpenedAsync);
             ExitMediaTypeSourcesOptions_Command = new SyncCommand(ExitMediaTypeSourcesOptions);
             ExitMediaTypesOptions_Command = new SyncCommand(ExitMediaTypesOptions);
+            ExitPlayerOptions_Command = new SyncCommand(ExitPlayerOptions);
+            ExitInterfaceOptions_Command = new SyncCommand(ExitInterfaceOptions);
+            ExitMediaCast_Command = new SyncCommand(() => AreActorsVisible = false);
             //Search_DropDownClosingAsync_Command = new AsyncCommand(Search_DropDownClosingAsync);
             SetIsFavoriteStatusAsync_Command = new AsyncCommand<IMediaEntity>(SetIsFavoriteStatusAsync);
             //DisplayOffset_ValueChanged_Command = new SyncCommand<decimal>(DisplayOffset_ValueChanged);
             mediaLibraryNavigation.Navigated += InitiateNavigation;
             OpenLoggingDirectory_Command = new SyncCommand(OpenLoggingDirectory);
             // SearchMediaLibrary_Command = new AutoCompleteFilterPredicate<object>(SearchMediaLibrary);
+            this.mediaStatistics.PropertyChanged += DomainModelPropertyChanged;
             this.mediaLibraryNavigation.PropertyChanged += DomainModelPropertyChanged;
-            this.optionsMedia.PropertyChanged += DomainModelPropertyChanged;
+            this.appOptions.OptionsMedia.PropertyChanged += DomainModelPropertyChanged;
+            this.appOptions.OptionsPlayer.PropertyChanged += DomainModelPropertyChanged;
+            this.appOptions.OptionsInterface.PropertyChanged += DomainModelPropertyChanged;
             AddMediaSourceAsync_Command = new AsyncCommand<string>(AddMediaTypeSourceAsync);
             RefreshMediaSourcesAsync_Command = new AsyncCommand(UpdateMediaLibraryAsync, ValidateAddMediaTypeSource);
             ResetAddMediaSourceElements_Command = new SyncCommand(ResetAddMediaSourceElements);
+            UpdatePlayerOptionsAsync_Command = new AsyncCommand(this.appOptions.OptionsPlayer.UpdatePlayerOptionsAsync, ValidateUpdatePlayerOptions);
+            UpdateInterfaceOptionsAsync_Command = new AsyncCommand(this.appOptions.OptionsInterface.UpdateUserInterfaceOptionsAsync, ValidateUpdateInterfaceOptions);
             DeleteMediaTypeAsync_Command = new AsyncCommand<MediaTypeEntity>(DeleteMediaTypeAsync);
             GetMediaTypeSources_Command = new SyncCommand<MediaTypeEntity>(GetMediaTypeSources);
             DeleteMediaTypeSource_Command = new SyncCommand<MediaTypeSourceEntity>(DeleteMediaTypeSource);
-            OpenMediaSourceLocation_Command = new SyncCommand<MediaTypeSourceEntity>(optionsMedia.OpenMediaSourceLocation);
+            OpenMediaSourceLocation_Command = new SyncCommand<MediaTypeSourceEntity>(this.appOptions.OptionsMedia.OpenMediaTypeSourceLocation);
+
+            ChangeRepeatArgument_Command = new SyncCommand<bool>(this.appOptions.OptionsPlayer.ChangeRepeatArgument);
+            ChangeShuffleArgument_Command = new SyncCommand<bool>(this.appOptions.OptionsPlayer.ChangeShuffleArgument);
+            ChangeAutoscaleArgument_Command = new SyncCommand<bool>(this.appOptions.OptionsPlayer.ChangeAutoscaleArgument);
+            ChangeFullScreenArgument_Command = new SyncCommand<bool>(this.appOptions.OptionsPlayer.ChangeFullScreenArgument);
+            ChangePlayAndStopArgument_Command = new SyncCommand<bool>(this.appOptions.OptionsPlayer.ChangePlayAndStopArgument);
+            ChangeAlwaysOnTopArgument_Command = new SyncCommand<bool>(this.appOptions.OptionsPlayer.ChangeAlwaysOnTopArgument);
+            ChangeSingleInstanceArgument_Command = new SyncCommand<bool>(this.appOptions.OptionsPlayer.ChangeSingleInstanceArgument);
+            ChangeEnqueueFilesInSingleInstanceModeArgument_Command = new SyncCommand<bool>(this.appOptions.OptionsPlayer.ChangeEnqueueFilesInSingleInstanceModeArgument);
+
             ShowMediaOptions_Command = new SyncCommand(ShowMediaOptions);
+            ShowPlayerOptions_Command = new SyncCommand(ShowPlayerOptions);
+            ShowInterfaceOptions_Command = new SyncCommand(ShowInterfaceOptions);
             SourceMediaCategoryTypes = new ObservableCollection<SearchEntity>()
             {
                 new SearchEntity() { Text = "TV SHOW" },
@@ -561,8 +650,6 @@ namespace Leya.ViewModels.Main
                 new SearchEntity() { Text = "MUSIC" },
             };
         }
-
-
         #endregion
 
         #region ================================================================= METHODS ===================================================================================
@@ -571,29 +658,18 @@ namespace Leya.ViewModels.Main
         /// Used in MVVM to trigger an update of the bounded properties, taking their values from the domain models corresponding properties
         /// </summary>
         /// <param name="propertyName">The name of the domain model property whose value changed</param>
-        /// <param name="sender">The name of the class containing the property identified by <paramref name="propertyName"/></param>
-        private void DomainModelPropertyChanged(string propertyName, string sender)
+        private void DomainModelPropertyChanged(string propertyName)
         {
-            // get the readonly field that contains the property whose value changed and was notified by the event broadcaster
-            FieldInfo diField = GetType().GetField(sender, BindingFlags.IgnoreCase | BindingFlags.NonPublic | BindingFlags.Instance);
-            // get the value of the above property
-            object fieldPropertyValue = diField.GetValue(this).GetType().GetProperty(propertyName).GetValue(diField.GetValue(this));
-            // set the value of the property in this class that has the same name as the above property, using the above value
-            PropertyInfo viewModelProperty = GetType().GetProperty(propertyName);
-            if (viewModelProperty.CanWrite)
-            {
-                // handle List to Obervable transition
-                if (viewModelProperty.PropertyType.IsGenericType && typeof(ObservableCollection<>).IsAssignableFrom(viewModelProperty.PropertyType.GetGenericTypeDefinition())
-                    && fieldPropertyValue is System.Collections.IEnumerable collection)
-                {
-                    // avoid for now: causes recursion it the VM observable directly references the model list!
+            Notify(propertyName);
+        }
 
-                    //Type observableGenericType = typeof(ObservableCollection<>).MakeGenericType(viewModelProperty.PropertyType.GetGenericArguments()[0]);
-                    //viewModelProperty.SetValue(this, Activator.CreateInstance(observableGenericType, new object[] { collection }));
-                }
-                else
-                    viewModelProperty.SetValue(this, fieldPropertyValue);
-            }
+        /// <summary>
+        /// Gets the weather information from the webpage located at <paramref name="url"/>
+        /// </summary>
+        /// <param name="url">The weather.com link of the chosen area</param>
+        public async Task GetWeatherInfoAsync(string url)
+        {
+            await mediaStatistics.GetWeatherInfoAsync(url);
         }
 
         /// <summary>
@@ -602,37 +678,7 @@ namespace Leya.ViewModels.Main
         /// <param name="mediaType">The media type item for which to update the statistics</param>
         private void DisplayMediaTypeStatistics(MediaTypeEntity mediaType)
         {
-            if (mediaType != null && mediaType.IsMedia)
-            {
-                switch (mediaType.MediaType)
-                {
-                    case "TV SHOW":
-                        TotalMediaCountType = "TV SHOWS:";
-                        TotalMediaCount = mediaLibrary.Library.TvShows?.Count() ?? 0;
-                        TotalWatchedCount = mediaLibrary.Library.TvShows?.Where(t => t.IsWatched == true).Count() ?? 0;
-                        TotalUnwatchedCount = mediaLibrary.Library.TvShows?.Where(t => !t.IsWatched == true).Count() ?? 0;
-                        break;
-                    case "MOVIE":
-                        TotalMediaCountType = "MOVIES:";
-                        TotalMediaCount = mediaLibrary.Library.Movies?.Count() ?? 0;
-                        TotalWatchedCount = mediaLibrary.Library.Movies?.Where(m => m.IsWatched == true).Count() ?? 0;
-                        TotalUnwatchedCount = mediaLibrary.Library.Movies?.Where(m => !m.IsWatched == true).Count() ?? 0;
-                        break;
-                    case "MUSIC":
-                        TotalMediaCountType = "ARTISTS:";
-                        TotalMediaCount = mediaLibrary.Library.Artists?.Count() ?? 0;
-                        TotalWatchedCount = mediaLibrary.Library.Artists?.Where(a => a.IsListened == true).Count() ?? 0;
-                        TotalUnwatchedCount = mediaLibrary.Library.Artists?.Where(a => !a.IsListened == true).Count() ?? 0;
-                        break;
-                }
-            }
-            else
-            {
-                TotalMediaCountType = "ALL MEDIA:";
-                TotalMediaCount = mediaLibrary.Library.TvShows?.SelectMany(t => t.Seasons)?.SelectMany(s => s.Episodes)?.Count() ?? 0 + mediaLibrary.Library?.Movies?.Count() ?? 0 + mediaLibrary.Library?.Artists?.SelectMany(t => t.Albums)?.SelectMany(s => s.Songs)?.Count() ?? 0;
-                TotalWatchedCount = mediaLibrary.Library.TvShows?.SelectMany(t => t.Seasons)?.SelectMany(s => s.Episodes)?.Where(e => e.IsWatched == true)?.Count() ?? 0 + mediaLibrary.Library.Movies?.Where(m => m.IsWatched == true)?.Count() ?? 0;
-                TotalUnwatchedCount = mediaLibrary.Library.TvShows?.SelectMany(t => t.Seasons)?.SelectMany(s => s.Episodes)?.Where(e => !e.IsWatched == true)?.Count() ?? 0 + mediaLibrary.Library.Movies?.Where(m => !m.IsWatched == true)?.Count() ?? 0;
-            }
+            mediaStatistics.GetMediaTypeStatistics(mediaLibrary, mediaType);
         }
 
         /// <summary>
@@ -694,6 +740,30 @@ namespace Leya.ViewModels.Main
         }
 
         /// <summary>
+        /// Shows the actors of <paramref name="media"/>
+        /// </summary>
+        /// <param name="media">The media for which to show the cast</param>
+        private async Task ShowMediaCastAsync(IMediaEntity media)
+        {
+            if (media != null)
+            {
+                IEnumerable<CastEntity> temp = new List<CastEntity>();
+                await Task.Run(() =>
+                {
+                    if (CurrentNavigationLevel == NavigationLevel.Episode)
+                        temp = mediaLibrary.MediaCast.ShowEpisodeMediaCastAsync(mediaLibrary, media);
+                    else if (CurrentNavigationLevel == NavigationLevel.TvShow)
+                        temp = mediaLibrary.MediaCast.ShowTvShowMediaCastAsync(mediaLibrary, media);
+                    else if (CurrentNavigationLevel == NavigationLevel.Movie)
+                        temp = mediaLibrary.MediaCast.ShowMovieMediaCastAsync(mediaLibrary, media);
+                });
+                SourceActors = new ObservableCollection<CastEntity>(temp);
+                if (CurrentNavigationLevel == NavigationLevel.TvShow || CurrentNavigationLevel == NavigationLevel.Episode || CurrentNavigationLevel == NavigationLevel.Movie)
+                    AreActorsVisible = true;
+            }
+        }
+
+        /// <summary>
         /// Opens a directory containing the logs of the application
         /// </summary>
         private void OpenLoggingDirectory()
@@ -737,32 +807,36 @@ namespace Leya.ViewModels.Main
         }
 
         #region Options Media
-
         /// <summary>
         /// Refreshes the media library
         /// </summary>
         private async Task UpdateMediaLibraryAsync()
         {
             // do not allow two media items with same name
-            if (SourceMediaCategories.Count(mc => mc.MediaName == MediaName) > 0 && !optionsMedia.IsMediaTypeSourceUpdate)
+            if (SourceMediaCategories.Count(mc => mc.MediaName == MediaName) > 0 && !appOptions.OptionsMedia.IsMediaTypeSourceUpdate)
                 await notificationService.ShowAsync("The specified media name already exists!", "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
             else
             {
-                MediaTypeEntity item = new MediaTypeEntity() { MediaName = MediaName, IsMedia = true, MediaType = SelectedMediaCategoryType.Text, Id = optionsMedia.IsMediaTypeSourceUpdate ? optionsMedia.Id : 0 };
+                MediaTypeEntity item = new MediaTypeEntity() { MediaName = MediaName, IsMedia = true, MediaType = SelectedMediaCategoryType.Text, Id = appOptions.OptionsMedia.IsMediaTypeSourceUpdate ? appOptions.OptionsMedia.Id : 0 };
                 // if we are updating an already existing media type, delete it and its sources before re-inserting them (might contain modifications)
-                if (optionsMedia.IsMediaTypeSourceUpdate)
+                if (appOptions.OptionsMedia.IsMediaTypeSourceUpdate)
                     await DeleteMediaTypeAsync(item);
                 // add the new media type and get the returned row id
-                int newMediaId = await optionsMedia.SaveMediaTypeAsync(item);
+                int newMediaId = await appOptions.OptionsMedia.SaveMediaTypeAsync(item);
                 if (newMediaId != -1)
-                    await optionsMedia.SaveMediaLibrarySourcesAsync(newMediaId);
+                    await appOptions.OptionsMedia.SaveMediaTypeSourcesAsync(newMediaId);
                 // refresh the list of media types
-                await optionsMedia.RefreshMediaTypes(mediaLibrary);
+                await appOptions.OptionsMedia.RefreshMediaTypes(mediaLibrary);
                 GetMediaTypes();
-                optionsMedia.IsMediaTypeSourceUpdate = false;
+                appOptions.OptionsMedia.IsMediaTypeSourceUpdate = false;
                 ExitMediaTypeSourcesOptions();
                 await notificationService.ShowAsync("Media library updated!", "LEYA - Success");
             }
+        }
+
+        private async Task UpdateInterfaceOptionsAsync()
+        {
+
         }
 
         /// <summary>
@@ -770,7 +844,7 @@ namespace Leya.ViewModels.Main
         /// </summary>
         private void ResetAddMediaSourceElements()
         {
-            optionsMedia.ResetAddMediaSourceElements();
+            appOptions.OptionsMedia.ResetAddMediaTypeSourceElements();
             SelectedMediaCategoryType = null;
             Notify(nameof(SourceMediaCategorySources));
             IsMediaTypeSourcesOptionVisible = true;
@@ -801,6 +875,37 @@ namespace Leya.ViewModels.Main
         }
 
         /// <summary>
+        /// Validates the required information for updating player options
+        /// </summary>
+        /// <returns>True if required information is fine, False otherwise</returns>
+        private bool ValidateUpdatePlayerOptions()
+        {
+            bool isValid = !string.IsNullOrEmpty(PlayerPath) && File.Exists(PlayerPath);
+            if (!isValid && IsPlayerOptionVisible)
+            {
+                ShowHelpButton();
+                WindowHelp = "\n";
+                if (string.IsNullOrEmpty(PlayerPath))
+                    WindowHelp += "Player path cannot be empty!\n";
+                else if (!File.Exists(PlayerPath))
+                    WindowHelp += "Player path must point to a valid file!\n";
+            }
+            else
+                HideHelpButton();
+            ValidationChanged?.Invoke(isValid);
+            return isValid;
+        }
+
+        /// <summary>
+        /// Validates the required information for updating user interface options
+        /// </summary>
+        /// <returns>True if required information is fine, False otherwise</returns>
+        private bool ValidateUpdateInterfaceOptions()
+        {
+            return true;
+        }
+        
+        /// <summary>
         /// Adds a new media source to the selected media
         /// </summary>
         /// <param name="selectedDirectories">The paths of the selected directories representing the media sources to be added</param>
@@ -810,12 +915,12 @@ namespace Leya.ViewModels.Main
             NotificationResult response = await notificationService.ShowAsync("Selected folder contains a single media?", "LEYA", NotificationButton.YesNo, NotificationImage.Question);
             try
             {
-                foreach (string mediaSource in optionsMedia.AddMediaTypeSource(selectedDirectories, response == NotificationResult.Yes))
+                foreach (string mediaSource in appOptions.OptionsMedia.AddMediaTypeSource(selectedDirectories, response == NotificationResult.Yes))
                 {
                     // do not add same source path twice
                     if (SourceMediaCategorySources.Count(ms => ms.MediaSourcePath == mediaSource.ToUpper()) == 0)
                     {
-                        optionsMedia.SourceMediaCategorySources.Add(new MediaTypeSourceEntity()
+                        appOptions.OptionsMedia.SourceMediaCategorySources.Add(new MediaTypeSourceEntity()
                         {
                             MediaSourcePath = mediaSource.ToUpper()
                         });
@@ -836,7 +941,7 @@ namespace Leya.ViewModels.Main
         /// <param name="item">The item to be removed from the media sources</param>
         private void DeleteMediaTypeSource(MediaTypeSourceEntity item)
         {
-            optionsMedia.SourceMediaCategorySources.Remove(item);
+            appOptions.OptionsMedia.SourceMediaCategorySources.Remove(item);
             Notify(nameof(SourceMediaCategorySources));
             RefreshMediaSourcesAsync_Command.RaiseCanExecuteChanged();
         }
@@ -848,10 +953,10 @@ namespace Leya.ViewModels.Main
         private void GetMediaTypeSources(MediaTypeEntity item)
         {
             ShowProgressBar();
-            IsMediaTypeSourcesOptionVisible = true; 
+            IsMediaTypeSourcesOptionVisible = true;
             // the user is updating the sources of an existing media type, not creating a new one
-            optionsMedia.IsMediaTypeSourceUpdate = true;
-            optionsMedia.Id = item.Id;
+            appOptions.OptionsMedia.IsMediaTypeSourceUpdate = true;
+            appOptions.OptionsMedia.Id = item.Id;
             // get the media type sources of the provided media type
             SourceMediaCategorySources = new ObservableCollection<MediaTypeSourceEntity>(mediaLibrary.Library.MediaTypes.SelectMany(mt => mt.MediaTypeSources)
                                                                                                                         .Where(mts => mts.MediaTypeId == item.Id));
@@ -869,23 +974,23 @@ namespace Leya.ViewModels.Main
         {
             try
             {
-                await optionsMedia.DeleteMediaTypeAsync(media.Id);
-                await optionsMedia.RefreshMediaTypes(mediaLibrary);
+                await appOptions.OptionsMedia.DeleteMediaTypeAsync(media.Id);
+                await appOptions.OptionsMedia.RefreshMediaTypes(mediaLibrary);
                 GetMediaTypes();
             }
             catch (Exception ex) when (ex is InvalidOperationException || ex is ArgumentException)
             {
-                await notificationService .ShowAsync(ex.Message, "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
+                await notificationService.ShowAsync(ex.Message, "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
             }
         }
 
         /// <summary>
         /// Gets the user defined media types
         /// </summary>
-        public void GetMediaTypes() 
+        public void GetMediaTypes()
         {
             ShowProgressBar();
-            SourceMediaCategories = new ObservableCollection<MediaTypeEntity>(optionsMedia.GetMediaTypesAsync(mediaLibrary));
+            SourceMediaCategories = new ObservableCollection<MediaTypeEntity>(appOptions.OptionsMedia.GetMediaTypesAsync(mediaLibrary));
             HideProgressBar();
         }
 
@@ -896,6 +1001,26 @@ namespace Leya.ViewModels.Main
         {
             IsMediaTypesOptionVisible = true;
             GetMediaTypes();
+        }
+
+        /// <summary>
+        /// Displays the options related to the media player
+        /// </summary>
+        private void ShowPlayerOptions()
+        {
+            IsPlayerOptionVisible = true;
+            UpdatePlayerOptionsAsync_Command.RaiseCanExecuteChanged();
+            appOptions.OptionsPlayer.GetPlayerOptions();
+        }
+
+        /// <summary>
+        /// Displays the options related to the user interface
+        /// </summary>
+        private void ShowInterfaceOptions()
+        {
+            IsInterfaceOptionVisible = true;
+            UpdatePlayerOptionsAsync_Command.RaiseCanExecuteChanged(); // ?
+            appOptions.OptionsInterface.GetUserInterfaceOptions();
         }
         #endregion
 
@@ -992,8 +1117,10 @@ namespace Leya.ViewModels.Main
             {
                 case NavigationLevel.None:
                     IsMainMenuVisible = true;
+                    IsPlayerOptionVisible = false;
                     IsMediaContainerVisible = false;
                     IsMaskBackgroundVisible = false;
+                    IsInterfaceOptionVisible = false;
                     IsOptionsContainerVisible = false;
                     IsMediaTypesOptionVisible = false;
                     IsMediaTypeSourcesOptionVisible = false;
@@ -1082,6 +1209,24 @@ namespace Leya.ViewModels.Main
             IsMediaTypesOptionVisible = false;
             IsHelpButtonVisible = false;
         }
+
+        /// <summary>
+        /// Exits the player options view and returns to the options list
+        /// </summary>
+        private void ExitPlayerOptions()
+        {
+            IsPlayerOptionVisible = false;
+            IsHelpButtonVisible = false;
+        }
+
+        /// <summary>
+        /// Exits the interface options view and returns to the options list
+        /// </summary>
+        private void ExitInterfaceOptions()
+        {
+            IsInterfaceOptionVisible = false;
+            IsHelpButtonVisible = false;
+        }
         #endregion
         #endregion
 
@@ -1097,7 +1242,16 @@ namespace Leya.ViewModels.Main
             ScannerOutput = "Loading media library...";
             WindowTitle = "LEYA";
             IsScannerTextVisible = true;
-            await mediaLibrary.GetMediaLibraryAsync();
+            IsMediaPlayingIndicatorSocketVisible = true;
+            try
+            {
+                await mediaLibrary.GetMediaLibraryAsync();
+            }
+            catch (Exception ex)
+            {
+                ScannerOutput = string.Empty;
+                IsScannerTextVisible = true;
+            }
             HideProgressBar();
         }
 
@@ -1123,28 +1277,22 @@ namespace Leya.ViewModels.Main
         /// </summary>
         private void SelectedMediaChanged()
         {
+            // update the displayed details of the selected media item, depending on its type
             if (SourceMediaSelectedItem != null)
             {
-                // if the UI displays a list of tv shows
-                if (CurrentNavigationLevel == NavigationLevel.TvShow)
+                if (CurrentNavigationLevel == NavigationLevel.TvShow) // if the UI displays a list of tv shows
                     mediaLibraryNavigation.GetTvShowMediaInfo(mediaLibrary, SourceMediaSelectedItem.Id);
-                // if the UI displays a list of tv show seasons
-                else if (CurrentNavigationLevel == NavigationLevel.Season)
+                else if (CurrentNavigationLevel == NavigationLevel.Season) // if the UI displays a list of tv show seasons
                     mediaLibraryNavigation.GetSeasonMediaInfo(mediaLibrary, SourceMediaSelectedItem.Id, SourceMediaSelectedItem.SeasonOrAlbumId);
-                // if the UI displays a list of tv show episodes
-                else if (CurrentNavigationLevel == NavigationLevel.Episode)
+                else if (CurrentNavigationLevel == NavigationLevel.Episode) // if the UI displays a list of tv show episodes
                     mediaLibraryNavigation.GetEpisodeMediaInfo(mediaLibrary, SourceMediaSelectedItem.Id, SourceMediaSelectedItem.SeasonOrAlbumId, SourceMediaSelectedItem.MediaName);
-                // if the UI displays a list of movies
-                else if (CurrentNavigationLevel == NavigationLevel.Movie)
+                else if (CurrentNavigationLevel == NavigationLevel.Movie) // if the UI displays a list of movies
                     mediaLibraryNavigation.GetMovieMediaInfo(mediaLibrary, SourceMediaSelectedItem.Id);
-                // if the UI displays a list of artists
-                else if (CurrentNavigationLevel == NavigationLevel.Artist)
+                else if (CurrentNavigationLevel == NavigationLevel.Artist) // if the UI displays a list of artists
                     mediaLibraryNavigation.GetArtistMediaInfo(mediaLibrary, SourceMediaSelectedItem.Id);
-                // if the UI displays a list of albums
-                else if (CurrentNavigationLevel == NavigationLevel.Album)
+                else if (CurrentNavigationLevel == NavigationLevel.Album) // if the UI displays a list of albums
                     mediaLibraryNavigation.GetAlbumMediaInfo(mediaLibrary, SourceMediaSelectedItem.Id, SourceMediaSelectedItem.SeasonOrAlbumId);
-                // if the UI displays a list of songs
-                else if (CurrentNavigationLevel == NavigationLevel.Song)
+                else if (CurrentNavigationLevel == NavigationLevel.Song) // if the UI displays a list of songs
                     mediaLibraryNavigation.GetSongMediaInfo(mediaLibrary, SourceMediaSelectedItem.Id, SourceMediaSelectedItem.SeasonOrAlbumId, SourceMediaSelectedItem.MediaName);
             }
         }

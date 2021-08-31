@@ -11,6 +11,7 @@ namespace Leya.Models.Common.Models.Media
     {
         #region ================================================================ PROPERTIES =================================================================================
         int Id { get; set; }
+        int Index { get; set; }
         int Year { get; set; }
         int SeasonOrAlbumId { get; set; }
         int EpisodeOrSongId { get; set; }

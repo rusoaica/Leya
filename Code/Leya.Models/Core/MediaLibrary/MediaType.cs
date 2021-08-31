@@ -100,7 +100,8 @@ namespace Leya.Models.Core.MediaLibrary
         /// <summary>
         /// Saves <paramref name="media"/> in the storage medium
         /// </summary>
-        /// <param name="media">The media to be saved</param>
+        /// <param name="media">The media type to be saved</param>
+        /// <returns>The Id of the inserted media type</returns>
         public async Task<int> AddMediaTypeAsync(MediaTypeEntity media)
         {
             var result = await mediaTypeRepository.InsertAsync(media.ToStorageEntity());

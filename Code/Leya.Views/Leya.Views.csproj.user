@@ -2,83 +2,43 @@
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup />
   <ItemGroup>
-    <ApplicationDefinition Update="App.xaml">
+    <AvaloniaResource Update="Common\Styles\TextBox.xaml">
       <SubType>Designer</SubType>
-    </ApplicationDefinition>
+    </AvaloniaResource>
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="Common\Controls\NavigationTreeView\FileSystemTreeView.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Common\Dialogs\FileBrowserDialogV.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Common\Dialogs\FileSaveDialogV.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Common\Dialogs\FolderBrowserDialogV.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Common\Dialogs\MsgBoxV.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Main\MainWindowV.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Options\OptionsMediaV.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Register\ChangePasswordV.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Register\RecoverPasswordV.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Register\RegisterV.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Startup\StartupV.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <AvaloniaResource Update="Common\Styles\ScrollViewer.xaml">
+      <SubType>Designer</SubType>
+    </AvaloniaResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
+    <AvaloniaResource Update="Common\Styles\RepeatButton.xaml">
       <SubType>Designer</SubType>
-    </EmbeddedResource>
+    </AvaloniaResource>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Common\Controls\NavigationTreeView\FileSystemTreeView.xaml">
+    <AvaloniaResource Update="Common\Styles\AutoCompleteBox.xaml">
       <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Common\Dialogs\FileBrowserDialogV.xaml">
+    </AvaloniaResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AvaloniaResource Update="Common\Styles\CheckBox.xaml">
       <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Common\Dialogs\FileSaveDialogV.xaml">
+    </AvaloniaResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AvaloniaResource Update="Common\Styles\ComboBox.xaml">
       <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Common\Dialogs\FolderBrowserDialogV.xaml">
+    </AvaloniaResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AvaloniaResource Update="Common\Styles\ListBox.xaml">
       <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Common\Dialogs\MsgBoxV.xaml">
+    </AvaloniaResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AvaloniaResource Update="Common\Styles\ToolTip.xaml">
       <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Main\MainWindowV.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Options\OptionsMediaV.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Register\ChangePasswordV.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Register\RecoverPasswordV.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Register\RegisterV.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Startup\StartupV.xaml">
-      <SubType>Designer</SubType>
-    </Page>
+    </AvaloniaResource>
   </ItemGroup>
 </Project>

@@ -19,7 +19,7 @@ namespace Leya.DataAccess.Common.Models.Seasons
         public int SeasonNumber { get; set; }
         public string Synopsis { get; set; }
         public string SeasonName { get; set; }
-        public string IsWatched { get; set; }
+        public string IsWatched { get; set; } = "False"; 
         public bool IsFavorite { get; set; }
         public DateTime Premiered { get; set; }
         #endregion

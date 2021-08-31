@@ -16,7 +16,7 @@ namespace Leya.Models.Core.Navigation
     {
         #region ============================================================== FIELD MEMBERS ================================================================================
         event Action Navigated;
-        event Action<string, string> PropertyChanged;
+        event Action<string> PropertyChanged;
         #endregion
 
         #region ================================================================ PROPERTIES =================================================================================

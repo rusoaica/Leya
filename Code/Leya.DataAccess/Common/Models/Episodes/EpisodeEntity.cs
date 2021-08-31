@@ -33,7 +33,7 @@ namespace Leya.DataAccess.Common.Models.Episodes
         public EpisodeGenreEntity[] Genres { get; set; }
         [IgnoreOnInsert]
         public EpisodeCreditEntity[] Credits { get; set; }
-        public string IsWatched { get; set; }
+        public string IsWatched { get; set; } = "False";
         public bool IsFavorite { get; set; }
         [IgnoreOnInsert]
         public EpisodeActorEntity[] Actors { get; set; }

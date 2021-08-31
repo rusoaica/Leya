@@ -11,7 +11,7 @@ namespace Leya.Models.Common.Broadcasting
     public class NotifyPropertyChanged
     {
         #region ============================================================== FIELD MEMBERS ================================================================================
-        public event Action<string, string> PropertyChanged;
+        public event Action<string> PropertyChanged;
         #endregion
 
         #region ================================================================= METHODS ===================================================================================
@@ -21,7 +21,7 @@ namespace Leya.Models.Common.Broadcasting
         /// <param name="propertyName">The property that had the value changed</param>
         public void Notify([CallerMemberName] string propertyName = null)
         {
-            PropertyChanged?.Invoke(propertyName, GetType().Name);
+            PropertyChanged?.Invoke(propertyName);
         }
         #endregion
     }

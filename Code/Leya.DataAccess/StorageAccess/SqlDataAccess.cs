@@ -39,6 +39,7 @@ namespace Leya.DataAccess.StorageAccess
         {
             this.dbConnection = dbConnection;
             // map the string type to the bool database type (save booleans as strings, not integers)
+            SqlMapper.AddTypeMap(typeof(bool), DbType.String);
             SqlMapper.AddTypeMap(typeof(bool?), DbType.String);
         }
 

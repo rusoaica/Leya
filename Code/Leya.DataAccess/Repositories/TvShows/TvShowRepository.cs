@@ -131,23 +131,23 @@ namespace Leya.DataAccess.Repositories.TvShows
         {
             // get the tv show data
             dataAccess.OpenTransaction();
-            ApiResponse<TvShowEntity> _output = await dataAccess.SelectAsync<TvShowEntity>(EntityContainers.TvShows,
+            ApiResponse<TvShowEntity> output = await dataAccess.SelectAsync<TvShowEntity>(EntityContainers.TvShows,
                 "Id, MediaTypeSourceId, MediaTypeId, TvShowNamedTitle, TvShowTitle, NumberOfSeasons, NumberOfEpisodes, Synopsis, TagLine, Runtime, MPAA, " +
                 "LastPlayed, ImDbId, TvDbId, TmDbId, Aired, IsEnded, Trailer, Studio, IsWatched, IsFavorite, Created", new { Id = id });
-            if (_output.Data != null)
+            if (output.Data != null)
             {
                 await Task.Run(async () =>
                 {
                     // get the data assoviated with the tv show
-                    _output.Data[0].Ratings = (await dataAccess.SelectAsync<TvShowRatingEntity>(EntityContainers.TvShowRatings, "Id, TvShowId, Name, Max, Value, Votes", new { TvShowId = _output.Data[0].Id })).Data;
-                    _output.Data[0].Genres = (await dataAccess.SelectAsync<TvShowGenreEntity>(EntityContainers.TvShowGenre, "Genre, TvShowId, Id", new { TvShowId = _output.Data[0].Id })).Data;
-                    _output.Data[0].Actors = (await dataAccess.SelectAsync<TvShowActorEntity>(EntityContainers.TvShowActors, "Id, TvShowId, Name, Role, `Order`, Thumb", new { TvShowId = _output.Data[0].Id })).Data;
-                    //_output.Data[0].Seasons = (await dataAccess.SelectAsync<SeasonEntity>(EntityContainers.Seasons, "Id, TvShowId, SeasonNumber, SeasonName, IsWatched, IsFavorite, Year, Synopsis, Premiered", new { TvShowId = _output.Data[0].Id })).Data;
-                    _output.Data[0].Resume = (await dataAccess.SelectAsync<TvShowResumeEntity>(EntityContainers.TvShowResume, "TvShowId, SeasonId, EpisodeId, Position, Total", new { TvShowId = _output.Data[0].Id, SeasonId = 0, EpisodeId = 0 })).Data?[0];
+                    output.Data[0].Ratings = (await dataAccess.SelectAsync<TvShowRatingEntity>(EntityContainers.TvShowRatings, "Id, TvShowId, Name, Max, Value, Votes", new { TvShowId = output.Data[0].Id })).Data;
+                    output.Data[0].Genres = (await dataAccess.SelectAsync<TvShowGenreEntity>(EntityContainers.TvShowGenre, "Genre, TvShowId, Id", new { TvShowId = output.Data[0].Id })).Data;
+                    output.Data[0].Actors = (await dataAccess.SelectAsync<TvShowActorEntity>(EntityContainers.TvShowActors, "Id, TvShowId, Name, Role, `Order`, Thumb", new { TvShowId = output.Data[0].Id })).Data;
+                    //output.Data[0].Seasons = (await dataAccess.SelectAsync<SeasonEntity>(EntityContainers.Seasons, "Id, TvShowId, SeasonNumber, SeasonName, IsWatched, IsFavorite, Year, Synopsis, Premiered", new { TvShowId = _output.Data[0].Id })).Data;
+                    output.Data[0].Resume = (await dataAccess.SelectAsync<TvShowResumeEntity>(EntityContainers.TvShowResume, "TvShowId, SeasonId, EpisodeId, Position, Total", new { TvShowId = output.Data[0].Id, SeasonId = 0, EpisodeId = 0 })).Data?[0];
                 });
             }
             dataAccess.CloseTransaction();
-            return _output;
+            return output;
         }
 
         /// <summary>

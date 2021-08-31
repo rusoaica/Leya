@@ -16,7 +16,7 @@ namespace Leya.Views.Common.Clipboard
         /// <param name="text">The string to be set into Windows clipboard</param>
         public void SetText(string text)
         {
-            System.Windows.Clipboard.SetText(text);
+            //System.Windows.Clipboard.SetText(text);
         }
         #endregion
     }

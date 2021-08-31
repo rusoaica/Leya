@@ -54,7 +54,7 @@ namespace Leya.Models.Core.Navigation
         public string Poster
         {
             get { return poster; }
-            set { poster = value; Notify(); }
+            set { poster = value; Notify(); IsMediaCoverVisible = value != null; }
         }
 
         private string fanart;
@@ -643,10 +643,12 @@ namespace Leya.Models.Core.Navigation
         {
             int mediaTypeId = mediaLibrary.Library.MediaTypes.Where(mt => mt.MediaName == currentMediaName).First().Id;
             List<IMediaEntity> temp = new List<IMediaEntity>();
+            int count = 0;
             foreach (TvShowEntity tvShow in mediaLibrary.Library.TvShows.Where(t => t.MediaTypeId == mediaTypeId))
             {
                 IMediaEntity media = mediaFactory.Invoke();
                 media.Id = tvShow.Id;
+                media.Index = ++count;
                 media.MediaName = tvShow.TvShowTitle;
                 media.IsWatched = tvShow.IsWatched;
                 media.IsFavorite = tvShow.IsFavorite;
@@ -664,10 +666,12 @@ namespace Leya.Models.Core.Navigation
         /// <param name="fromEpisode">An episode in the current navigation list from which to take the parent seasons</param>
         public IEnumerable<IMediaEntity> GetSeasonsNavigationListFromEpisode(IMediaLibrary mediaLibrary, IMediaEntity fromEpisode, Func<IMediaEntity> mediaFactory)
         {
+            int count = 0;
             foreach (SeasonEntity season in mediaLibrary.Library.TvShows.SelectMany(t => t.Seasons).Where(s => s.TvShowId == fromEpisode.Id))
             {
                 IMediaEntity media = mediaFactory.Invoke();
                 media.Id = season.TvShowId;
+                media.Index = ++count;
                 media.MediaName = season.SeasonName;
                 media.IsWatched = season.IsWatched;
                 media.IsFavorite = season.IsFavorite;
@@ -704,12 +708,14 @@ namespace Leya.Models.Core.Navigation
         /// <param name="fromSeason">A season in the current navigation list from which to take the child episodes</param>
         public IEnumerable<IMediaEntity> GetEpisodesNavigationList(IMediaLibrary mediaLibrary, IMediaEntity fromSeason, Func<IMediaEntity> mediaFactory)
         {
+            int count = 0;
             foreach (EpisodeEntity episode in mediaLibrary.Library.TvShows.SelectMany(t => t.Seasons)
                                                                           .SelectMany(s => s.Episodes)
                                                                           .Where(e => e.SeasonId == fromSeason.SeasonOrAlbumId && e.TvShowId == fromSeason.Id))
             {
                 IMediaEntity media = mediaFactory.Invoke();
                 media.Id = episode.TvShowId;
+                media.Index = ++count;
                 media.SeasonOrAlbumId = fromSeason.SeasonOrAlbumId;
                 media.EpisodeOrSongId = episode.Id;
                 media.MediaName = episode.Title;
@@ -730,10 +736,12 @@ namespace Leya.Models.Core.Navigation
         {
             int mediaTypeId = mediaLibrary.Library.MediaTypes.Where(mt => mt.MediaName == currentMediaName).First().Id;
             List<IMediaEntity> temp = new List<IMediaEntity>();
+            int count = 0;
             foreach (MovieEntity movie in mediaLibrary.Library.Movies.Where(t => t.MediaTypeId == mediaTypeId))
             {
                 IMediaEntity media = mediaFactory.Invoke();
                 media.Id = movie.Id;
+                media.Index = ++count;
                 media.MediaName = movie.MovieTitle;
                 media.IsWatched = movie.IsWatched;
                 media.IsFavorite = movie.IsFavorite;
@@ -751,10 +759,12 @@ namespace Leya.Models.Core.Navigation
         public IEnumerable<IMediaEntity> GetArtistsNavigationList(IMediaLibrary mediaLibrary, Func<IMediaEntity> mediaFactory)
         {
             int mediaTypeId = mediaLibrary.Library.MediaTypes.Where(mt => mt.MediaName == currentMediaName).First().Id;
+            int count = 0;
             foreach (ArtistEntity artist in mediaLibrary.Library.Artists.Where(a => a.MediaTypeId == mediaTypeId))
             {
                 IMediaEntity media = mediaFactory.Invoke();
                 media.Id = artist.Id;
+                media.Index = ++count;
                 media.MediaName = artist.ArtistName;
                 media.IsWatched = artist.IsListened;
                 media.IsFavorite = artist.IsFavorite;
@@ -770,10 +780,12 @@ namespace Leya.Models.Core.Navigation
         /// <param name="fromSong">A song in the current navigation list from which to take the parent albums</param>
         public IEnumerable<IMediaEntity> GetAlbumsNavigationListFromSong(IMediaLibrary mediaLibrary, IMediaEntity fromSong, Func<IMediaEntity> mediaFactory)
         {
+            int count = 0;
             foreach (AlbumEntity album in mediaLibrary.Library.Artists.SelectMany(a => a.Albums).Where(a => a.ArtistId == fromSong.Id))
             {
                 IMediaEntity media = mediaFactory.Invoke();
                 media.Id = album.ArtistId;
+                media.Index = ++count;
                 media.MediaName = album.Title;
                 media.IsWatched = album.IsListened;
                 media.IsFavorite = album.IsFavorite;
@@ -810,12 +822,14 @@ namespace Leya.Models.Core.Navigation
         /// <param name="fromAlbum">An album in the current navigation list from which to take the child songs</param>
         public IEnumerable<IMediaEntity> GetSongsNavigationList(IMediaLibrary mediaLibrary, IMediaEntity fromAlbum, Func<IMediaEntity> mediaFactory)
         {
+            int count = 0;
             foreach (SongEntity song in mediaLibrary.Library.Artists.SelectMany(a => a.Albums)
                                                                     .SelectMany(a => a.Songs)
                                                                     .Where(s => s.AlbumId == fromAlbum.SeasonOrAlbumId && s.ArtistId == fromAlbum.Id))
             {
                 IMediaEntity media = mediaFactory.Invoke();
                 media.Id = song.ArtistId;
+                media.Index = ++count;
                 media.SeasonOrAlbumId = fromAlbum.SeasonOrAlbumId;
                 media.EpisodeOrSongId = song.Id;
                 media.MediaName = song.Title;

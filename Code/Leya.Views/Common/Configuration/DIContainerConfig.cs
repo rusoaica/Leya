@@ -29,7 +29,6 @@ using Leya.ViewModels.Common.Dispatcher;
 using Leya.ViewModels.Common.Models.Media;
 using Leya.ViewModels.Common.ViewFactory;
 using Leya.ViewModels.Main;
-using Leya.ViewModels.Options;
 using Leya.ViewModels.Register;
 using Leya.ViewModels.Startup;
 using Leya.Views.Common.Clipboard;
@@ -38,7 +37,6 @@ using Leya.Views.Common.Dialogs.MessageBox;
 using Leya.Views.Common.Dispatcher;
 using Leya.Views.Common.UIFactory;
 using Leya.Views.Main;
-using Leya.Views.Options;
 using Leya.Views.Register;
 using Leya.Views.Startup;
 using Newtonsoft.Json;
@@ -77,7 +75,6 @@ namespace Leya.Views.Common.Configuration
             builder.RegisterType<FolderBrowserDialogVM>().As<IFolderBrowserDialogVM>().InstancePerDependency();
             builder.RegisterType<FileBrowserDialogVM>().As<IFileBrowserDialogVM>().InstancePerDependency();
             builder.RegisterType<FileSaveDialogVM>().As<IFileSaveDialogVM>().InstancePerDependency();
-            builder.RegisterType<OptionsMediaVM>().As<IOptionsMediaVM>().InstancePerDependency();
             #endregion
 
             #region models            
@@ -201,6 +198,47 @@ namespace Leya.Views.Common.Configuration
 //#endif
                    .SingleInstance();
 
+            builder.RegisterType<OptionsPlayer>()
+                   .As<IOptionsPlayer>()
+//#if !DEBUG
+                   .EnableInterfaceInterceptors()
+                   .InterceptedBy(typeof(LoggerInterceptor))
+//#endif
+                   .SingleInstance();
+
+            builder.RegisterType<OptionsInterface>()
+                   .As<IOptionsInterface>()
+//#if !DEBUG
+                   .EnableInterfaceInterceptors()
+                   .InterceptedBy(typeof(LoggerInterceptor))
+//#endif
+                   .SingleInstance();
+
+            builder.RegisterType<AppOptions>()
+                   .As<IAppOptions>()
+//#if !DEBUG
+                   .EnableInterfaceInterceptors()
+                   .InterceptedBy(typeof(LoggerInterceptor))
+//#endif
+                   .SingleInstance();
+
+            builder.RegisterType<MediaCast>()
+                   .As<IMediaCast>()
+//#if !DEBUG
+                   .EnableInterfaceInterceptors()
+                   .InterceptedBy(typeof(LoggerInterceptor))
+//#endif
+                   .SingleInstance();
+
+
+            builder.RegisterType<MediaStatistics>()
+                   .As<IMediaStatistics>()
+//#if !DEBUG
+                   .EnableInterfaceInterceptors()
+                   .InterceptedBy(typeof(LoggerInterceptor))
+//#endif
+                   .SingleInstance();
+
             #endregion
 
             #region data access
@@ -215,13 +253,15 @@ namespace Leya.Views.Common.Configuration
             Type iRepositoryFactoryType = Type.GetType("Leya.DataAccess.Repositories.Common.IRepositoryFactory, Leya.DataAccess");
             Type sqLiteConnectionType = Type.GetType("System.Data.SQLite.SQLiteConnection, System.Data.SQLite");
 
-            if (File.Exists(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\appsettings.json"))
-                builder.Register(context => JsonConvert.DeserializeObject<AppConfig>(File.ReadAllText(Directory.GetCurrentDirectory() + "\\appsettings.json")))
-                       .OnActivating(e => e.Instance.ConfigurationFilePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\appsettings.json")
+            if (File.Exists(Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + "appsettings.json"))
+                builder.Register(context => JsonConvert.DeserializeObject<AppConfig>(File.ReadAllText(Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + "appsettings.json")))
+                       .OnActivating(e => e.Instance.ConfigurationFilePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + Path.DirectorySeparatorChar + "appsettings.json")
                        .As<IAppConfig>()
                        .SingleInstance();
+#if !DEBUG
             else
-                throw new FileNotFoundException("Configuration file not found!\nPath: " + Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\appsettings.json");
+                throw new FileNotFoundException("Configuration file not found!\nPath: " + Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)  + Path.DirectorySeparatorChar + "appsettings.json");
+#endif
             builder.RegisterType(sqLiteConnectionType).As<IDbConnection>().InstancePerLifetimeScope();
 
 
@@ -231,7 +271,8 @@ namespace Leya.Views.Common.Configuration
                    .OnActivating(e => e.Instance.GetType()
                                                 .GetProperty("ConnectionString")
                                                 .SetValue(e.Instance, e.Context.Resolve<IAppConfig>().ConnectionStrings["SqLite"]))
-                   .InstancePerDependency();
+                   .SingleInstance();
+                   //.InstancePerDependency();
 
             builder.RegisterType(repositoryFactoryType).As(iRepositoryFactoryType).SingleInstance();
             // get all classes implementing IRepository (all repository classes) and register them as their corresponding repository interface
@@ -256,9 +297,9 @@ namespace Leya.Views.Common.Configuration
             //                                                             .InstancePerDependency()
             //                                                             .EnableInterfaceInterceptors()
             //                                                             .InterceptedBy(typeof(LoggerInterceptor)); 
-            #endregion
+#endregion
 
-            #region dialogs
+#region dialogs
             //builder.RegisterType<ClientVM>().As<IClientVM>().InstancePerDependency();
             //builder.RegisterType<MsgBoxVM>().As<IMsgBoxVM>().InstancePerDependency();
             //builder.RegisterType<MockDispatcher>().As<IDispatcher>().InstancePerDependency();
@@ -270,14 +311,21 @@ namespace Leya.Views.Common.Configuration
                 .WithParameter(new ResolvedParameter(
                     (propertyInfo, context) => propertyInfo.ParameterType == typeof(IDispatcher),
                     (propertyInfo, context) => context.Resolve<IDispatcher>()))
-                .WithParameter(
-                    (propertyInfo, context) => propertyInfo.ParameterType == typeof(Func<IMsgBoxVM>),
-                    (propertyInfo, context) =>
-                    {
-                        IComponentContext componentContext = context.Resolve<IComponentContext>();
-                        return new Func<IMsgBoxVM>(() => componentContext.Resolve<IMsgBoxVM>());
-                    })
                 .As<INotificationService>().InstancePerDependency();
+
+            //builder.RegisterType<MessageBoxService>()
+            //   .WithParameter(new ResolvedParameter(
+            //       (propertyInfo, context) => propertyInfo.ParameterType == typeof(IDispatcher),
+            //       (propertyInfo, context) => context.Resolve<IDispatcher>()))
+            //   .WithParameter(
+            //       (propertyInfo, context) => propertyInfo.ParameterType == typeof(Func<IMsgBoxVM>),
+            //       (propertyInfo, context) =>
+            //       {
+            //           IComponentContext componentContext = context.Resolve<IComponentContext>();
+            //            //return new Func<IMsgBoxVM>(() => componentContext.Resolve<IMsgBoxVM>());
+            //            return new Func<IMsgBoxVM>(() => componentContext.Resolve<IMsgBoxVM>());
+            //       })
+            //   .As<INotificationService>().InstancePerDependency();
 
             builder.RegisterType<FolderBrowserService>()
                 .WithParameter(new ResolvedParameter(
@@ -317,9 +365,9 @@ namespace Leya.Views.Common.Configuration
                         return new Func<IFileSaveDialogVM>(() => componentContext.Resolve<IFileSaveDialogVM>());
                     })
                 .As<IFileSaveService>().InstancePerDependency();
-            #endregion
+#endregion
 
-            #region views
+#region views
             //builder.RegisterType<MainWindow>().OnActivating(e => e.Instance.DataContext = e.Context.Resolve<IMainWindowVM>()).As<IMainWindowView>().InstancePerDependency();
             //builder.RegisterType<Client>().OnActivating(e => e.Instance.DataContext = e.Context.Resolve<IClientVM>()).As<IClientView>().InstancePerDependency();
             //builder.RegisterType<MsgBoxV>().OnActivating(e => e.Instance.DataContext = e.Context.Resolve<IMsgBoxVM>()).As<IMsgBoxView>().InstancePerDependency();
@@ -330,14 +378,13 @@ namespace Leya.Views.Common.Configuration
 
             // views
 
-            builder.RegisterType<StartupV>().OnActivating(e => e.Instance.DataContext = e.Context.Resolve<IStartupVM>()).As<IStartupView>().InstancePerDependency();
+            builder.RegisterType<StartupV>().OnActivating(e => e.Instance.DataContext = e.Context.Resolve<IStartupVM>()).As<IStartupView>().SingleInstance();
             //builder.RegisterType<SystemV>().OnActivating(e => e.Instance.DataContext = e.Context.Resolve<ISystemVM>()).As<ISystemView>().InstancePerDependency();
             builder.RegisterType<RegisterV>().OnActivating(e => e.Instance.DataContext = e.Context.Resolve<IRegisterVM>()).As<IRegisterView>().InstancePerDependency();
             builder.RegisterType<MainWindowV>().OnActivating(e => e.Instance.DataContext = e.Context.Resolve<IMainWindowVM>()).As<IMainWindowView>().InstancePerDependency();
             builder.RegisterType<RecoverPasswordV>().OnActivating(e => e.Instance.DataContext = e.Context.Resolve<IRecoverPasswordVM>()).As<IRecoverPasswordView>().InstancePerDependency();
             builder.RegisterType<ChangePasswordV>().OnActivating(e => e.Instance.DataContext = e.Context.Resolve<IChangePasswordVM>()).As<IChangePasswordView>().InstancePerDependency();
-            builder.RegisterType<OptionsMediaV>().OnActivating(e => e.Instance.DataContext = e.Context.Resolve<IOptionsMediaVM>()).As<IOptionsMediaView>().InstancePerDependency();
-            #endregion
+#endregion
 
 
             builder.RegisterType<MsgBoxV>().As<IMsgBoxView>().InstancePerDependency();
@@ -346,6 +393,7 @@ namespace Leya.Views.Common.Configuration
             builder.RegisterType<FileSaveDialogV>().As<IFileSaveDialogView>().InstancePerDependency();
             builder.RegisterType<ApplicationDispatcher>().As<IDispatcher>().InstancePerDependency();
             builder.RegisterType<WindowsClipboard>().As<IClipboard>().SingleInstance();
+
             builder.RegisterType<ViewFactory>().As<IViewFactory>().InstancePerDependency();
 
             return builder.Build();
@@ -358,9 +406,6 @@ namespace Leya.Views.Common.Configuration
         {
             Type[] dataAccessLayerTypes = Assembly.Load("Leya.DataAccess").GetTypes();
             Type genericRepositoryType = Type.GetType("Leya.DataAccess.Repositories.Common.IRepository`1, Leya.DataAccess");
-            Type sqlDataAccessType = Type.GetType("Leya.DataAccess.StorageAccess.SqlDataAccess, Leya.DataAccess");
-            Type iDataAccessType = Type.GetType("Leya.DataAccess.StorageAccess.IDataAccess, Leya.DataAccess");
-            Type iConnectionStringType = Type.GetType("Leya.DataAccess.StorageAccess.IConnectionString, Leya.DataAccess");
             Type iRepositoryFactoryType = Type.GetType("Leya.DataAccess.Repositories.Common.IRepositoryFactory, Leya.DataAccess");
 
 

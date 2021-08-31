@@ -83,6 +83,13 @@ namespace Leya.ViewModels.Common.MVVM
             get { return mediaPlayingImage; }
             set { mediaPlayingImage = value; Notify(); }
         }
+
+        private DateTime currentTime = DateTime.Now;
+        public DateTime CurrentTime
+        {
+            get { return currentTime; }
+            set { currentTime = value; Notify(); }
+        }
         #endregion
 
         #region ================================================================ PROPERTIES =================================================================================
@@ -184,6 +191,7 @@ namespace Leya.ViewModels.Common.MVVM
         {
             MediaPlayingImage = (isMediaPlaying ? "red" : "green") + ".png";
             IsMediaPlayingIndicatorVisible = !IsMediaPlayingIndicatorVisible;
+            CurrentTime = DateTime.Now;
         }
         #endregion
     }

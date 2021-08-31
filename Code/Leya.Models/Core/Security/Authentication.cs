@@ -35,7 +35,7 @@ namespace Leya.Models.Core.Security
         /// Overload C-tor
         /// <param name="unitOfWork">Injected unit of work for interacting with the data access layer repositories</param>
         /// <param name="config">Injected configuration for itneracting with the application's configuration</param>
-        /// <param name="notificationService">Injected notification service</param>
+        /// <param name="notificationService">The injected service used for displaying notifications</param>
         /// </summary>
         public Authentication(IUnitOfWork unitOfWork, IAppConfig config, INotificationService notificationService)
         {

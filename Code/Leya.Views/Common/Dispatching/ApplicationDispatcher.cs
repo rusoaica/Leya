@@ -3,25 +3,25 @@
 /// Purpose: Explicit implementation of abstract Dispatcher interface, used in UI environments
 #region ========================================================================= USING =====================================================================================
 using System;
-using System.Windows;
-using System.Windows.Threading;
-using Leya.ViewModels.Common.Dispatcher;
+using Avalonia;
+using Avalonia.Threading;
+using System.Threading.Tasks;
 #endregion
 
 namespace Leya.Views.Common.Dispatcher
 {
-    public class ApplicationDispatcher : IDispatcher
+    public class ApplicationDispatcher : ViewModels.Common.Dispatcher.IDispatcher
     {
         #region =============================================================== PROPERTIES ==================================================================================
-        System.Windows.Threading.Dispatcher UnderlyingDispatcher
+        Avalonia.Threading.Dispatcher UnderlyingDispatcher
         {
             get
             {
                 if (Application.Current == null)
-                    throw new InvalidOperationException("You must call this method from within a running WPF application!");
-                if (Application.Current.Dispatcher == null)
-                    throw new InvalidOperationException("You must call this method from within a running WPF application with an active dispatcher!");
-                return Application.Current.Dispatcher;
+                    throw new InvalidOperationException("You must call this method from within a running Avalonia application!");
+                if (Avalonia.Threading.Dispatcher.UIThread == null)
+                    throw new InvalidOperationException("You must call this method from within a running Avalonia application with an active dispatcher!");
+                return Avalonia.Threading.Dispatcher.UIThread;
             }
         }
         #endregion
@@ -32,9 +32,9 @@ namespace Leya.Views.Common.Dispatcher
         /// </summary>
         /// <param name="method">A delegate to a method that takes one argument, which is pushed onto the System.Windows.Threading.Dispatcher event queue.</param>
         /// <param name="args">An object to pass as an argument to the given method.</param>
-        public void Dispatch(Delegate method, params object[] args)
+        public async Task Dispatch(Action method, params object[] args)
         {
-            UnderlyingDispatcher.Invoke(DispatcherPriority.Background, method, args);
+            await UnderlyingDispatcher.InvokeAsync(method, DispatcherPriority.Background);
         }
 
         /// <summary>
@@ -43,9 +43,9 @@ namespace Leya.Views.Common.Dispatcher
         /// <typeparam name="TResult">The type of result returned by <paramref name="callback"/></typeparam>
         /// <param name="callback">A func returning a result of type <typeparamref name="TResult"/></param>
         /// <returns>A Func callback of type <typeparamref name="TResult"/></returns>
-        public TResult Dispatch<TResult>(Func<TResult> callback)
+        public async Task<TResult> Dispatch<TResult>(Func<TResult> callback)
         {
-            return UnderlyingDispatcher.Invoke(callback);
+            return await UnderlyingDispatcher.InvokeAsync(callback);
         }
         #endregion
     }

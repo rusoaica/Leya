@@ -28,7 +28,7 @@ namespace Leya.Models.Common.Models.TvShows
         public string TvShowTitle { get; set; }
         public string TvShowNamedTitle { get; set; }
         public bool IsEnded { get; set; }
-        public bool? IsWatched { get; set; }
+        public bool? IsWatched { get; set; } = false;
         public bool IsFavorite { get; set; }
         public SeasonEntity[] Seasons { get; set; }
         public TvShowResumeEntity Resume { get; set; }

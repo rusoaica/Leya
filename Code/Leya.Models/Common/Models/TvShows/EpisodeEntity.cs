@@ -29,7 +29,7 @@ namespace Leya.Models.Common.Models.TvShows
         public EpisodeActorEntity[] Actors { get; set; }
         public EpisodeCreditEntity[] Credits { get; set; }
         public EpisodeRatingEntity[] Ratings { get; set; }
-        public bool? IsWatched { get; set; }
+        public bool? IsWatched { get; set; } = false;
         public bool IsFavorite { get; set; }
         public DateTime Aired { get; set; }
         public DateTime Created { get; set; }
