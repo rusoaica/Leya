@@ -1,6 +1,6 @@
 ﻿/// Written by: Yulia Danilova
 /// Creation Date: 19th of May, 2021
-/// Purpose: Deserialization model for the MovieCountry storage container
+/// Purpose: Deserialization model for the MovieCountries storage container
 #region ========================================================================= USING =====================================================================================
 using Leya.DataAccess.StorageAccess;
 using Leya.DataAccess.Common.Attributes;

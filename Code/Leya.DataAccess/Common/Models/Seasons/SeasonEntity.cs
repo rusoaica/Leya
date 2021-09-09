@@ -16,9 +16,9 @@ namespace Leya.DataAccess.Common.Models.Seasons
         public int Id { get; set; }
         public int Year { get; set; }
         public int TvShowId { get; set; }
-        public int SeasonNumber { get; set; }
+        public int Number { get; set; }
+        public string Title { get; set; }
         public string Synopsis { get; set; }
-        public string SeasonName { get; set; }
         public string IsWatched { get; set; } = "False"; 
         public bool IsFavorite { get; set; }
         public DateTime Premiered { get; set; }
@@ -31,7 +31,7 @@ namespace Leya.DataAccess.Common.Models.Seasons
         /// <returns>Custom string value showing relevant data for current class</returns>
         public override string ToString()
         {
-            return Id + " :: " + SeasonName;
+            return Id + " :: " + Title;
         }
         #endregion
     }

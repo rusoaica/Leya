@@ -2,13 +2,14 @@
 /// Creation Date: 20th of November, 2020
 /// Purpose: Data transfer object for the tv shows
 #region ========================================================================= USING =====================================================================================
-using Leya.Models.Common.Infrastructure;
 using System;
+using Leya.Models.Common.Models.Media;
+using Leya.Models.Common.Infrastructure;
 #endregion
 
 namespace Leya.Models.Common.Models.TvShows
 {
-    public class TvShowEntity
+    public class TvShowEntity : IMedia
     {
         #region ================================================================ PROPERTIES =================================================================================
         public int Id { get; set; }
@@ -20,13 +21,13 @@ namespace Leya.Models.Common.Models.TvShows
         public int NumberOfEpisodes { get; set; }
         public int MediaTypeSourceId { get; set; }
         public string MPAA { get; set; }
+        public string Title { get; set; }
         public string ImDbId { get; set; }
         public string Studio { get; set; }
         public string TagLine { get; set; }
         public string Trailer { get; set; }
         public string Synopsis { get; set; }
-        public string TvShowTitle { get; set; }
-        public string TvShowNamedTitle { get; set; }
+        public string NamedTitle { get; set; }
         public bool IsEnded { get; set; }
         public bool? IsWatched { get; set; } = false;
         public bool IsFavorite { get; set; }
@@ -47,7 +48,7 @@ namespace Leya.Models.Common.Models.TvShows
         /// <returns>Custom string value showing relevant data for current class</returns>
         public override string ToString()
         {
-            return Id + " :: " + TvShowTitle;
+            return Id + " :: " + Title;
         }
 
         /// <summary>

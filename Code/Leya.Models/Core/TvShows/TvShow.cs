@@ -102,7 +102,7 @@ namespace Leya.Models.Core.TvShows
                         // iterate all the seasons and save their episodes by reading their info json files
                         foreach (SeasonEntity season in tvShowEntity.Seasons)
                         {
-                            foreach (string episodePath in Directory.EnumerateFiles(mediaTypeSource.MediaSourcePath + Path.DirectorySeparatorChar + season.SeasonName).Where(f => f.EndsWith(".nfo")))
+                            foreach (string episodePath in Directory.EnumerateFiles(mediaTypeSource.MediaSourcePath + Path.DirectorySeparatorChar + season.Title).Where(f => f.EndsWith(".nfo")))
                             {
                                 using (StreamReader episodeStream = new StreamReader(episodePath))
                                 {
@@ -110,7 +110,7 @@ namespace Leya.Models.Core.TvShows
                                     EpisodeEntity episodeEntity = JsonConvert.DeserializeObject<EpisodeEntity>(episodeStream.ReadToEnd());
                                     // assign the media type source 
                                     episodeEntity.TvShowId = result.Data[0].Id;
-                                    episodeEntity.SeasonId = tvShowStorageEntity.Seasons.Where(s => s.SeasonNumber == season.SeasonNumber).First().Id;
+                                    episodeEntity.SeasonId = tvShowStorageEntity.Seasons.Where(s => s.Number == season.Number).First().Id;
                                     // save the episode
                                     await seasons.SaveEpisodeAsync(episodeEntity);
                                 }

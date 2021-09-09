@@ -10,6 +10,10 @@ namespace Leya.Models.Core.MediaLibrary
 {
     public interface IMediaCast
     {
+        #region ================================================================ PROPERTIES =================================================================================
+        bool AreActorsVisible { get; set; }
+        #endregion
+
         #region ================================================================= METHODS ===================================================================================
         /// <summary>
         /// Gets the list of actors of an episode

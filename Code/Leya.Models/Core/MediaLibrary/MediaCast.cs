@@ -6,12 +6,22 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using Leya.Models.Common.Models.Media;
+using Leya.Models.Common.Broadcasting;
 #endregion
 
 namespace Leya.Models.Core.MediaLibrary
 {
-    public class MediaCast : IMediaCast
+    public class MediaCast : NotifyPropertyChanged, IMediaCast
     {
+        #region ================================================================ PROPERTIES =================================================================================
+        private bool areActorsVisible = false;
+        public bool AreActorsVisible
+        {
+            get { return areActorsVisible; }
+            set { areActorsVisible = value; Notify(); }
+        }
+        #endregion
+
         #region ================================================================= METHODS ===================================================================================
         /// <summary>
         /// Gets the list of actors of an episode

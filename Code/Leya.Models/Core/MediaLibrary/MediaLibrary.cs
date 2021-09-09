@@ -10,6 +10,11 @@ using Leya.Models.Core.TvShows;
 using Leya.Models.Common.Broadcasting;
 using Leya.Models.Common.Models.Media;
 using System.Linq;
+using Leya.Models.Common.Models.Common;
+using System.Collections.Generic;
+using Leya.Models.Common.Models.TvShows;
+using System.IO;
+using Leya.Models.Core.Navigation;
 #endregion
 
 namespace Leya.Models.Core.MediaLibrary
@@ -20,39 +25,39 @@ namespace Leya.Models.Core.MediaLibrary
         public event Action MediaTypesLoaded;
         public event Action LibraryLoaded;
 
-        private readonly IMovie movies;
-        private readonly IArtist artists;
-        private readonly ITvShow tvShows;
+        private readonly ILibrary library;
         private readonly IMediaCast mediaCast;
-        private readonly IMediaType mediaTypes;
         private readonly IMediaState mediaState;
+        private readonly IMediaStatistics mediaStatistics;
+        private readonly IMediaLibraryNavigation mediaLibraryNavigation;
         #endregion
 
         #region ================================================================ PROPERTIES =================================================================================
-        public IMediaState MediaState => mediaState;
         public IMediaCast MediaCast => mediaCast;
+        public IMediaState MediaState => mediaState;
+        public IMediaStatistics MediaStatistics => mediaStatistics;
+        public IMediaLibraryNavigation Navigation => mediaLibraryNavigation;
         public MediaLibraryEntity Library { get; set; } = new MediaLibraryEntity();
+        public List<SearchEntity> SourceSearch { get; set; } = new List<SearchEntity>();
         #endregion
 
         #region ================================================================== CTOR =====================================================================================
         /// <summary>
         /// Overload C-tor
-        /// <param name="mediaTypes">Injected media types business model</param>
-        /// <param name="tvShows">Injected tv show business model</param>
-        /// <param name="movies">Injected movie business model</param>
-        /// <param name="artists">Injected artist business model</param>
+        /// <param name="library">Injected library business model</param>
         /// <param name="mediaState">Injected media state business model</param>
         /// <param name="mediaCast">Injected media cast business model</param>
+        /// <param name="mediaLibraryNavigation">Injected media library navigation business model</param>
+        /// <param name="mediaStatistics">Injected media library statistics</param>
         /// </summary>
-        public MediaLibrary(IMediaType mediaTypes, ITvShow tvShows, IMovie movies, IArtist artists, IMediaState mediaState, IMediaCast mediaCast)
+        public MediaLibrary(ILibrary library, IMediaState mediaState, IMediaCast mediaCast, IMediaLibraryNavigation mediaLibraryNavigation, IMediaStatistics mediaStatistics)
         {
-            this.movies = movies;
-            this.tvShows = tvShows;
-            this.artists = artists;
+            this.library = library;
             this.mediaCast = mediaCast;
             this.mediaState = mediaState;
-            this.mediaTypes = mediaTypes;
-    }
+            this.mediaStatistics = mediaStatistics;
+            this.mediaLibraryNavigation = mediaLibraryNavigation;
+        }
         #endregion
 
         #region ================================================================= METHODS ===================================================================================
@@ -61,19 +66,73 @@ namespace Leya.Models.Core.MediaLibrary
         /// </summary>
         public async Task GetMediaLibraryAsync()
         {
-            // get the media types and raise an event when finished, so that an eventual UI can be 
-            // able to display the main menu items before waiting for the whole library to load
-            await mediaTypes.GetMediaTypesAsync();
-            Library.MediaTypes = mediaTypes.MediaTypes;
+            await library.GetMediaLibraryAsync();
+            Library.MediaTypes = library.MediaTypes;
             MediaTypesLoaded?.Invoke();
-            // load the rest of the media library and notify an eventual UI when done
-            await tvShows.GetAllAsync();
-            await movies.GetAllAsync();
-            await artists.GetAllAsync();
-            Library.TvShows = tvShows.TvShows;
-            Library.Movies = movies.Movies;
-            Library.Artists = artists.Artists;
+            Library.TvShows = library.TvShows;
+            Library.Movies = library.Movies;
+            Library.Artists = library.Artists;
+            await GetMediaLibrarySearchListAsync();
             LibraryLoaded?.Invoke();
+        }
+
+        /// <summary>
+        /// Gets a list of searchable items from the media library
+        /// </summary>
+        private async Task GetMediaLibrarySearchListAsync()
+        {
+            SourceSearch = new List<SearchEntity>();
+            await Task.Run(() =>
+            {
+                SourceSearch.AddRange(from tv in Library.TvShows
+                              from season in tv.Seasons
+                              from episode in season.Episodes
+                              select new SearchEntity()
+                              {
+                                  
+                                  Text = episode.Title,
+                                  Value = tv.Title,
+                                  Hover = episode.Actors?.Select(e => e.Role).ToArray(),
+                                  Actors = episode.Actors?.Select(a => a.Name).ToArray(),
+                                  Genres = episode.Genres?.Select(g => g.Genre).ToArray(),
+                                  MediaItemPath = Library.MediaTypes.Where(mt => mt.Id == tv.MediaTypeId)
+                                                                        .Select(mt => mt.MediaTypeSources.Where(mts => mts.Id == tv.MediaTypeSourceId)
+                                                                                                         .First())
+                                                                        .First().MediaSourcePath +
+                                                       Path.DirectorySeparatorChar + season.Title +
+                                                       Path.DirectorySeparatorChar + episode.NamedTitle
+                              });
+                SourceSearch.AddRange(from movie in Library.Movies
+                              select new SearchEntity()
+                              {
+                                  Text = movie.Title,
+                                  Hover = movie.Actors?.Select(e => e.Role).ToArray(),
+                                  Actors = movie.Actors?.Select(a => a.Name).ToArray(),
+                                  Genres = movie.Genres?.Select(g => g.Genre).ToArray(),
+                                  MediaItemPath = Library.MediaTypes.Where(mt => mt.Id == movie.MediaTypeId)
+                                                                        .Select(mt => mt.MediaTypeSources.Where(mts => mts.Id == movie.MediaTypeSourceId)
+                                                                                                         .First())
+                                                                        .First().MediaSourcePath +
+                                                       Path.DirectorySeparatorChar + movie.NamedTitle
+                              });
+                SourceSearch.AddRange(from artist in Library.Artists
+                              from album in artist.Albums
+                              from song in album.Songs
+                              select new SearchEntity()
+                              {
+                                  Text = song.Title,
+                                  Value = artist.Title,
+                                  Hover = artist.Members?.Select(e => e.Role).ToArray(),
+                                  Actors = artist.Members?.Select(a => a.Name).ToArray(),
+                                  Genres = artist.Genres?.Select(g => g.Genre).ToArray(),
+                                  MediaItemPath = Library.MediaTypes.Where(mt => mt.Id == artist.MediaTypeId)
+                                                                        .Select(mt => mt.MediaTypeSources.Where(mts => mts.Id == artist.MediaTypeSourceId)
+                                                                                                         .First())
+                                                                        .First().MediaSourcePath +
+                                                       Path.DirectorySeparatorChar + album.NamedTitle +
+                                                       Path.DirectorySeparatorChar + song.NamedTitle
+                              });
+            });
         }
 
         /// <summary>
@@ -81,21 +140,7 @@ namespace Leya.Models.Core.MediaLibrary
         /// </summary>
         public async Task UpdateMediaLibraryAsync()
         {
-            await tvShows.DeleteAllAsync();
-            await movies.DeleteAllAsync();
-            await artists.DeleteAllAsync();
-            foreach (MediaTypeEntity mediaType in mediaTypes.MediaTypes.Where(mt => mt.IsMedia))
-            {
-                foreach (MediaTypeSourceEntity mediaTypeSource in mediaType.MediaTypeSources)
-                {
-                    if (mediaType.MediaType == "TV SHOW")
-                        await tvShows.SaveAsync(mediaTypeSource, mediaType.Id);
-                    else if (mediaType.MediaType == "MOVIE")
-                        await movies.SaveAsync(mediaTypeSource, mediaType.Id);
-                    else if (mediaType.MediaType == "MUSIC")
-                        await artists.SaveAsync(mediaTypeSource, mediaType.Id);
-                }
-            }
+            await library.UpdateMediaLibraryAsync();
         }
         #endregion
     }

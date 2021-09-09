@@ -41,7 +41,7 @@ namespace Leya.DataAccess.Repositories.Seasons
             ApiResponse deleteSeasons = await dataAccess.DeleteAsync(EntityContainers.Seasons);
             ApiResponse deleteEpisodeActors = await dataAccess.DeleteAsync(EntityContainers.EpisodeActors);
             ApiResponse deleteEpisodeCredits = await dataAccess.DeleteAsync(EntityContainers.EpisodeCredits);
-            ApiResponse deleteEpisodeGenres = await dataAccess.DeleteAsync(EntityContainers.EpisodeGenre);
+            ApiResponse deleteEpisodeGenres = await dataAccess.DeleteAsync(EntityContainers.EpisodeGenres);
             ApiResponse deleteEpisodeRatings = await dataAccess.DeleteAsync(EntityContainers.EpisodeRatings);
             dataAccess.CloseTransaction();
             // check if any of the queries resulted in an error
@@ -75,7 +75,7 @@ namespace Leya.DataAccess.Repositories.Seasons
                         deleteSeason.Error = (await dataAccess.DeleteAsync(EntityContainers.Episodes, new { SeasonId = episodes.Data[0].Id }))?.Error ?? deleteSeason.Error;
                         deleteSeason.Error = (await dataAccess.DeleteAsync(EntityContainers.EpisodeActors, new { SeasonId = episodes.Data[0].Id }))?.Error ?? deleteSeason.Error;
                         deleteSeason.Error = (await dataAccess.DeleteAsync(EntityContainers.EpisodeCredits, new { SeasonId = episodes.Data[0].Id }))?.Error ?? deleteSeason.Error;
-                        deleteSeason.Error = (await dataAccess.DeleteAsync(EntityContainers.EpisodeGenre, new { SeasonId = episodes.Data[0].Id }))?.Error ?? deleteSeason.Error;
+                        deleteSeason.Error = (await dataAccess.DeleteAsync(EntityContainers.EpisodeGenres, new { SeasonId = episodes.Data[0].Id }))?.Error ?? deleteSeason.Error;
                         deleteSeason.Error = (await dataAccess.DeleteAsync(EntityContainers.EpisodeRatings, new { SeasonId = episodes.Data[0].Id }))?.Error ?? deleteSeason.Error;
                     }
                 });
@@ -95,7 +95,7 @@ namespace Leya.DataAccess.Repositories.Seasons
         /// <returns>A list of seasons, wrapped in a generic API container of type <see cref="ApiResponse{SeasonEntity}"/></returns>
         public async Task<ApiResponse<SeasonEntity>> GetAllAsync()
         {
-            return await dataAccess.SelectAsync<SeasonEntity>(EntityContainers.Seasons, "Id, TvShowId, SeasonNumber, SeasonName, IsWatched, IsFavorite, Year, Synopsis, Premiered");
+            return await dataAccess.SelectAsync<SeasonEntity>(EntityContainers.Seasons, "Id, TvShowId, Number, Title, IsWatched, IsFavorite, Year, Synopsis, Premiered");
         }
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace Leya.DataAccess.Repositories.Seasons
         /// <returns>A season identified by <paramref name="id"/>, wrapped in a generic API container of type <see cref="ApiResponse{SeasonEntity}"/></returns>
         public async Task<ApiResponse<SeasonEntity>> GetByIdAsync(int id)
         {
-            return await dataAccess.SelectAsync<SeasonEntity>(EntityContainers.Seasons, "Id, TvShowId, SeasonNumber, SeasonName, IsWatched, IsFavorite, Year, Synopsis, Premiered", new { Id = id });
+            return await dataAccess.SelectAsync<SeasonEntity>(EntityContainers.Seasons, "Id, TvShowId, Number, Title, IsWatched, IsFavorite, Year, Synopsis, Premiered", new { Id = id });
         }
 
         /// <summary>
@@ -128,8 +128,8 @@ namespace Leya.DataAccess.Repositories.Seasons
             return await dataAccess.UpdateAsync(EntityContainers.Seasons,
                 "TvShowId = '" + entity.TvShowId +
                 "', Year = '" + entity.Year +
-                "', SeasonNumber = '" + entity.SeasonNumber +
-                "', SeasonName = '" + entity.SeasonName +
+                "', Number = '" + entity.Number +
+                "', Title = '" + entity.Title +
                 "', IsWatched = '" + entity.IsWatched +
                 "', IsFavorite = '" + entity.IsFavorite +
                 "', Synopsis = '" + entity.Synopsis +

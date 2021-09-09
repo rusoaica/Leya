@@ -68,13 +68,13 @@
         <Label Content="RECENTLY ADDED" Foreground="{DynamicResource WindowForeColor}" Cursor="Hand" FontStyle="Italic" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="20" Padding="0" HorizontalAlignment="Left" Width="189" Margin="482,0,0,0" Opacity="0.7"/>
         <Label Content="GENRES" Foreground="{DynamicResource WindowForeColor}" Cursor="Hand" FontStyle="Italic" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="20" Padding="0" HorizontalAlignment="Left" Width="157" Margin="679,0,0,0" Opacity="0.7"/>
         <Label Content="SEARCH" Foreground="{DynamicResource WindowForeColor}" FontStyle="Italic" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="20" Padding="0" HorizontalAlignment="Left" Width="86" Margin="841,0,0,0" Opacity="0.7"/>
-        <AutoCompleteBox Items="{Binding SourceSearch}" ValueMemberBinding="{Binding Text}" SelectedItem="{Binding SearchSelectedItem, Mode=TwoWay}" Classes="autoCompleteBox" FilterMode="Custom" IsTextCompletionEnabled="True" ItemFilter="{Binding SearchMediaLibrary_Command}" Margin="950,4,10,4" FontSize="14" FontWeight="Bold" MinimumPrefixLength="0" MaxDropDownHeight="800" Opacity="1">
+        <AutoCompleteBox Items="{Binding SourceSearch}" x:Name="acbSearchMediaLibrary" ValueMemberBinding="{Binding Text}" SelectedItem="{Binding SearchSelectedItem, Mode=TwoWay}" Classes="autoCompleteBox" FilterMode="Custom" IsTextCompletionEnabled="True" Margin="950,4,10,4" FontSize="14" FontWeight="Bold" MinimumPrefixLength="0" MaxDropDownHeight="500" Opacity="1">
           <AutoCompleteBox.ItemTemplate>
             <DataTemplate>
               <Grid>
                 <Grid.ColumnDefinitions>
-                  <ColumnDefinition Width="500" />
-                  <ColumnDefinition Width="500" />
+                  <ColumnDefinition Width="300" />
+                  <ColumnDefinition Width="300" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="{Binding Text}" Foreground="{DynamicResource textForeground}"/>
                 <TextBlock Text="{Binding Value}" Foreground="Gray" HorizontalAlignment="Right" Grid.Column="1" />
@@ -193,14 +193,14 @@
         <Label Content="Runtime:" Foreground="#FF00B4FF" Margin="4.5,69,0,0" FontSize="20" FontWeight="Bold" Height="20" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" Grid.Column="1" />
         <Label Content="{Binding Runtime, Converter={StaticResource TimeSpanFormatConverter}}" Foreground="{DynamicResource textForeground}" Margin="0,69,0,0" FontSize="20" FontWeight="Bold" FontStyle="Italic" VerticalAlignment="Top" Padding="0" Grid.Row="0" Grid.ColumnSpan="3" HorizontalContentAlignment="Center"/>
         
-        <Label Content="Seasons:" IsVisible="{Binding IsNumberOfSeasonsVisible}" Grid.Column="1" Foreground="#FF00B4FF" Margin="84.5,30,0,0" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Center" Padding="0" HorizontalAlignment="Left" Width="102" Grid.Row="2"/>
-        <Label Content="{Binding NumberOfSeasons}" Foreground="{DynamicResource MainMenuForeground}" IsVisible="{Binding IsNumberOfSeasonsVisible}" FontSize="18" FontWeight="Bold" Margin="192.5,30,10,0" Height="28" VerticalAlignment="Center" Padding="0" Grid.Column="1" Grid.Row="2"/>
+        <Label Content="Seasons:" IsVisible="{Binding AreNumberOfSeasonsVisible}" Grid.Column="1" Foreground="#FF00B4FF" Margin="84.5,30,0,0" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Center" Padding="0" HorizontalAlignment="Left" Width="102" Grid.Row="2"/>
+        <Label Content="{Binding NumberOfSeasons}" Foreground="{DynamicResource MainMenuForeground}" IsVisible="{Binding AreNumberOfSeasonsVisible}" FontSize="18" FontWeight="Bold" Margin="192.5,30,10,0" Height="28" VerticalAlignment="Center" Padding="0" Grid.Column="1" Grid.Row="2"/>
 
         <Label Content="Director:" IsVisible="{Binding IsDirectorVisible}" Grid.Column="1" Foreground="#FF00B4FF" Margin="10.5,48,0,0" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" Width="78" Grid.Row="2"/>
         <controls:Marquee SetText="{Binding DataContext.Director, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Margin="93.5,49,10,0" IsVisible="{Binding DataContext.IsDirectorVisible, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Foreground="{DynamicResource MainMenuForeground}" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Top" Padding="0" Grid.Column="1" Grid.Row="2"/>
 
-        <Label Content="Writers:" IsVisible="{Binding IsWritersVisible}" Grid.Column="1" Foreground="#FF00B4FF" Margin="10.5,73,0,0" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" Width="70" Grid.Row="2"/>
-        <controls:Marquee SetText="{Binding DataContext.Writers, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Margin="84.5,73,10,0" IsVisible="{Binding DataContext.IsWritersVisible, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Foreground="{DynamicResource MainMenuForeground}" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Top" Padding="0" Grid.Column="1" Grid.Row="2"/>
+        <Label Content="Writers:" IsVisible="{Binding AreWritersVisible}" Grid.Column="1" Foreground="#FF00B4FF" Margin="10.5,73,0,0" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" Width="70" Grid.Row="2"/>
+        <controls:Marquee SetText="{Binding DataContext.Writers, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Margin="84.5,73,10,0" IsVisible="{Binding DataContext.AreWritersVisible, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Foreground="{DynamicResource MainMenuForeground}" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Top" Padding="0" Grid.Column="1" Grid.Row="2"/>
         
         <Label Content="Episodes:" IsVisible="{Binding IsTvShow}" Grid.Column="1" Foreground="#FF00B4FF" Margin="84.5,75,0,0" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Center" Padding="0" HorizontalAlignment="Left" Width="102" Grid.Row="2"/>
         <Label Content="{Binding NumberOfEpisodes}" Foreground="{DynamicResource MainMenuForeground}" IsVisible="{Binding IsTvShow}" FontSize="18" FontWeight="Bold" Margin="192.5,75,10,0" Height="28" VerticalAlignment="Center" Padding="0" Grid.Column="1" Grid.Row="2"/>
@@ -417,7 +417,7 @@
       <Button Command="{Binding ResetAddMediaSourceElements_Command}" Classes="confirmButton" Content="Add new media" Margin="20,0,20,15" FontSize="12" BorderThickness="0" Height="22" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="105"/>
       <Button Command="{Binding ExitMediaTypesOptions_Command}" Classes="abortButton" Content="Back" Margin="20,0,20,15" FontSize="12" BorderThickness="0" Height="22" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="105"/>
     </Grid>
-    <Grid x:Name="grdMediaTypeSourcesOptions" IsVisible="{Binding IsMediaTypeSourcesOptionVisible}" Margin="150,100,150,100" Opacity="0.9">
+    <Grid x:Name="grdMediaTypeSourcesOptions" IsVisible="{Binding AreMediaTypeSourcesOptionVisible}" Margin="150,100,150,100" Opacity="0.9">
       <Grid Margin="11,11,11,11">
         <Path Data="M 1,0 0.5,0 Q 0,0 0,0.5 L 0,1" Fill="Transparent" HorizontalAlignment="Left" Height="6" Margin="-5" Stretch="Fill" Stroke="{DynamicResource BorderLit}" StrokeThickness="4" VerticalAlignment="Top" Width="6"/>
         <Path Data="M 0,1 0.5,1 Q 1,1 1,0.5 L 1,0" Fill="Transparent" HorizontalAlignment="Right" Height="6" Margin="-5" Stretch="Fill" Stroke="{DynamicResource BorderUnlit}" StrokeThickness="4" VerticalAlignment="Bottom" Width="6"/>
@@ -529,6 +529,89 @@
 
       <Button Command="{Binding UpdateInterfaceOptionsAsync_Command}" Content="Confirm" Classes="confirmButton" HorizontalAlignment="Right" Margin="20,0,20,15" Height="22" FontSize="12" VerticalAlignment="Bottom" Width="105"/>
       <Button Command="{Binding ExitInterfaceOptions_Command}" Classes="abortButton" Content="Back" Margin="20,0,20,15" FontSize="12" BorderThickness="0" Height="22" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="105"/>
+    </Grid>
+    <Grid x:Name="grdSearch" IsVisible="{Binding IsSearchContainerVisible}" Margin="150,100,150,100" Opacity="0.9">
+      <Grid Margin="11,11,11,11" ZIndex="-2">
+        <Path Data="M 1,0 0.5,0 Q 0,0 0,0.5 L 0,1" Fill="Transparent" HorizontalAlignment="Left" Height="6" Margin="-5" Stretch="Fill" Stroke="{DynamicResource BorderLit}" StrokeThickness="4" VerticalAlignment="Top" Width="6"/>
+        <Path Data="M 0,1 0.5,1 Q 1,1 1,0.5 L 1,0" Fill="Transparent" HorizontalAlignment="Right" Height="6" Margin="-5" Stretch="Fill" Stroke="{DynamicResource BorderUnlit}" StrokeThickness="4" VerticalAlignment="Bottom" Width="6"/>
+        <Path Data="M 0,0 0.5,0 Q 1,0 1,0.5 L 1,1" Fill="Transparent" HorizontalAlignment="Right" Height="6" Margin="-5" Stretch="Fill" Stroke="{DynamicResource AngleShadow}" StrokeThickness="4" VerticalAlignment="Top" Width="6"/>
+        <Path Data="M 0,0 0,0.5 Q 0,1 0.5,1 L 1,1" Fill="Transparent" HorizontalAlignment="Left" Height="6" Margin="-5" Stretch="Fill" Stroke="{DynamicResource AngleShadow}" StrokeThickness="4" VerticalAlignment="Bottom" Width="6"/>
+        <Line StartPoint="0,0" EndPoint="1,0" Stroke="{DynamicResource BorderLit}" Stretch="Fill" Margin="0,-5" StrokeThickness="4" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+        <Line StartPoint="0,1" EndPoint="1,1" Stroke="{DynamicResource BorderUnlit}" Stretch="Fill" Margin="0,5,0,-5" StrokeThickness="4" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+        <Line StartPoint="0,0" EndPoint="0,1" Stroke="{DynamicResource BorderLit}" Stretch="Fill" Margin="-5,-1" StrokeThickness="4" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <Line StartPoint="1,0" EndPoint="1,1" Stroke="{DynamicResource BorderUnlit}" Stretch="Fill" Margin="5,-1,-5,-1" StrokeThickness="4" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+        <Line StartPoint="0,0" EndPoint="1,0" Stroke="{DynamicResource UpperHighlight}" Stretch="Fill" Margin="1,-5" StrokeThickness="4" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+      </Grid>
+      <Border Margin="0" Classes="contentBorder" ZIndex="-1"/>
+      <TextBlock Text="Search media library" Foreground="{DynamicResource WindowForeColor}" TextAlignment="Center" FontWeight="Bold" Height="19" VerticalAlignment="Top" Margin="10,10,10,0"/>
+
+
+      <Label Content="Media type:" Foreground="{DynamicResource textForeground}" HorizontalContentAlignment="Left" FontSize="20" Padding="0" HorizontalAlignment="Left" Width="200" Margin="30,30,0,0" Height="30" VerticalAlignment="Top"/>
+      <Label Content="Name:" Foreground="{DynamicResource textForeground}" HorizontalContentAlignment="Left" FontSize="20" Padding="0" HorizontalAlignment="Left" Width="200" Margin="30,70,0,0" Height="30" VerticalAlignment="Top"/>
+      <Label Content="Tag:" Foreground="{DynamicResource textForeground}" HorizontalContentAlignment="Left" FontSize="20" Padding="0" HorizontalAlignment="Left" Width="200" Margin="30,110,0,0" Height="30" VerticalAlignment="Top"/>
+      <Label Content="Genre:" Foreground="{DynamicResource textForeground}" HorizontalContentAlignment="Left" FontSize="20" Padding="0" HorizontalAlignment="Left" Width="200" Margin="30,150,0,0" Height="30" VerticalAlignment="Top"/>
+      <Label Content="Member:" Foreground="{DynamicResource textForeground}" HorizontalContentAlignment="Left" FontSize="20" Padding="0" HorizontalAlignment="Left" Width="200" Margin="30,190,0,0" Height="30" VerticalAlignment="Top"/>
+      <Label Content="Role:" Foreground="{DynamicResource textForeground}" HorizontalContentAlignment="Left" FontSize="20" Padding="0" HorizontalAlignment="Left" Width="200" Margin="30,230,0,0" Height="30" VerticalAlignment="Top"/>
+
+      <ComboBox Items="{Binding SourceSearchMediaTypes}" SelectedItem="{Binding SelectedSearchMediaType, Mode=TwoWay}" PlaceholderText="Select media type..." Classes="ComboBox" FontSize="14" Height="25" VerticalAlignment="Top" Margin="300,30,30,0">
+        <i:Interaction.Behaviors>
+          <ia:EventTriggerBehavior EventName="SelectionChanged">
+            <ia:InvokeCommandAction Command="{Binding SearchMediaLibraryAsync_Command}"/>
+          </ia:EventTriggerBehavior>
+        </i:Interaction.Behaviors>
+      </ComboBox>
+      <TextBox Text="{Binding SearchMediaName}" Classes="inputField" Height="23" MinHeight="23" VerticalAlignment="Top" VerticalContentAlignment="Center" Margin="300,70,30,0" Padding="2" FontSize="14">
+        <TextBox.KeyBindings>
+          <KeyBinding Gesture="Enter" Command="{Binding SearchMediaLibraryAsync_Command}" />
+        </TextBox.KeyBindings>
+      </TextBox>
+      <TextBox Text="{Binding SearchMediaTag}" Classes="inputField" Height="23" MinHeight="23" VerticalAlignment="Top" VerticalContentAlignment="Center" Margin="300,110,30,0" Padding="2" FontSize="14">
+        <TextBox.KeyBindings>
+          <KeyBinding Gesture="Enter" Command="{Binding SearchMediaLibraryAsync_Command}" />
+        </TextBox.KeyBindings>
+      </TextBox>
+      <TextBox Text="{Binding SearchMediaGenre}" Classes="inputField" Height="23" MinHeight="23" VerticalAlignment="Top" VerticalContentAlignment="Center" Margin="300,150,30,0" Padding="2" FontSize="14">
+        <TextBox.KeyBindings>
+          <KeyBinding Gesture="Enter" Command="{Binding SearchMediaLibraryAsync_Command}" />
+        </TextBox.KeyBindings>
+      </TextBox>
+      <TextBox Text="{Binding SearchMediaMember}" Classes="inputField" Height="23" MinHeight="23" VerticalAlignment="Top" VerticalContentAlignment="Center" Margin="300,190,30,0" Padding="2" FontSize="14">
+        <TextBox.KeyBindings>
+          <KeyBinding Gesture="Enter" Command="{Binding SearchMediaLibraryAsync_Command}" />
+        </TextBox.KeyBindings>
+      </TextBox>
+      <TextBox Text="{Binding SearchMediaRole}" Classes="inputField" Height="23" MinHeight="23" VerticalAlignment="Top" VerticalContentAlignment="Center" Margin="300,230,30,0" Padding="2" FontSize="14">
+        <TextBox.KeyBindings>
+          <KeyBinding Gesture="Enter" Command="{Binding SearchMediaLibraryAsync_Command}" />
+        </TextBox.KeyBindings>
+      </TextBox>
+
+      <ListBox Items="{Binding SourceAdvancedSearch}" Background="{DynamicResource contentBackground}" Classes="ListBox" VirtualizationMode="Simple" Foreground="Black" Margin="30,260,30,50" BorderThickness="0">
+        <i:Interaction.Behaviors>
+          <iac:NthChildBehavior />
+        </i:Interaction.Behaviors>
+        <ListBox.ItemsPanel>
+          <ItemsPanelTemplate>
+            <VirtualizingStackPanel/>
+          </ItemsPanelTemplate>
+        </ListBox.ItemsPanel>
+        <ListBox.ItemTemplate>
+          <DataTemplate>
+            <Grid Margin="0,2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="150" />
+              </Grid.ColumnDefinitions>
+              <Label Content="{Binding MediaTitle}" Foreground="{DynamicResource ListTextHighlighted}" Tag="{Binding}" FontSize="20" Cursor="Hand" Background="Transparent" BorderThickness="0" Margin="6,0" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" Grid.Column="0" DoubleTapped="AdvancedSearchResultItem_DoubleTapped"/>
+              <Label Content="{Binding MediaType}" Foreground="{DynamicResource ListTextNormal}" Tag="{Binding}" FontWeight="Bold" FontSize="20" Cursor="Hand" Background="Transparent" BorderThickness="0" Margin="-6,0" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" Grid.Column="1" DoubleTapped="AdvancedSearchResultItem_DoubleTapped"/>
+            </Grid>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+      
+      <Button Command="{Binding SearchMediaLibraryAsync_Command}" Content="Search" Classes="confirmButton" HorizontalAlignment="Right" Margin="30,0,30,15" Height="22" FontSize="12" VerticalAlignment="Bottom" Width="105"/>
+      <Button Classes="abortButton" Content="Clear" Command="{Binding ClearAdvancedSearchTerms_Command}" Margin="30,0,145,15" FontSize="12" BorderThickness="0" Height="22" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="105"/>
+      <Button Classes="abortButton" Content="Back" Margin="30,0,30,15" FontSize="12" BorderThickness="0" Height="22" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="105" Click="DisplayMainMenu_Click"/>
     </Grid>
 
     <Label Content="{Binding Version}" Foreground="{DynamicResource MainMenuForeground}" FontSize="14" Height="39" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="156" Margin="15,0,0,0"/>

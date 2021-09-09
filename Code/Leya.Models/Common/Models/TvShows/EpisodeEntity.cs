@@ -4,11 +4,12 @@
 #region ========================================================================= USING =====================================================================================
 using System;
 using Leya.Models.Common.Infrastructure;
+using Leya.Models.Common.Models.Media;
 #endregion
 
 namespace Leya.Models.Common.Models.TvShows
 {
-    public class EpisodeEntity
+    public class EpisodeEntity : IMedia
     {
         #region ================================================================ PROPERTIES =================================================================================
         public int Id { get; set; }

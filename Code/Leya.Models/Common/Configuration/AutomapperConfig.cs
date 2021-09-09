@@ -36,6 +36,7 @@ namespace Leya.Models.Common.Configuration
             IEnumerable<Type> domainModelTypes = Assembly.GetExecutingAssembly()
                                                          .GetTypes()
                                                          .Where(t => !t.IsInterface &&
+                                                                     !t.Name.Contains("AnonymousType") &&
                                                                       t.Namespace.StartsWith("Leya.Models.Common.Models"));
             MapperConfiguration automapperConfig = new MapperConfiguration(cfg =>
             {

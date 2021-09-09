@@ -21,17 +21,21 @@ using Leya.ViewModels.Common.Models.Media;
 using System.IO;
 using System.Text.RegularExpressions;
 using Leya.Models.Core.Options;
+using Leya.Models.Core.Search;
 #endregion
 
 namespace Leya.ViewModels.Main
 {
     public class MainWindowVM : BaseModel, IMainWindowVM
     {
+
         #region ============================================================== FIELD MEMBERS ================================================================================
         public event Action Navigated;
         public event Action<bool> ValidationChanged;
+        public delegate bool AutoCompleteFilterPredicate<T>(string search, T item);
 
         private readonly IMediaLibrary mediaLibrary;
+        private readonly ISearch search;
         private readonly IMediaLibraryNavigation mediaLibraryNavigation;
         private readonly IAppOptions appOptions;
         private readonly IMediaStatistics mediaStatistics;
@@ -40,9 +44,9 @@ namespace Leya.ViewModels.Main
         #region ============================================================= BINDING COMMANDS ==============================================================================
         public IAsyncCommand PlayAllMediaAsync_Command { get; private set; }
         public IAsyncCommand SaveMediaLibraryAsync_Command { get; private set; }
-        public IAsyncCommand Search_EnterKeyUpAsync_Command { get; private set; }
-        public IAsyncCommand Search_DropDownClosingAsync_Command { get; private set; }
         public IAsyncCommand ViewOpenedAsync_Command { get; private set; }
+        public IAsyncCommand SearchMediaLibraryAsync_Command { get; set; }
+        public IAsyncCommand<AdvancedSearchResultEntity> OpenAdvancedSearchResult_Command { get; private set; }
         public IAsyncCommand<IMediaEntity> ShowMediaCastAsync_Command { get; private set; }
         public IAsyncCommand<IMediaEntity> SetIsWatchedStatusAsync_Command { get; private set; }
         public IAsyncCommand<IMediaEntity> SetIsFavoriteStatusAsync_Command { get; private set; }
@@ -52,14 +56,10 @@ namespace Leya.ViewModels.Main
         public ISyncCommand<MediaTypeSourceEntity> DeleteMediaTypeSource_Command { get; private set; }
         public ISyncCommand<MediaTypeSourceEntity> OpenMediaSourceLocation_Command { get; private set; }
         public IAsyncCommand<string> AddMediaSourceAsync_Command { get; private set; }
-        public ISyncCommand<decimal> DisplayOffset_ValueChanged_Command { get; private set; }
         public ISyncCommand ShowMediaOptions_Command { get; private set; }
         public ISyncCommand ShowPlayerOptions_Command { get; private set; }
         public ISyncCommand ShowInterfaceOptions_Command { get; private set; }
-        public ISyncCommand OpenMediaFolder_Command { get; private set; }
-        public ISyncCommand Filter_EnterKeyUp_Command { get; private set; }
         public ISyncCommand SelectedMediaChanged_Command { get; private set; }
-        public ISyncCommand Filter_DropDownClosing_Command { get; private set; }
         public ISyncCommand OpenLoggingDirectory_Command { get; private set; }
         public ISyncCommand ResetAddMediaSourceElements_Command { get; private set; }
         public IAsyncCommand UpdatePlayerOptionsAsync_Command { get; private set; }
@@ -70,7 +70,8 @@ namespace Leya.ViewModels.Main
         public ISyncCommand ExitPlayerOptions_Command { get; private set; }
         public ISyncCommand ExitInterfaceOptions_Command { get; set; }
         public ISyncCommand ExitMediaCast_Command { get; private set; }
-        //public AutoCompleteFilterPredicate<object> SearchMediaLibrary_Command { get; private set; }
+        public ISyncCommand ClearAdvancedSearchTerms_Command { get; private set; }
+        public AutoCompleteFilterPredicate<object> SearchMediaLibrary_Command { get; private set; }
         public ISyncCommand<bool> ChangeRepeatArgument_Command { get; private set; }
         public ISyncCommand<bool> ChangeShuffleArgument_Command { get; private set; }
         public ISyncCommand<bool> ChangeAutoscaleArgument_Command { get; private set; }
@@ -79,6 +80,9 @@ namespace Leya.ViewModels.Main
         public ISyncCommand<bool> ChangePlayAndStopArgument_Command { get; private set; }
         public ISyncCommand<bool> ChangeSingleInstanceArgument_Command { get; private set; }
         public ISyncCommand<bool> ChangeEnqueueFilesInSingleInstanceModeArgument_Command { get; private set; }
+
+        public IAsyncCommand SearchLibraryKeyUpAsync_Command { get; private set; }
+        public IAsyncCommand SearchLibraryDropDownClosingAsync_Command { get; private set; }
         #endregion
 
         #region ============================================================ BINDING PROPERTIES ============================================================================= 
@@ -218,6 +222,36 @@ namespace Leya.ViewModels.Main
             set { appOptions.OptionsInterface.WeatherUrl = value; Notify(); }
         }
 
+        public string SearchMediaName
+        {
+            get { return search.SearchMediaName; }
+            set { search.SearchMediaName = value; Notify(); }
+        }
+
+        public string SearchMediaTag
+        {
+            get { return search.SearchMediaTag; }
+            set { search.SearchMediaTag = value; Notify(); }
+        }
+
+        public string SearchMediaGenre
+        {
+            get { return search.SearchMediaGenre; }
+            set { search.SearchMediaGenre = value; Notify(); }
+        }
+
+        public string SearchMediaMember
+        {
+            get { return search.SearchMediaMember; }
+            set { search.SearchMediaMember = value; Notify(); }
+        }
+
+        public string SearchMediaRole
+        {
+            get { return search.SearchMediaRole; }
+            set { search.SearchMediaRole = value; Notify(); }
+        }
+
         public int SelectedThemeIndex
         {
             get { return appOptions.OptionsInterface.SelectedThemeIndex; }
@@ -286,17 +320,16 @@ namespace Leya.ViewModels.Main
             set { isMainMenuVisible = value; Notify(); }
         }
 
-        private bool areActorsVisible = false;
         public bool AreActorsVisible
         {
-            get { return areActorsVisible; }
-            set { areActorsVisible = value; Notify(); }
+            get { return mediaLibrary.MediaCast.AreActorsVisible; }
+            set { mediaLibrary.MediaCast.AreActorsVisible = value; Notify(); }
         }
 
-        public bool IsNumberOfSeasonsVisible
+        public bool AreNumberOfSeasonsVisible
         {
-            get { return mediaLibraryNavigation.IsNumberOfSeasonsVisible; }
-            set { mediaLibraryNavigation.IsNumberOfSeasonsVisible = value; Notify(); }
+            get { return mediaLibraryNavigation.AreNumberOfSeasonsVisible; }
+            set { mediaLibraryNavigation.AreNumberOfSeasonsVisible = value; Notify(); }
         }
 
         private bool isScannerTextVisible = true;
@@ -337,46 +370,40 @@ namespace Leya.ViewModels.Main
             set { mediaLibraryNavigation.IsBackNavigationPossible = value; Notify(); }
         }
 
-        private bool isMediaContainerVisible = false;
         public bool IsMediaContainerVisible
         {
-            get { return isMediaContainerVisible; }
-            set { isMediaContainerVisible = value; Notify(); }
+            get { return mediaLibraryNavigation.IsMediaContainerVisible; }
+            set { mediaLibraryNavigation.IsMediaContainerVisible = value; Notify(); }
         }
 
-        private bool isMediaTypeSourcesOptionVisible = false;
-        public bool IsMediaTypeSourcesOptionVisible
+        public bool AreMediaTypeSourcesOptionVisible
         {
-            get { return isMediaTypeSourcesOptionVisible; }
-            set { isMediaTypeSourcesOptionVisible = value; Notify(); }
+            get { return mediaLibraryNavigation.AreMediaTypeSourcesOptionVisible; }
+            set { mediaLibraryNavigation.AreMediaTypeSourcesOptionVisible = value; Notify(); }
         }
 
-        private bool isMediaTypesOptionVisible;
         public bool IsMediaTypesOptionVisible
         {
-            get { return isMediaTypesOptionVisible; }
-            set { isMediaTypesOptionVisible = value; Notify(); }
+            get { return mediaLibraryNavigation.IsMediaTypesOptionVisible; }
+            set { mediaLibraryNavigation.IsMediaTypesOptionVisible = value; Notify(); }
         }
 
-        private bool isPlayerOptionVisible = false;
         public bool IsPlayerOptionVisible
         {
-            get { return isPlayerOptionVisible; }
-            set { isPlayerOptionVisible = value; Notify(); }
+            get { return mediaLibraryNavigation.IsPlayerOptionVisible; }
+            set { mediaLibraryNavigation.IsPlayerOptionVisible = value; Notify(); }
         }
 
-        private bool isInterfaceOptionVisible = false;
         public bool IsInterfaceOptionVisible
         {
-            get { return isInterfaceOptionVisible; }
-            set { isInterfaceOptionVisible = value; Notify(); }
+            get { return mediaLibraryNavigation.IsInterfaceOptionVisible; }
+            set { mediaLibraryNavigation.IsInterfaceOptionVisible = value; Notify(); }
         }
 
-        private bool isOptionsContainerVisible = false;
         public bool IsOptionsContainerVisible
         {
-            get { return isOptionsContainerVisible; }
-            set { isOptionsContainerVisible = value; Notify(); }
+            get { return mediaLibraryNavigation.IsOptionsContainerVisible; }
+            set { mediaLibraryNavigation.IsOptionsContainerVisible = value; Notify(); }
         }
 
         private bool isMaskBackgroundVisible = false;
@@ -386,10 +413,16 @@ namespace Leya.ViewModels.Main
             set { isMaskBackgroundVisible = value; Notify(); }
         }
 
-        public bool IsWritersVisible
+        public bool IsSearchContainerVisible
         {
-            get { return mediaLibraryNavigation.IsWritersVisible; }
-            set { mediaLibraryNavigation.IsWritersVisible = value; Notify(); }
+            get { return mediaLibraryNavigation.IsSearchContainerVisible; }
+            set { mediaLibraryNavigation.IsSearchContainerVisible = value; Notify(); }
+        }
+
+        public bool AreWritersVisible
+        {
+            get { return mediaLibraryNavigation.AreWritersVisible; }
+            set { mediaLibraryNavigation.AreWritersVisible = value; Notify(); }
         }
 
         public bool IsDirectorVisible
@@ -549,6 +582,26 @@ namespace Leya.ViewModels.Main
             set { sourceMedia = value; Notify(); }
         }
 
+        private ObservableCollection<MediaTypeEntity> sourceSearchMediaTypes = new ObservableCollection<MediaTypeEntity>();
+        public ObservableCollection<MediaTypeEntity> SourceSearchMediaTypes
+        {
+            get { return sourceSearchMediaTypes; }
+            set { sourceSearchMediaTypes = value; Notify(); }
+        }
+
+        private ObservableCollection<AdvancedSearchResultEntity> sourceAdvancedSearch = new ObservableCollection<AdvancedSearchResultEntity>();
+        public ObservableCollection<AdvancedSearchResultEntity> SourceAdvancedSearch
+        {
+            get { return sourceAdvancedSearch; }
+            set { sourceAdvancedSearch = value; Notify(); }
+        }
+
+        public MediaTypeEntity SelectedSearchMediaType
+        {
+            get { return search.SelectedSearchMediaType; }
+            set { search.SelectedSearchMediaType = value; Notify(); }
+        }
+
         private SearchEntity searchSelectedItem;
         public SearchEntity SearchSelectedItem
         {
@@ -580,44 +633,45 @@ namespace Leya.ViewModels.Main
         /// Overload C-tor
         /// </summary>
         /// <param name="mediaLibrary">Injected media library business model</param>
-        /// <param name="mediaLibraryNavigation">Injected media library navigation business model</param>
         /// <param name="appOptions">Injected application options</param>
-        /// <param name="mediaStatistics">Injected media library statistics</param>
         /// <param name="notificationService">Injected notification service</param>
-        public MainWindowVM(IMediaLibrary mediaLibrary, IMediaLibraryNavigation mediaLibraryNavigation, IAppOptions appOptions, IMediaStatistics mediaStatistics, INotificationService notificationService)
+        public MainWindowVM(IMediaLibrary mediaLibrary, ISearch search, IAppOptions appOptions, INotificationService notificationService)
         {
+            this.search = search;
+            this.appOptions = appOptions;
             this.mediaLibrary = mediaLibrary;
             this.notificationService = notificationService;
-            this.mediaLibraryNavigation = mediaLibraryNavigation;
-            this.appOptions = appOptions;
-            this.mediaStatistics = mediaStatistics;
+
+            mediaStatistics = mediaLibrary.MediaStatistics;
+            mediaLibraryNavigation = mediaLibrary.Navigation;
+
             this.mediaLibrary.MediaTypesLoaded += MediaLibrary_MediaTypesLoaded;
             this.mediaLibrary.LibraryLoaded += MediaLibrary_LibraryLoaded;
-            //IsOptionsContainerVisible = true;
+
             //OpenMediaFolder_Command = new SyncCommand(OpenMediaFolder);
             //Filter_EnterKeyUp_Command = new SyncCommand(Filter_EnterKeyUp);
             //PlayAllMediaAsync_Command = new AsyncCommand(PlayAllMediaAsync);
             SelectedMediaChanged_Command = new SyncCommand(SelectedMediaChanged);
             SaveMediaLibraryAsync_Command = new AsyncCommand(SaveMediaLibraryAsync);
+            ClearAdvancedSearchTerms_Command = new SyncCommand(ClearAdvancedSearchTerms);
             //Filter_DropDownClosing_Command = new SyncCommand(Filter_DropDownClosing);
-            //Search_EnterKeyUpAsync_Command = new AsyncCommand(Search_EnterKeyUpAsync);
             ShowMediaCastAsync_Command = new AsyncCommand<IMediaEntity>(ShowMediaCastAsync);
             DisplayMediaTypeInfo_Command = new SyncCommand<MediaTypeEntity>(DisplayMediaTypeStatistics);
             SetIsWatchedStatusAsync_Command = new AsyncCommand<IMediaEntity>(SetIsWatchedStatusAsync);
             ViewOpenedAsync_Command = new AsyncCommand(ViewOpenedAsync);
+            SearchMediaLibraryAsync_Command = new AsyncCommand(SearchLibraryAsync);
+            OpenAdvancedSearchResult_Command = new AsyncCommand<AdvancedSearchResultEntity>(OpenAdvancedSearchResult);
             ExitMediaTypeSourcesOptions_Command = new SyncCommand(ExitMediaTypeSourcesOptions);
-            ExitMediaTypesOptions_Command = new SyncCommand(ExitMediaTypesOptions);
-            ExitPlayerOptions_Command = new SyncCommand(ExitPlayerOptions);
-            ExitInterfaceOptions_Command = new SyncCommand(ExitInterfaceOptions);
+            ExitMediaTypesOptions_Command = new SyncCommand(mediaLibraryNavigation.ExitMediaTypesOptions);
+            ExitPlayerOptions_Command = new SyncCommand(mediaLibraryNavigation.ExitPlayerOptions);
+            ExitInterfaceOptions_Command = new SyncCommand(mediaLibraryNavigation.ExitInterfaceOptions);
             ExitMediaCast_Command = new SyncCommand(() => AreActorsVisible = false);
-            //Search_DropDownClosingAsync_Command = new AsyncCommand(Search_DropDownClosingAsync);
             SetIsFavoriteStatusAsync_Command = new AsyncCommand<IMediaEntity>(SetIsFavoriteStatusAsync);
-            //DisplayOffset_ValueChanged_Command = new SyncCommand<decimal>(DisplayOffset_ValueChanged);
             mediaLibraryNavigation.Navigated += InitiateNavigation;
             OpenLoggingDirectory_Command = new SyncCommand(OpenLoggingDirectory);
-            // SearchMediaLibrary_Command = new AutoCompleteFilterPredicate<object>(SearchMediaLibrary);
-            this.mediaStatistics.PropertyChanged += DomainModelPropertyChanged;
-            this.mediaLibraryNavigation.PropertyChanged += DomainModelPropertyChanged;
+            SearchMediaLibrary_Command = new AutoCompleteFilterPredicate<object>(SearchMediaLibrary);
+            mediaStatistics.PropertyChanged += DomainModelPropertyChanged;
+            mediaLibraryNavigation.PropertyChanged += DomainModelPropertyChanged;
             this.appOptions.OptionsMedia.PropertyChanged += DomainModelPropertyChanged;
             this.appOptions.OptionsPlayer.PropertyChanged += DomainModelPropertyChanged;
             this.appOptions.OptionsInterface.PropertyChanged += DomainModelPropertyChanged;
@@ -640,6 +694,9 @@ namespace Leya.ViewModels.Main
             ChangeSingleInstanceArgument_Command = new SyncCommand<bool>(this.appOptions.OptionsPlayer.ChangeSingleInstanceArgument);
             ChangeEnqueueFilesInSingleInstanceModeArgument_Command = new SyncCommand<bool>(this.appOptions.OptionsPlayer.ChangeEnqueueFilesInSingleInstanceModeArgument);
 
+            SearchLibraryKeyUpAsync_Command = new AsyncCommand(SearchLibraryKeyUpAsync);
+            SearchLibraryDropDownClosingAsync_Command = new AsyncCommand(SearchLibraryDropDownClosingAsync);
+
             ShowMediaOptions_Command = new SyncCommand(ShowMediaOptions);
             ShowPlayerOptions_Command = new SyncCommand(ShowPlayerOptions);
             ShowInterfaceOptions_Command = new SyncCommand(ShowInterfaceOptions);
@@ -649,6 +706,18 @@ namespace Leya.ViewModels.Main
                 new SearchEntity() { Text = "MOVIE" },
                 new SearchEntity() { Text = "MUSIC" },
             };
+            SourceSearchMediaTypes = new ObservableCollection<MediaTypeEntity>()
+            {
+                new MediaTypeEntity() { MediaName = "ANY"},
+                new MediaTypeEntity() { MediaName = "MOVIE"},
+                new MediaTypeEntity() { MediaName = "TV SHOW"},
+                new MediaTypeEntity() { MediaName = "SEASON"},
+                new MediaTypeEntity() { MediaName = "EPISODE"},
+                new MediaTypeEntity() { MediaName = "ARTIST"},
+                new MediaTypeEntity() { MediaName = "ALBUM"},
+                new MediaTypeEntity() { MediaName = "SONG"}
+            };
+            SelectedSearchMediaType = SourceSearchMediaTypes[0];
         }
         #endregion
 
@@ -661,6 +730,62 @@ namespace Leya.ViewModels.Main
         private void DomainModelPropertyChanged(string propertyName)
         {
             Notify(propertyName);
+        }
+
+        /// <summary>
+        /// Searches the media library
+        /// </summary>
+        private async Task SearchLibraryAsync()
+        {
+            ShowProgressBar();
+            SourceAdvancedSearch = new ObservableCollection<AdvancedSearchResultEntity>((await search.SearchLibraryAsync()).ToList());
+            HideProgressBar();
+        }
+
+        /// <summary>
+        /// Opens the media library view for the advanced search element identified by <paramref name="searchEntity"/>
+        /// </summary>
+        /// <param name="searchEntity">The advanced search entity for which to display the media library view</param>
+        public async Task OpenAdvancedSearchResult(AdvancedSearchResultEntity searchEntity)
+        {
+            IEnumerable<IMediaEntity> temp = new List<IMediaEntity>();
+            await Task.Run(() =>
+            {
+                if (searchEntity.MediaType == NavigationLevel.Episode)
+                    temp = mediaLibraryNavigation.NavigateToEpisodeSearchResult(mediaLibrary, () => new MediaEntity(), searchEntity);
+                else if (searchEntity.MediaType == NavigationLevel.Season)
+                    temp = mediaLibraryNavigation.NavigateToSeasonSearchResult(mediaLibrary, () => new MediaEntity(), searchEntity);
+                else if (searchEntity.MediaType == NavigationLevel.TvShow)
+                    temp = mediaLibraryNavigation.NavigateToTvShowSearchResult(mediaLibrary, () => new MediaEntity(), searchEntity);
+                else if (searchEntity.MediaType == NavigationLevel.Song)
+                    temp = mediaLibraryNavigation.NavigateToSongSearchResult(mediaLibrary, () => new MediaEntity(), searchEntity);
+                else if (searchEntity.MediaType == NavigationLevel.Album)
+                    temp = mediaLibraryNavigation.NavigateToAlbumSearchResult(mediaLibrary, () => new MediaEntity(), searchEntity);
+                else if (searchEntity.MediaType == NavigationLevel.Artist)
+                    temp = mediaLibraryNavigation.NavigateToArtistSearchResult(mediaLibrary, () => new MediaEntity(), searchEntity);
+                else if (searchEntity.MediaType == NavigationLevel.Movie)
+                    temp = mediaLibraryNavigation.NavigateToMovieSearchResult(mediaLibrary, () => new MediaEntity(), searchEntity);
+            });
+            if (temp.Count() > 0)
+            {
+                SourceMedia = new ObservableCollection<IMediaEntity>(temp);
+                SourceFilter = new ObservableCollection<SearchEntity>(temp.Select(e => new SearchEntity() { Text = e.MediaName }));
+                SourceMediaSelectedItem = SourceMedia.Where(e => e.MediaName == searchEntity.MediaTitle).First();
+            }
+            IsMediaContainerVisible = true;
+            IsMaskBackgroundVisible = false;
+            IsSearchContainerVisible = false;
+            Navigated?.Invoke();
+        }
+
+        /// <summary>
+        /// Clears the advanced search terms
+        /// </summary>
+        private void ClearAdvancedSearchTerms()
+        {
+            search.ClearAdvancedSearchTerms();
+            search.SelectedSearchMediaType = SourceSearchMediaTypes[0];
+            SourceAdvancedSearch.Clear();
         }
 
         /// <summary>
@@ -847,7 +972,7 @@ namespace Leya.ViewModels.Main
             appOptions.OptionsMedia.ResetAddMediaTypeSourceElements();
             SelectedMediaCategoryType = null;
             Notify(nameof(SourceMediaCategorySources));
-            IsMediaTypeSourcesOptionVisible = true;
+            AreMediaTypeSourcesOptionVisible = true;
         }
 
         /// <summary>
@@ -904,7 +1029,7 @@ namespace Leya.ViewModels.Main
         {
             return true;
         }
-        
+
         /// <summary>
         /// Adds a new media source to the selected media
         /// </summary>
@@ -953,7 +1078,7 @@ namespace Leya.ViewModels.Main
         private void GetMediaTypeSources(MediaTypeEntity item)
         {
             ShowProgressBar();
-            IsMediaTypeSourcesOptionVisible = true;
+            AreMediaTypeSourcesOptionVisible = true;
             // the user is updating the sources of an existing media type, not creating a new one
             appOptions.OptionsMedia.IsMediaTypeSourceUpdate = true;
             appOptions.OptionsMedia.Id = item.Id;
@@ -1076,7 +1201,7 @@ namespace Leya.ViewModels.Main
             ShowProgressBar();
             if (sourceMedia != null && sourceMedia.Count > 0)
             {
-                IMediaEntity media = sourceMedia[0];
+                IMediaEntity media = SourceMediaSelectedItem ?? sourceMedia[0];
                 IEnumerable<IMediaEntity> temp = new List<IMediaEntity>();
                 await Task.Run(() =>
                 {
@@ -1095,6 +1220,15 @@ namespace Leya.ViewModels.Main
                 SourceFilter = new ObservableCollection<SearchEntity>(temp.Select(e => new SearchEntity() { Text = e.MediaName }));
                 // advance current level of navigation one level higher and notify the user interface that the navigation took place
                 mediaLibraryNavigation.NavigateUp(mediaLibrary, media.Id);
+                // whether a media item was previously selected or not, select the parent item that contained the media list from which the up navigation initiated
+                if (media != null && temp.Count() > 0)
+                {
+                    // when navigating up from an episode or song, Id holds the id of the tv show/artist, SeasonOrAlbumId holds the id of the season/album
+                    if (CurrentNavigationLevel == NavigationLevel.Season || CurrentNavigationLevel == NavigationLevel.Album)
+                        SourceMediaSelectedItem = SourceMedia.Where(m => m.Id == media.Id && m.SeasonOrAlbumId == media.SeasonOrAlbumId).First();
+                    else
+                        SourceMediaSelectedItem = SourceMedia.Where(m => m.Id == media.Id).First();
+                }
             }
             else
             {
@@ -1122,8 +1256,9 @@ namespace Leya.ViewModels.Main
                     IsMaskBackgroundVisible = false;
                     IsInterfaceOptionVisible = false;
                     IsOptionsContainerVisible = false;
+                    IsSearchContainerVisible = false;
                     IsMediaTypesOptionVisible = false;
-                    IsMediaTypeSourcesOptionVisible = false;
+                    AreMediaTypeSourcesOptionVisible = false;
                     break;
                 case NavigationLevel.TvShow:
                 case NavigationLevel.Movie:
@@ -1132,12 +1267,16 @@ namespace Leya.ViewModels.Main
                     IsMediaContainerVisible = true;
                     break;
                 case NavigationLevel.System:
-                case NavigationLevel.Search:
-                case NavigationLevel.Favorite:
                     IsMainMenuVisible = false;
                     IsMaskBackgroundVisible = true;
-                    IsMediaContainerVisible = false;
                     IsOptionsContainerVisible = true;
+                    break;
+                case NavigationLevel.Search:
+                    IsMainMenuVisible = false;
+                    IsMaskBackgroundVisible = true;
+                    IsSearchContainerVisible = true;
+                    break;
+                case NavigationLevel.Favorite:
                     break;
                 default:
                     break;
@@ -1173,7 +1312,7 @@ namespace Leya.ViewModels.Main
             // advance current level of navigation one level higher and notify the user interface that the navigation took place
             try
             {
-                await mediaLibraryNavigation.NavigateDown(mediaLibrary, media);
+                await mediaLibraryNavigation.NavigateDownAsync(mediaLibrary, media);
             }
             catch (Exception ex) when (ex is InvalidOperationException || ex is ArgumentException)
             {
@@ -1196,38 +1335,38 @@ namespace Leya.ViewModels.Main
         /// </summary>
         private void ExitMediaTypeSourcesOptions()
         {
-            IsMediaTypeSourcesOptionVisible = false;
+            AreMediaTypeSourcesOptionVisible = false;
             ResetAddMediaSourceElements_Command?.RaiseCanExecuteChanged();
             IsHelpButtonVisible = false;
         }
 
-        /// <summary>
-        /// Exits the media types options list and returns to the options list
-        /// </summary>
-        private void ExitMediaTypesOptions()
-        {
-            IsMediaTypesOptionVisible = false;
-            IsHelpButtonVisible = false;
-        }
 
-        /// <summary>
-        /// Exits the player options view and returns to the options list
-        /// </summary>
-        private void ExitPlayerOptions()
-        {
-            IsPlayerOptionVisible = false;
-            IsHelpButtonVisible = false;
-        }
 
-        /// <summary>
-        /// Exits the interface options view and returns to the options list
-        /// </summary>
-        private void ExitInterfaceOptions()
-        {
-            IsInterfaceOptionVisible = false;
-            IsHelpButtonVisible = false;
-        }
+
+
+
         #endregion
+
+        /// <summary>
+        /// Custom filter for the media library searching
+        /// </summary>
+        /// <param name="search">The search term</param>
+        /// <param name="item">The item to be searched for <paramref name="search"/></param>
+        /// <returns>True if <paramref name="item"/> contains <paramref name="search"/>, False otherwise</returns>
+        private bool SearchMediaLibrary(string search, object item)
+        {
+            SearchEntity element = item as SearchEntity;
+            // ignore casing
+            search = search.ToLower().Trim();
+            // check if at least one search criteria is met
+            bool hasEpisode = element.Text.ToLower().Contains(search);
+            bool hasTvShow = (element.Value?.ToString().ToLower().Contains(search) ?? false);
+            bool hasTags = element.Tags?.Where(t => t.ToLower().Contains(search)).Count() > 0;
+            bool hasGenres = element?.Genres.Where(g => g.ToLower().Contains(search)).Count() > 0;
+            bool hasActors = element?.Actors.Where(a => a.ToLower().Contains(search)).Count() > 0;
+            bool hasRoles = (element?.Hover as string[]).Where(r => r.ToLower().Contains(search)).Count() > 0;
+            return hasEpisode || hasTvShow || hasTags || hasGenres || hasActors || hasRoles;
+        }
         #endregion
 
         #region ============================================================= EVENT HANDLERS ================================================================================
@@ -1246,9 +1385,11 @@ namespace Leya.ViewModels.Main
             try
             {
                 await mediaLibrary.GetMediaLibraryAsync();
+                SourceSearch = new ObservableCollection<SearchEntity>(mediaLibrary.SourceSearch.ToArray());
             }
             catch (Exception ex)
             {
+                await notificationService.ShowAsync("Error retrieving the media library!\n" + ex.Message, "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
                 ScannerOutput = string.Empty;
                 IsScannerTextVisible = true;
             }
@@ -1296,6 +1437,26 @@ namespace Leya.ViewModels.Main
                     mediaLibraryNavigation.GetSongMediaInfo(mediaLibrary, SourceMediaSelectedItem.Id, SourceMediaSelectedItem.SeasonOrAlbumId, SourceMediaSelectedItem.MediaName);
             }
         }
+
+        /// <summary>
+        /// Handles the KeyUp event of the library search autocomplete box
+        /// </summary>
+        private async Task SearchLibraryKeyUpAsync()
+        {
+            // if there is an element selected in the global media searching autocompletebox, play it when the enter key is pressed
+            //if (SearchSelectedItem != null && !string.IsNullOrEmpty(SearchSelectedItem.Text) && !string.IsNullOrEmpty(SearchSelectedItem.MediaItemPath))
+            //await PlayVideoItemAsync(SearchSelectedItem.MediaItemPath);
+        }
+
+        /// <summary>
+        /// Handles DropDownClosing event of the library search autocomplete box
+        /// </summary>
+        private async Task SearchLibraryDropDownClosingAsync()
+        {
+            //if (SearchSelectedItem != null && !string.IsNullOrEmpty(SearchSelectedItem.Text) && !string.IsNullOrEmpty(SearchSelectedItem.MediaItemPath))
+            //await mediaLibraryNavigation.PlayVideoItemAsync(SearchSelectedItem.MediaItemPath);
+        }
+
         #endregion
     }
 }

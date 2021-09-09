@@ -34,6 +34,7 @@ using Avalonia.Controls.Templates;
 using System.Collections.Generic;
 using Leya.Infrastructure.Notification;
 using System.IO;
+using Leya.Models.Common.Models.Common;
 #endregion
 
 namespace Leya.Views.Main
@@ -49,6 +50,7 @@ namespace Leya.Views.Main
         Grid grdWindowDrag;
         Grid grdDescription;
         Image imgBanner;
+        AutoCompleteBox acbSearchMediaLibrary;
         private readonly IFolderBrowserService folderBrowserService;
         private readonly IFileBrowserService fileBrowserService;
         private readonly IAppConfig appConfig;
@@ -77,6 +79,7 @@ namespace Leya.Views.Main
             grdTransitionMask = this.FindControl<Grid>("grdTransitionMask");
             imgBanner = this.FindControl<Image>("imgBanner");
             grdDescription = this.FindControl<Grid>("grdDescription");
+            acbSearchMediaLibrary = this.FindControl<AutoCompleteBox>("acbSearchMediaLibrary");
 
             grdTransitionMask.Clock = animationPlaybackClock;
             CreateOpacityFadeInAnimation();
@@ -91,26 +94,6 @@ namespace Leya.Views.Main
         #endregion
 
         #region ================================================================= METHODS =================================================================================== 
-        /// <summary>
-        /// Handles MediaItem's DoubleTapped event
-        /// </summary>
-        private async void MediaItem_DoubleTapped(object? sender, RoutedEventArgs e)
-        {
-            NavigationLevel navigationLevel = (DataContext as MainWindowVM).CurrentNavigationLevel;
-            // get the parent listbox item of the double tapped element
-            IMediaEntity mediaEntity = (sender as Label).Tag as IMediaEntity;
-            if (navigationLevel is not NavigationLevel.Episode and not NavigationLevel.Song and not NavigationLevel.Movie)
-            {
-                // start the fade in animation of the black mask
-                grdTransitionMask.IsVisible = true;
-                await opacityFadeInAnimation.RunAsync(grdTransitionMask, animationPlaybackClock);
-                // WPF bug - due to virtualization, sometimes _parameter can be automatically set to "DisconnectedItem", throwing exception
-                await (DataContext as MainWindowVM).NavigateMediaLibraryDownAsync(mediaEntity);
-            }
-            else
-                await (DataContext as MainWindowVM).NavigateMediaLibraryDownAsync(mediaEntity);
-        }
-
         /// <summary>
         /// Creates the animation used in the mask fade in
         /// </summary>
@@ -171,17 +154,19 @@ namespace Leya.Views.Main
             };
         }
 
-        private void SlideScoreTitle(object sender, EventArgs e)
+        /// <summary>
+        /// Displays the main menu via a fading animation
+        /// </summary>
+        private async Task AnimateToMainMenu()
         {
-            App.styles.SetTheme(App.styles.CurrentTheme switch
+            if ((DataContext as MainWindowVM).CurrentNavigationLevel != NavigationLevel.None)
             {
-                Themes.Dark => Themes.Light,
-                Themes.Light => Themes.Dark,
-                _ => throw new ArgumentOutOfRangeException(nameof(App.styles.CurrentTheme))
-            });
-            ff = !ff;
+                // start the fade in animation of the black mask
+                grdTransitionMask.IsVisible = true;
+                await opacityFadeInAnimation.RunAsync(grdTransitionMask, animationPlaybackClock);
+                await (DataContext as MainWindowVM).ExitMediaLibrary();
+            }
         }
-        bool ff;
 
         /// <summary>
         /// Escapes backslash
@@ -195,17 +180,6 @@ namespace Leya.Views.Main
             else
                 return text;
         }
-
-        /// <summary>
-        /// Gets the DPI value for the screen identified by <paramref name="_screenIndex"/>
-        /// </summary>
-        /// <param name="_screenIndex">The screen for which to take the DPI</param>
-        /// <returns>The DPI of the screen identified by <paramref name="_screenIndex"/></returns>
-        //private Size GetDpiForScreen(int _screenIndex)
-        //{
-        //    WinForms.Screen.AllScreens[_screenIndex].GetDpi(DpiType.Effective, out uint _x, out uint _y);
-        //    return new Size(_x, _y);
-        //}
         #endregion
 
         #region ============================================================= EVENT HANDLERS ================================================================================
@@ -247,6 +221,8 @@ namespace Leya.Views.Main
             {
                 await notificationService.ShowAsync("Error getting the weather info from www.weather.com!\n" + ex.Message, "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
             }
+
+            acbSearchMediaLibrary.ItemFilter = new AutoCompleteFilterPredicate<object>(SearchMediaLibrary);
         }
 
         /// <summary>
@@ -290,15 +266,57 @@ namespace Leya.Views.Main
         private async void Window_KeyUp(object? sender, KeyEventArgs e)
         {
             // if the user presses Escape, exit any view and return to main menu
-            if (e.Key == Key.Escape && (DataContext as MainWindowVM).CurrentNavigationLevel != NavigationLevel.None)
+            if (e.Key == Key.Escape)
+            {
+                await AnimateToMainMenu();
+                // for some reason, the window closes when escape is pressed, so keep it handled
+                e.Handled = true;
+            }
+        }
+
+        /// <summary>
+        /// Handles MediaItem's DoubleTapped event
+        /// </summary>
+        private async void MediaItem_DoubleTapped(object? sender, RoutedEventArgs e)
+        {
+            NavigationLevel navigationLevel = (DataContext as MainWindowVM).CurrentNavigationLevel;
+            // get the parent listbox item of the double tapped element
+            IMediaEntity mediaEntity = (sender as Label).Tag as IMediaEntity;
+            if (navigationLevel is not NavigationLevel.Episode and not NavigationLevel.Song and not NavigationLevel.Movie)
             {
                 // start the fade in animation of the black mask
                 grdTransitionMask.IsVisible = true;
                 await opacityFadeInAnimation.RunAsync(grdTransitionMask, animationPlaybackClock);
-                await (DataContext as MainWindowVM).ExitMediaLibrary();
-                // for some reason, the window closes when escape is pressed, so keep it handled
-                e.Handled = true;
             }
+            await (DataContext as MainWindowVM).NavigateMediaLibraryDownAsync(mediaEntity);
+        }
+
+
+        /// <summary>
+        /// Handles advanced search results DoubleTapped event
+        /// </summary>
+        private async void AdvancedSearchResultItem_DoubleTapped(object? sender, RoutedEventArgs e)
+        {
+            // start the fade in animation of the black mask
+            grdTransitionMask.IsVisible = true;
+            await opacityFadeInAnimation.RunAsync(grdTransitionMask, animationPlaybackClock);
+            // proceed to display the media list containing the double clicked search result
+            await (DataContext as MainWindowVM).OpenAdvancedSearchResult((sender as Label).Tag as AdvancedSearchResultEntity);
+        }
+
+        private bool SearchMediaLibrary(string search, object item)
+        {
+            Models.Common.Models.Common.SearchEntity element = item as Models.Common.Models.Common.SearchEntity;
+            // ignore casing
+            search = search.ToLower().Trim();
+            // check if at least one search criteria is met
+            bool hasEpisode = element.Text.ToLower().Contains(search);
+            bool hasTvShow = (element.Value?.ToString().ToLower().Contains(search) ?? false);
+            bool hasTags = element.Tags?.Where(t => t.ToLower().Contains(search)).Count() > 0;
+            bool hasGenres = element?.Genres.Where(g => g.ToLower().Contains(search)).Count() > 0;
+            bool hasActors = element?.Actors.Where(a => a.ToLower().Contains(search)).Count() > 0;
+            bool hasRoles = (element?.Hover as string[]).Where(r => r.ToLower().Contains(search)).Count() > 0;
+            return hasEpisode || hasTvShow || hasTags || hasGenres || hasActors || hasRoles;
         }
 
         ///// <summary>
@@ -448,6 +466,14 @@ namespace Leya.Views.Main
                 (DataContext as MainWindowVM).BackgroundImagePath = fileBrowserService.SelectedFiles.Length > 3 ? fileBrowserService.SelectedFiles.Substring(1, fileBrowserService.SelectedFiles.Length - 2) : null;
                 (DataContext as MainWindowVM).UpdatePlayerOptionsAsync_Command.RaiseCanExecuteChanged(); // ?
             }
+        }
+
+        /// <summary>
+        /// Handles the media seach Back button's Click event
+        /// </summary>
+        private async void DisplayMainMenu_Click(object sender, RoutedEventArgs e)
+        {
+            await AnimateToMainMenu();
         }
         #endregion
     }

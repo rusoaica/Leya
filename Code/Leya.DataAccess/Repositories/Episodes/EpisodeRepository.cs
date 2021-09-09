@@ -40,7 +40,7 @@ namespace Leya.DataAccess.Repositories.Episodes
             ApiResponse deleteEpisodes = await dataAccess.DeleteAsync(EntityContainers.Episodes);
             ApiResponse deleteEpisodeActors = await dataAccess.DeleteAsync(EntityContainers.EpisodeActors);
             ApiResponse deleteEpisodeCredits = await dataAccess.DeleteAsync(EntityContainers.EpisodeCredits);
-            ApiResponse deleteEpisodeGenres = await dataAccess.DeleteAsync(EntityContainers.EpisodeGenre);
+            ApiResponse deleteEpisodeGenres = await dataAccess.DeleteAsync(EntityContainers.EpisodeGenres);
             ApiResponse deleteEpisodeRatings = await dataAccess.DeleteAsync(EntityContainers.EpisodeRatings);
             dataAccess.CloseTransaction();
             // check if any of the queries resulted in an error
@@ -63,7 +63,7 @@ namespace Leya.DataAccess.Repositories.Episodes
             ApiResponse deleteEpisode = await dataAccess.DeleteAsync(EntityContainers.Episodes, new { Id = id });
             ApiResponse deleteEpisodeActors = await dataAccess.DeleteAsync(EntityContainers.EpisodeActors, new { EpisodeId = id });
             ApiResponse deleteEpisodeCredits = await dataAccess.DeleteAsync(EntityContainers.EpisodeCredits, new { EpisodeId = id });
-            ApiResponse deleteEpisodeGenres = await dataAccess.DeleteAsync(EntityContainers.EpisodeGenre, new { EpisodeId = id });
+            ApiResponse deleteEpisodeGenres = await dataAccess.DeleteAsync(EntityContainers.EpisodeGenres, new { EpisodeId = id });
             ApiResponse deleteEpisodeRatings = await dataAccess.DeleteAsync(EntityContainers.EpisodeRatings, new { EpisodeId = id });
             dataAccess.CloseTransaction();
             // check if any of the queries resulted in an error
@@ -92,7 +92,7 @@ namespace Leya.DataAccess.Repositories.Episodes
                     {
                         // get the data associated with the episode
                         episodes.Data[i].Ratings = (await dataAccess.SelectAsync<EpisodeRatingEntity>(EntityContainers.EpisodeRatings, "Id, EpisodeId, Name, Max, Value, Votes", new { EpisodeId = episodes.Data[i].Id })).Data;
-                        episodes.Data[i].Genres = (await dataAccess.SelectAsync<EpisodeGenreEntity>(EntityContainers.EpisodeGenre, "Genre, EpisodeId, Id", new { EpisodeId = episodes.Data[i].Id })).Data;
+                        episodes.Data[i].Genres = (await dataAccess.SelectAsync<EpisodeGenreEntity>(EntityContainers.EpisodeGenres, "Genre, EpisodeId, Id", new { EpisodeId = episodes.Data[i].Id })).Data;
                         episodes.Data[i].Actors = (await dataAccess.SelectAsync<EpisodeActorEntity>(EntityContainers.EpisodeActors, "Id, EpisodeId, Name, Role, `Order`, Thumb", new { EpisodeId = episodes.Data[i].Id })).Data;
                         episodes.Data[i].Credits = (await dataAccess.SelectAsync<EpisodeCreditEntity>(EntityContainers.EpisodeCredits, "Credit, EpisodeId, Id", new { EpisodeId = episodes.Data[i].Id })).Data;
                     }
@@ -120,7 +120,7 @@ namespace Leya.DataAccess.Repositories.Episodes
                 {
                     // get the data associated with the episode
                     episode.Data[0].Ratings = (await dataAccess.SelectAsync<EpisodeRatingEntity>(EntityContainers.EpisodeRatings, "Id, EpisodeId, Name, Max, Value, Votes", new { EpisodeId = episode.Data[0].Id })).Data;
-                    episode.Data[0].Genres = (await dataAccess.SelectAsync<EpisodeGenreEntity>(EntityContainers.EpisodeGenre, "Genre, EpisodeId, Id", new { EpisodeId = episode.Data[0].Id })).Data;
+                    episode.Data[0].Genres = (await dataAccess.SelectAsync<EpisodeGenreEntity>(EntityContainers.EpisodeGenres, "Genre, EpisodeId, Id", new { EpisodeId = episode.Data[0].Id })).Data;
                     episode.Data[0].Actors = (await dataAccess.SelectAsync<EpisodeActorEntity>(EntityContainers.EpisodeActors, "Id, EpisodeId, Name, Role, `Order`, Thumb", new { EpisodeId = episode.Data[0].Id })).Data;
                     episode.Data[0].Credits = (await dataAccess.SelectAsync<EpisodeCreditEntity>(EntityContainers.EpisodeCredits, "Credit, EpisodeId, Id", new { EpisodeId = episode.Data[0].Id })).Data;
                 });
@@ -149,7 +149,7 @@ namespace Leya.DataAccess.Repositories.Episodes
                 {
                     // get the data associated with the episode
                     episode.Data[0].Ratings = (await dataAccess.SelectAsync<EpisodeRatingEntity>(EntityContainers.EpisodeRatings, "Id, EpisodeId, Name, Max, Value, Votes", new { EpisodeId = episode.Data[0].Id })).Data;
-                    episode.Data[0].Genres = (await dataAccess.SelectAsync<EpisodeGenreEntity>(EntityContainers.EpisodeGenre, "Genre, EpisodeId, Id", new { EpisodeId = episode.Data[0].Id })).Data;
+                    episode.Data[0].Genres = (await dataAccess.SelectAsync<EpisodeGenreEntity>(EntityContainers.EpisodeGenres, "Genre, EpisodeId, Id", new { EpisodeId = episode.Data[0].Id })).Data;
                     episode.Data[0].Actors = (await dataAccess.SelectAsync<EpisodeActorEntity>(EntityContainers.EpisodeActors, "Id, EpisodeId, Name, Role, `Order`, Thumb", new { EpisodeId = episode.Data[0].Id })).Data;
                     episode.Data[0].Credits = (await dataAccess.SelectAsync<EpisodeCreditEntity>(EntityContainers.EpisodeCredits, "Credit, EpisodeId, Id", new { EpisodeId = episode.Data[0].Id })).Data;
                 });
@@ -187,7 +187,7 @@ namespace Leya.DataAccess.Repositories.Episodes
                         foreach (EpisodeGenreEntity genre in entity.Genres)
                         {
                             genre.EpisodeId = episode.Data[0].Id;
-                            await dataAccess.InsertAsync(EntityContainers.EpisodeGenre, genre);
+                            await dataAccess.InsertAsync(EntityContainers.EpisodeGenres, genre);
                         }
                     }
                     // insert the credits
@@ -255,7 +255,7 @@ namespace Leya.DataAccess.Repositories.Episodes
                     "EpisodeId", "'" + entity.Id + "'");
                 }
                 foreach (EpisodeGenreEntity genre in entity.Genres)
-                    await dataAccess.UpdateAsync(EntityContainers.EpisodeGenre, "Genre = '" + genre.Genre + "'", "EpisodeId", "'" + entity.Id + "'");
+                    await dataAccess.UpdateAsync(EntityContainers.EpisodeGenres, "Genre = '" + genre.Genre + "'", "EpisodeId", "'" + entity.Id + "'");
                 foreach (EpisodeCreditEntity credit in entity.Credits)
                     await dataAccess.UpdateAsync(EntityContainers.EpisodeCredits, "Credit = '" + credit.Credit + "'", "EpisodeId", "'" + entity.Id + "'");
                 foreach (EpisodeActorEntity actor in entity.Actors)

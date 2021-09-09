@@ -8,6 +8,7 @@ using Leya.Infrastructure.Enums;
 using System.Collections.Generic;
 using Leya.Models.Core.MediaLibrary;
 using Leya.Models.Common.Models.Media;
+using Leya.Models.Common.Models.Common;
 #endregion
 
 namespace Leya.Models.Core.Navigation
@@ -36,11 +37,19 @@ namespace Leya.Models.Core.Navigation
         string CurrentStatus { get; set; }
         bool IsTvShow { get; set; }
         bool IsFanartVisible { get; set; }
-        bool IsWritersVisible { get; set; }
+        bool AreWritersVisible { get; set; }
         bool IsDirectorVisible { get; set; }
         bool IsMediaCoverVisible { get; set; }
-        bool IsNumberOfSeasonsVisible { get; set; }
+        bool IsHelpButtonVisible { get; set; }
+        bool IsPlayerOptionVisible { get; set; }
+        bool IsMediaContainerVisible { get; set; }
+        bool IsInterfaceOptionVisible { get; set; }
         bool IsBackNavigationPossible { get; set; }
+        bool IsSearchContainerVisible { get; set; }
+        bool IsMediaTypesOptionVisible { get; set; }
+        bool AreNumberOfSeasonsVisible { get; set; }
+        bool IsOptionsContainerVisible { get; set; }
+        bool AreMediaTypeSourcesOptionVisible { get; set; }
         TimeSpan Runtime { get; set; }
         DateTime Added { get; set; }
         DateTime Premiered { get; set; }
@@ -53,6 +62,21 @@ namespace Leya.Models.Core.Navigation
         /// </summary>
         /// <param name="menu">The menu item for which to display the media view</param>
         void InitiateMainMenuNavigation(MediaTypeEntity menu);
+
+        /// <summary>
+        /// Exits the interface options view and returns to the options list
+        /// </summary>
+        void ExitInterfaceOptions();
+
+        /// <summary>
+        /// Exits the player options view and returns to the options list
+        /// </summary>
+        void ExitPlayerOptions();
+
+        /// <summary>
+        /// Exits the media types options list and returns to the options list
+        /// </summary>
+        void ExitMediaTypesOptions();
         
         /// <summary>
         /// Gets the additional info for the tv show identified by <paramref name="tvShowId"/>
@@ -121,13 +145,13 @@ namespace Leya.Models.Core.Navigation
         /// </summary>
         /// <param name="mediaLibrary">The media library to be navigated</param>
         /// <param name="media">The element from which to navigate one level down</param>
-        Task NavigateDown(IMediaLibrary mediaLibrary, IMediaEntity media);
+        Task NavigateDownAsync(IMediaLibrary mediaLibrary, IMediaEntity media);
 
         /// <summary>
         /// Gets the list of tv shows to be displayed in the navigation list
         /// </summary>
         /// <param name="mediaLibrary">The library from which to take the tv shows to be displayed</param>
-        IEnumerable<IMediaEntity> GetTvShowsNavigationList(IMediaLibrary mediaLibrary, Func<IMediaEntity> mediaFactory);
+        IEnumerable<IMediaEntity> GetTvShowsNavigationList(IMediaLibrary mediaLibrary, Func<IMediaEntity> mediaFactory, string mediaName = null);
 
         /// <summary>
         /// Gets the list of seasons to be displayed in the navigation list
@@ -154,13 +178,13 @@ namespace Leya.Models.Core.Navigation
         /// Gets the list of movies to be displayed in the navigation list
         /// </summary>
         /// <param name="mediaLibrary">The library from which to take the movies to be displayed</param>
-        IEnumerable<IMediaEntity> GetMoviesNavigationList(IMediaLibrary mediaLibrary, Func<IMediaEntity> mediaFactory);
+        IEnumerable<IMediaEntity> GetMoviesNavigationList(IMediaLibrary mediaLibrary, Func<IMediaEntity> mediaFactory, string mediaName = null);
 
         /// <summary>
         /// Gets the list of artists to be displayed in the navigation list
         /// </summary>
         /// <param name="mediaLibrary">The library from which to take the artists to be displayed</param>
-        IEnumerable<IMediaEntity> GetArtistsNavigationList(IMediaLibrary mediaLibrary, Func<IMediaEntity> mediaFactory);
+        IEnumerable<IMediaEntity> GetArtistsNavigationList(IMediaLibrary mediaLibrary, Func<IMediaEntity> mediaFactory, string mediaName = null);
 
         /// <summary>
         /// Gets the list of albums to be displayed in the navigation list
@@ -182,6 +206,69 @@ namespace Leya.Models.Core.Navigation
         /// <param name="mediaLibrary">The library from which to take the songs to be displayed</param>
         /// <param name="fromAlbum">An album in the current navigation list from which to take the child songs</param>
         IEnumerable<IMediaEntity> GetSongsNavigationList(IMediaLibrary mediaLibrary, IMediaEntity fromAlbum, Func<IMediaEntity> mediaFactory);
+
+        /// <summary>
+        /// Navigates to the episode media list from an episode advanced search result
+        /// </summary>
+        /// <param name="mediaLibrary">The library from which to take the episodes to be displayed</param>
+        /// <param name="mediaFactory">The factory for creating new instances of type <see cref="IMediaEntity"/></param>
+        /// <param name="searchEntity">The advanced search entity that initiated the navigation</param>
+        /// <returns>An IEnumerable of media items representing the episodes containing the <paramref name="searchEntity"/></returns>
+        IEnumerable<IMediaEntity> NavigateToEpisodeSearchResult(IMediaLibrary mediaLibrary, Func<IMediaEntity> mediaFactory, AdvancedSearchResultEntity searchEntity);
+
+        /// <summary>
+        /// Navigates to the season media list from a season advanced search result
+        /// </summary>
+        /// <param name="mediaLibrary">The library from which to take the seasons to be displayed</param>
+        /// <param name="mediaFactory">The factory for creating new instances of type <see cref="IMediaEntity"/></param>
+        /// <param name="searchEntity">The advanced search entity that initiated the navigation</param>
+        /// <returns>An IEnumerable of media items representing the seasons containing the <paramref name="searchEntity"/></returns>
+        IEnumerable<IMediaEntity> NavigateToSeasonSearchResult(IMediaLibrary mediaLibrary, Func<IMediaEntity> mediaFactory, AdvancedSearchResultEntity searchEntity);
+
+        /// <summary>
+        /// Navigates to the tv show media list from a tv show advanced search result
+        /// </summary>
+        /// <param name="mediaLibrary">The library from which to take the tv shows to be displayed</param>
+        /// <param name="mediaFactory">The factory for creating new instances of type <see cref="IMediaEntity"/></param>
+        /// <param name="searchEntity">The advanced search entity that initiated the navigation</param>
+        /// <returns>An IEnumerable of media items representing the tv shows containing the <paramref name="searchEntity"/></returns>
+        IEnumerable<IMediaEntity> NavigateToTvShowSearchResult(IMediaLibrary mediaLibrary, Func<IMediaEntity> mediaFactory, AdvancedSearchResultEntity searchEntity);
+
+        /// <summary>
+        /// Navigates to the song media list from a song advanced search result
+        /// </summary>
+        /// <param name="mediaLibrary">The library from which to take the songs to be displayed</param>
+        /// <param name="mediaFactory">The factory for creating new instances of type <see cref="IMediaEntity"/></param>
+        /// <param name="searchEntity">The advanced search entity that initiated the navigation</param>
+        /// <returns>An IEnumerable of media items representing the songs containing the <paramref name="searchEntity"/></returns>
+        IEnumerable<IMediaEntity> NavigateToSongSearchResult(IMediaLibrary mediaLibrary, Func<IMediaEntity> mediaFactory, AdvancedSearchResultEntity searchEntity);
+
+        /// <summary>
+        /// Navigates to the album media list from an album advanced search result
+        /// </summary>
+        /// <param name="mediaLibrary">The library from which to take the albums to be displayed</param>
+        /// <param name="mediaFactory">The factory for creating new instances of type <see cref="IMediaEntity"/></param>
+        /// <param name="searchEntity">The advanced search entity that initiated the navigation</param>
+        /// <returns>An IEnumerable of media items representing the albums containing the <paramref name="searchEntity"/></returns>
+        IEnumerable<IMediaEntity> NavigateToAlbumSearchResult(IMediaLibrary mediaLibrary, Func<IMediaEntity> mediaFactory, AdvancedSearchResultEntity searchEntity);
+
+        /// <summary>
+        /// Navigates to the artist media list from an artist advanced search result
+        /// </summary>
+        /// <param name="mediaLibrary">The library from which to take the artists to be displayed</param>
+        /// <param name="mediaFactory">The factory for creating new instances of type <see cref="IMediaEntity"/></param>
+        /// <param name="searchEntity">The advanced search entity that initiated the navigation</param>
+        /// <returns>An IEnumerable of media items representing the artists containing the <paramref name="searchEntity"/></returns>
+        IEnumerable<IMediaEntity> NavigateToArtistSearchResult(IMediaLibrary mediaLibrary, Func<IMediaEntity> mediaFactory, AdvancedSearchResultEntity searchEntity);
+
+        /// <summary>
+        /// Navigates to the movie media list from a movie advanced search result
+        /// </summary>
+        /// <param name="mediaLibrary">The library from which to take the movies to be displayed</param>
+        /// <param name="mediaFactory">The factory for creating new instances of type <see cref="IMediaEntity"/></param>
+        /// <param name="searchEntity">The advanced search entity that initiated the navigation</param>
+        /// <returns>An IEnumerable of media items representing the movies containing the <paramref name="searchEntity"/></returns>
+        IEnumerable<IMediaEntity> NavigateToMovieSearchResult(IMediaLibrary mediaLibrary, Func<IMediaEntity> mediaFactory, AdvancedSearchResultEntity searchEntity);
         #endregion
     }
 }

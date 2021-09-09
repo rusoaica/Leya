@@ -28,9 +28,8 @@ namespace Leya.Models.Common.Models.Media
         /// <returns>Custom string value showing relevant data for current class</returns>
         public override string ToString()
         {
-            return Id + " :: " + MediaName;
+            return MediaName;
         }
-
 
         /// <summary>
         /// Maps between this entity and the coresponding persistance entity

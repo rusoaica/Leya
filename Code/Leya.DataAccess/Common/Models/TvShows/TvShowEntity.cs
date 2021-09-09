@@ -23,13 +23,13 @@ namespace Leya.DataAccess.Common.Models.TvShows
         public int NumberOfEpisodes { get; set; }
         public int MediaTypeSourceId { get; set; }
         public string MPAA { get; set; }
+        public string Title { get; set; }
         public string ImDbId { get; set; }
         public string Studio { get; set; }
         public string Trailer { get; set; }
         public string TagLine { get; set; }
         public string Synopsis { get; set; }
-        public string TvShowTitle { get; set; }
-        public string TvShowNamedTitle { get; set; }
+        public string NamedTitle { get; set; }
         [IgnoreOnInsert]
         public TvShowRatingEntity[] Ratings { get; set; }
         [IgnoreOnInsert]
@@ -56,7 +56,7 @@ namespace Leya.DataAccess.Common.Models.TvShows
         /// <returns>Custom string value showing relevant data for current class</returns>
         public override string ToString()
         {
-            return Id + " :: " + TvShowTitle;
+            return Id + " :: " + Title;
         }
         #endregion  
     }

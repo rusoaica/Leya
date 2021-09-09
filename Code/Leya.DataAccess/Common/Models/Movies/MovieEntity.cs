@@ -20,25 +20,25 @@ namespace Leya.DataAccess.Common.Models.Movies
         public int MediaTypeSourceId { get; set; }
         public string Set { get; set; }
         public string MPAA { get; set; }
+        public string Title { get; set; }
         public string ImDbId { get; set; }
         public string Studio { get; set; }
         public string Trailer { get; set; }
         public string Tagline { get; set; }
         public string Synopsis { get; set; }
-        public string MovieTitle { get; set; }
         public string NamedTitle { get; set; }
         public string TvShowLink { get; set; }
         public string OriginalTitle { get; set; }
         [IgnoreOnInsert]
         public MovieRatingEntity[] Ratings { get; set; }
         [IgnoreOnInsert]
-        public MovieGenreEntity[] Genre { get; set; }
+        public MovieGenreEntity[] Genres { get; set; }
         [IgnoreOnInsert]
-        public MovieCountryEntity[] Country { get; set; }
+        public MovieCountryEntity[] Countries { get; set; }
         [IgnoreOnInsert]
         public MovieCreditEntity[] Credits { get; set; }
         [IgnoreOnInsert]
-        public MovieDirectorEntity[] Director { get; set; }
+        public MovieDirectorEntity[] Directors { get; set; }
         [IgnoreOnInsert]
         public MovieTagEntity[] Tags { get; set; }
         public bool IsEnded { get; set; }
@@ -62,7 +62,7 @@ namespace Leya.DataAccess.Common.Models.Movies
         /// <returns>Custom string value showing relevant data for current class</returns>
         public override string ToString()
         {
-            return Id + " :: " + MovieTitle;
+            return Id + " :: " + Title;
         }
         #endregion  
     }

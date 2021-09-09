@@ -15,6 +15,7 @@ using Leya.Models.Common.Models.Movies;
 using Leya.Models.Common.Models.TvShows;
 using Leya.Models.Common.Models.Artists;
 using Leya.Infrastructure.Miscellaneous;
+using Leya.Models.Common.Models.Common;
 #endregion
 
 namespace Leya.Models.Core.Navigation
@@ -134,18 +135,18 @@ namespace Leya.Models.Core.Navigation
             set { isTvShow = value; Notify(); }
         }
 
-        private bool isFanartVisible = false;
+        private bool isFanartVisible;
         public bool IsFanartVisible
         {
             get { return isFanartVisible; }
             set { isFanartVisible = value; Notify(); }
         }
 
-        private bool isWritersVisible;
-        public bool IsWritersVisible
+        private bool areWritersVisible;
+        public bool AreWritersVisible
         {
-            get { return isWritersVisible; }
-            set { isWritersVisible = value; Notify(); }
+            get { return areWritersVisible; }
+            set { areWritersVisible = value; Notify(); }
         }
 
         private bool isDirectorVisible;
@@ -155,11 +156,11 @@ namespace Leya.Models.Core.Navigation
             set { isDirectorVisible = value; Notify(); }
         }
 
-        private bool isNumberOfSeasonsVisible;
-        public bool IsNumberOfSeasonsVisible
+        private bool areNumberOfSeasonsVisible;
+        public bool AreNumberOfSeasonsVisible
         {
-            get { return isNumberOfSeasonsVisible; }
-            set { isNumberOfSeasonsVisible = value; Notify(); }
+            get { return areNumberOfSeasonsVisible; }
+            set { areNumberOfSeasonsVisible = value; Notify(); }
         }
 
         private bool isMediaCoverVisible = false;
@@ -174,6 +175,62 @@ namespace Leya.Models.Core.Navigation
         {
             get { return isBackNavigationPossible; }
             set { isBackNavigationPossible = value; Notify(); }
+        }
+
+        private bool isInterfaceOptionVisible = false;
+        public bool IsInterfaceOptionVisible
+        {
+            get { return isInterfaceOptionVisible; }
+            set { isInterfaceOptionVisible = value; Notify(); }
+        }
+
+        private bool isHelpButtonVisible;
+        public bool IsHelpButtonVisible
+        {
+            get { return isHelpButtonVisible; }
+            set { isHelpButtonVisible = value; Notify(); }
+        }
+
+        private bool isPlayerOptionVisible = false;
+        public bool IsPlayerOptionVisible
+        {
+            get { return isPlayerOptionVisible; }
+            set { isPlayerOptionVisible = value; Notify(); }
+        }
+
+        private bool isMediaTypesOptionVisible;
+        public bool IsMediaTypesOptionVisible
+        {
+            get { return isMediaTypesOptionVisible; }
+            set { isMediaTypesOptionVisible = value; Notify(); }
+        }
+
+        private bool isSearchContainerVisible;
+        public bool IsSearchContainerVisible
+        {
+            get { return isSearchContainerVisible; }
+            set { isSearchContainerVisible = value; Notify(); }
+        }
+
+        private bool isMediaContainerVisible;
+        public bool IsMediaContainerVisible
+        {
+            get { return isMediaContainerVisible; }
+            set { isMediaContainerVisible = value; Notify(); }
+        }
+
+        private bool areMediaTypeSourcesOptionVisible;
+        public bool AreMediaTypeSourcesOptionVisible
+        {
+            get { return areMediaTypeSourcesOptionVisible; }
+            set { areMediaTypeSourcesOptionVisible = value; Notify(); }
+        }
+
+        private bool isOptionsContainerVisible;
+        public bool IsOptionsContainerVisible
+        {
+            get { return isOptionsContainerVisible; }
+            set { isOptionsContainerVisible = value; Notify(); }
         }
 
         private TimeSpan runtime = TimeSpan.FromSeconds(0);
@@ -291,7 +348,7 @@ namespace Leya.Models.Core.Navigation
         /// </summary>
         /// <param name="mediaLibrary">The media library to be navigated</param>
         /// <param name="media">The element from which to navigate one level down</param>
-        public async Task NavigateDown(IMediaLibrary mediaLibrary, IMediaEntity media)
+        public async Task NavigateDownAsync(IMediaLibrary mediaLibrary, IMediaEntity media)
         {
             // when current navigation level is episode or movie or song, this is not further navigation, so play the media item
             if (CurrentNavigationLevel == NavigationLevel.Episode)
@@ -365,6 +422,33 @@ namespace Leya.Models.Core.Navigation
         }
 
         /// <summary>
+        /// Exits the interface options view and returns to the options list
+        /// </summary>
+        public void ExitInterfaceOptions()
+        {
+            IsInterfaceOptionVisible = false;
+            IsHelpButtonVisible = false;
+        }
+
+        /// <summary>
+        /// Exits the player options view and returns to the options list
+        /// </summary>
+        public void ExitPlayerOptions()
+        {
+            IsPlayerOptionVisible = false;
+            IsHelpButtonVisible = false;
+        }
+
+        /// <summary>
+        /// Exits the media types options list and returns to the options list
+        /// </summary>
+        public void ExitMediaTypesOptions()
+        {
+            IsMediaTypesOptionVisible = false;
+            IsHelpButtonVisible = false;
+        }
+
+        /// <summary>
         /// Gets the additional info for the tv show identified by <paramref name="tvShowId"/>
         /// </summary>
         /// <param name="mediaLibrary">The library containing the tv show whose details are get</param>
@@ -423,12 +507,12 @@ namespace Leya.Models.Core.Navigation
             SeasonEntity season = tvShow.Seasons.Where(s => s.Id == seasonId && s.TvShowId == tvShowId)
                                                 .First();
             // get the poster art for the season
-            Poster = LogoHelpers.GetPossibleImagePath(source.MediaSourcePath + @"\" + season.SeasonName);
+            Poster = LogoHelpers.GetPossibleImagePath(source.MediaSourcePath + @"\" + season.Title);
             // assign the rest of the tv show season info
             MPAA = string.Empty;
             Synopsis = season.Synopsis;
             Premiered = season.Premiered;
-            LocalPath = source.MediaSourcePath + @"\" + season.SeasonName;
+            LocalPath = source.MediaSourcePath + @"\" + season.Title;
             NumberOfEpisodes = mediaLibrary.Library.TvShows.SelectMany(t => t.Seasons)
                                                            .SelectMany(s => s.Episodes)
                                                            .Where(e => e.SeasonId == seasonId && e.TvShowId == tvShowId)
@@ -445,13 +529,13 @@ namespace Leya.Models.Core.Navigation
         }
 
         /// <summary>
-        /// Gets the additional info for the tv show episode identified by <paramref name="episodeName"/>
+        /// Gets the additional info for the tv show episode identified by <paramref name="episodeTitle"/>
         /// </summary>
         /// <param name="mediaLibrary">The library containing the tv show containing the episode whose details are get</param>
         /// <param name="tvShowId">The id of the tv show containing the episode whose details are get</param>
         /// <param name="seasonId">The id of the season containing the episode whose details are get</param>
-        /// <param name="episodeName">The name of the episode whose details are get</param>
-        public void GetEpisodeMediaInfo(IMediaLibrary mediaLibrary, int tvShowId, int seasonId, string episodeName)
+        /// <param name="episodeTitle">The name of the episode whose details are get</param>
+        public void GetEpisodeMediaInfo(IMediaLibrary mediaLibrary, int tvShowId, int seasonId, string episodeTitle)
         {
             // get the tv show from the selected media
             TvShowEntity tvShow = mediaLibrary.Library.TvShows.Where(t => t.Id == tvShowId)
@@ -463,12 +547,12 @@ namespace Leya.Models.Core.Navigation
             // get the episode of the tv show from the selected media
             EpisodeEntity episode = mediaLibrary.Library.TvShows.SelectMany(t => t.Seasons)
                                                                 .SelectMany(s => s.Episodes)
-                                                                .Where(e => e.TvShowId == tvShowId && e.SeasonId == seasonId && e.Title == episodeName)
+                                                                .Where(e => e.TvShowId == tvShowId && e.SeasonId == seasonId && e.Title == episodeTitle)
                                                                 .FirstOrDefault();
             // get the poster art for the episode
             string fanart = source.MediaSourcePath + @"\" + mediaLibrary.Library.TvShows.SelectMany(t => t.Seasons)
                                                                                         .Where(s => s.Id == episode.SeasonId)
-                                                                                        .First().SeasonName + @"\" + episode.NamedTitle.Substring(0, episode.NamedTitle.LastIndexOf("."));
+                                                                                        .First().Title + @"\" + episode.NamedTitle.Substring(0, episode.NamedTitle.LastIndexOf("."));
             Fanart = LogoHelpers.GetPossibleImagePath(fanart);
             // assign the rest of the tv show episode info
             MPAA = episode.MPAA;
@@ -512,9 +596,9 @@ namespace Leya.Models.Core.Navigation
             LocalPath = source.MediaSourcePath;
             Runtime = TimeSpan.FromSeconds(movie.Runtime);
             CurrentStatus = movie.IsEnded ? "Ended" : "Ongoing";
-            Genre = string.Join(" / ", movie.Genre.Select(g => g.Genre) ?? Enumerable.Empty<string>());
+            Genre = string.Join(" / ", movie.Genres.Select(g => g.Genre) ?? Enumerable.Empty<string>());
             Writers = string.Join(", ", movie.Credits.Select(c => c.Credit) ?? Enumerable.Empty<string>());
-            Director = string.Join(", ", movie.Director.Select(d => d.Director) ?? Enumerable.Empty<string>());
+            Director = string.Join(", ", movie.Directors.Select(d => d.Director) ?? Enumerable.Empty<string>());
             Runtime = TimeSpan.FromSeconds(mediaLibrary.Library.Movies.Sum(m => m.Runtime));
             SetMovieDisplayedElements();
         }
@@ -601,13 +685,13 @@ namespace Leya.Models.Core.Navigation
         }
 
         /// <summary>
-        /// Gets the additional info for the artist song identified by <paramref name="songName"/>
+        /// Gets the additional info for the artist song identified by <paramref name="songTitle"/>
         /// </summary>
         /// <param name="mediaLibrary">The library containing the artist containing the song whose details are get</param>
         /// <param name="artistId">The id of the artist containing the song whose details are get</param>
         /// <param name="albumId">The id of the album containing the song whose details are get</param>
-        /// <param name="songName">The name of the song whose details are get</param>
-        public void GetSongMediaInfo(IMediaLibrary mediaLibrary, int artistId, int albumId, string songName)
+        /// <param name="songTitle">The name of the song whose details are get</param>
+        public void GetSongMediaInfo(IMediaLibrary mediaLibrary, int artistId, int albumId, string songTitle)
         {
             // get the artist from the selected media
             ArtistEntity artist = mediaLibrary.Library.Artists.Where(a => a.Id == artistId)
@@ -619,7 +703,7 @@ namespace Leya.Models.Core.Navigation
             // get the song from the selected media
             SongEntity song = mediaLibrary.Library.Artists.SelectMany(a => a.Albums)
                                                           .SelectMany(a => a.Songs)
-                                                          .Where(s => s.ArtistId == artistId && s.AlbumId == albumId && s.Title == songName)
+                                                          .Where(s => s.ArtistId == artistId && s.AlbumId == albumId && s.Title == songTitle)
                                                           .FirstOrDefault();
             // get the poster art for the song
             string fanart = source.MediaSourcePath + @"\" + mediaLibrary.Library.Artists.SelectMany(a => a.Albums)
@@ -639,17 +723,16 @@ namespace Leya.Models.Core.Navigation
         /// Gets the list of tv shows to be displayed in the navigation list
         /// </summary>
         /// <param name="mediaLibrary">The library from which to take the tv shows to be displayed</param>
-        public IEnumerable<IMediaEntity> GetTvShowsNavigationList(IMediaLibrary mediaLibrary, Func<IMediaEntity> mediaFactory)
+        public IEnumerable<IMediaEntity> GetTvShowsNavigationList(IMediaLibrary mediaLibrary, Func<IMediaEntity> mediaFactory, string mediaName = null)
         {
-            int mediaTypeId = mediaLibrary.Library.MediaTypes.Where(mt => mt.MediaName == currentMediaName).First().Id;
-            List<IMediaEntity> temp = new List<IMediaEntity>();
+            int mediaTypeId = mediaLibrary.Library.MediaTypes.Where(mt => mt.MediaName == (mediaName ?? currentMediaName)).First().Id;
             int count = 0;
             foreach (TvShowEntity tvShow in mediaLibrary.Library.TvShows.Where(t => t.MediaTypeId == mediaTypeId))
             {
                 IMediaEntity media = mediaFactory.Invoke();
                 media.Id = tvShow.Id;
                 media.Index = ++count;
-                media.MediaName = tvShow.TvShowTitle;
+                media.MediaName = tvShow.Title;
                 media.IsWatched = tvShow.IsWatched;
                 media.IsFavorite = tvShow.IsFavorite;
                 media.Year = tvShow.Aired.Year;
@@ -672,7 +755,7 @@ namespace Leya.Models.Core.Navigation
                 IMediaEntity media = mediaFactory.Invoke();
                 media.Id = season.TvShowId;
                 media.Index = ++count;
-                media.MediaName = season.SeasonName;
+                media.MediaName = season.Title;
                 media.IsWatched = season.IsWatched;
                 media.IsFavorite = season.IsFavorite;
                 media.Year = season.Year;
@@ -692,7 +775,7 @@ namespace Leya.Models.Core.Navigation
             {
                 IMediaEntity media = mediaFactory.Invoke();
                 media.Id = season.TvShowId;
-                media.MediaName = season.SeasonName;
+                media.MediaName = season.Title;
                 media.IsWatched = season.IsWatched;
                 media.IsFavorite = season.IsFavorite;
                 media.Year = season.Year;
@@ -732,9 +815,9 @@ namespace Leya.Models.Core.Navigation
         /// Gets the list of movies to be displayed in the navigation list
         /// </summary>
         /// <param name="mediaLibrary">The library from which to take the movies to be displayed</param>
-        public IEnumerable<IMediaEntity> GetMoviesNavigationList(IMediaLibrary mediaLibrary, Func<IMediaEntity> mediaFactory)
+        public IEnumerable<IMediaEntity> GetMoviesNavigationList(IMediaLibrary mediaLibrary, Func<IMediaEntity> mediaFactory, string mediaName = null)
         {
-            int mediaTypeId = mediaLibrary.Library.MediaTypes.Where(mt => mt.MediaName == currentMediaName).First().Id;
+            int mediaTypeId = mediaLibrary.Library.MediaTypes.Where(mt => mt.MediaName == (mediaName ?? currentMediaName)).First().Id;
             List<IMediaEntity> temp = new List<IMediaEntity>();
             int count = 0;
             foreach (MovieEntity movie in mediaLibrary.Library.Movies.Where(t => t.MediaTypeId == mediaTypeId))
@@ -742,7 +825,7 @@ namespace Leya.Models.Core.Navigation
                 IMediaEntity media = mediaFactory.Invoke();
                 media.Id = movie.Id;
                 media.Index = ++count;
-                media.MediaName = movie.MovieTitle;
+                media.MediaName = movie.Title;
                 media.IsWatched = movie.IsWatched;
                 media.IsFavorite = movie.IsFavorite;
                 media.Year = movie.Premiered.Year;
@@ -756,16 +839,16 @@ namespace Leya.Models.Core.Navigation
         /// Gets the list of artists to be displayed in the navigation list
         /// </summary>
         /// <param name="mediaLibrary">The library from which to take the artists to be displayed</param>
-        public IEnumerable<IMediaEntity> GetArtistsNavigationList(IMediaLibrary mediaLibrary, Func<IMediaEntity> mediaFactory)
+        public IEnumerable<IMediaEntity> GetArtistsNavigationList(IMediaLibrary mediaLibrary, Func<IMediaEntity> mediaFactory, string mediaName = null)
         {
-            int mediaTypeId = mediaLibrary.Library.MediaTypes.Where(mt => mt.MediaName == currentMediaName).First().Id;
+            int mediaTypeId = mediaLibrary.Library.MediaTypes.Where(mt => mt.MediaName == (mediaName ?? currentMediaName)).First().Id;
             int count = 0;
             foreach (ArtistEntity artist in mediaLibrary.Library.Artists.Where(a => a.MediaTypeId == mediaTypeId))
             {
                 IMediaEntity media = mediaFactory.Invoke();
                 media.Id = artist.Id;
                 media.Index = ++count;
-                media.MediaName = artist.ArtistName;
+                media.MediaName = artist.Title;
                 media.IsWatched = artist.IsListened;
                 media.IsFavorite = artist.IsFavorite;
                 media.Year = artist.Formed.Year;
@@ -843,15 +926,218 @@ namespace Leya.Models.Core.Navigation
         }
 
         /// <summary>
+        /// Navigates to the episode media list from an episode advanced search result
+        /// </summary>
+        /// <param name="mediaLibrary">The library from which to take the episodes to be displayed</param>
+        /// <param name="mediaFactory">The factory for creating new instances of type <see cref="IMediaEntity"/></param>
+        /// <param name="searchEntity">The advanced search entity that initiated the navigation</param>
+        /// <returns>An IEnumerable of media items representing the episodes containing the <paramref name="searchEntity"/></returns>
+        public IEnumerable<IMediaEntity> NavigateToEpisodeSearchResult(IMediaLibrary mediaLibrary, Func<IMediaEntity> mediaFactory, AdvancedSearchResultEntity searchEntity)
+        {
+            CurrentNavigationLevel = NavigationLevel.Episode;
+            // get the episode from the media library with an id and title similar to the searched entity
+            var episode = mediaLibrary.Library.TvShows.SelectMany(t => t.Seasons)
+                                                      .SelectMany(s => s.Episodes)
+                                                      .Where(e => e.Id == searchEntity.Id && e.Title == searchEntity.MediaTitle)
+                                                      .FirstOrDefault();
+            // get the season of the above episode
+            var season = mediaLibrary.Library.TvShows.SelectMany(t => t.Seasons)
+                                                     .Where(s => s.Episodes.Where(e => e.Id == episode.Id)
+                                                                           .Count() > 0)
+                                                     .FirstOrDefault();
+            // get the tv show of the above season
+            var tvshow = mediaLibrary.Library.TvShows.Where(t => t.Seasons.Where(s => s.Id == season.Id)
+                                                                          .Count() > 0)
+                                                     .FirstOrDefault();
+            // get the media type of the above tv show
+            MediaTypeEntity mediaType = mediaLibrary.Library.MediaTypes.Where(mt => mt.Id == tvshow.MediaTypeId)
+                                                                       .FirstOrDefault();
+            currentMediaName = mediaType.MediaName;
+            // update the displayed elements for tv show episodes
+            GetTvShowMediaInfo(mediaLibrary, tvshow.Id);
+            GetSeasonMediaInfo(mediaLibrary, tvshow.Id, season.Id);
+            GetEpisodeMediaInfo(mediaLibrary, tvshow.Id, season.Id, episode.Title);
+            // return the media navigation list containing the searched episode
+            IMediaEntity mediaEntity = mediaFactory.Invoke();
+            mediaEntity.SeasonOrAlbumId = season.Id;
+            mediaEntity.Id = tvshow.Id;
+            mediaEntity.Year = season.Year;
+            return GetEpisodesNavigationList(mediaLibrary, mediaEntity, mediaFactory);
+        }
+
+        /// <summary>
+        /// Navigates to the season media list from a season advanced search result
+        /// </summary>
+        /// <param name="mediaLibrary">The library from which to take the seasons to be displayed</param>
+        /// <param name="mediaFactory">The factory for creating new instances of type <see cref="IMediaEntity"/></param>
+        /// <param name="searchEntity">The advanced search entity that initiated the navigation</param>
+        /// <returns>An IEnumerable of media items representing the seasons containing the <paramref name="searchEntity"/></returns>
+        public IEnumerable<IMediaEntity> NavigateToSeasonSearchResult(IMediaLibrary mediaLibrary, Func<IMediaEntity> mediaFactory, AdvancedSearchResultEntity searchEntity)
+        {
+            CurrentNavigationLevel = NavigationLevel.Season;
+            // get the season from the media library with an id and title similar to the searched entity
+            var season = mediaLibrary.Library.TvShows.SelectMany(t => t.Seasons)
+                                                     .Where(s => s.Id == searchEntity.Id && s.Title == searchEntity.MediaTitle)
+                                                     .FirstOrDefault();
+            // get the tv show of the above season
+            var tvshow = mediaLibrary.Library.TvShows.Where(t => t.Seasons.Where(s => s.Id == season.Id)
+                                                                          .Count() > 0)
+                                                     .FirstOrDefault();
+            // get the media type of the above tv show
+            MediaTypeEntity mediaType = mediaLibrary.Library.MediaTypes.Where(mt => mt.Id == tvshow.MediaTypeId)
+                                                                       .FirstOrDefault();
+            currentMediaName = mediaType.MediaName;
+            // update the displayed elements for tv show 
+            GetTvShowMediaInfo(mediaLibrary, tvshow.Id);
+            // return the media navigation list containing the searched season
+            IMediaEntity mediaEntity = mediaFactory.Invoke();
+            mediaEntity.Id = tvshow.Id;
+            return GetSeasonsNavigationListFromEpisode(mediaLibrary, mediaEntity, mediaFactory);
+        }
+
+        /// <summary>
+        /// Navigates to the tv show media list from a tv show advanced search result
+        /// </summary>
+        /// <param name="mediaLibrary">The library from which to take the tv shows to be displayed</param>
+        /// <param name="mediaFactory">The factory for creating new instances of type <see cref="IMediaEntity"/></param>
+        /// <param name="searchEntity">The advanced search entity that initiated the navigation</param>
+        /// <returns>An IEnumerable of media items representing the tv shows containing the <paramref name="searchEntity"/></returns>
+        public IEnumerable<IMediaEntity> NavigateToTvShowSearchResult(IMediaLibrary mediaLibrary, Func<IMediaEntity> mediaFactory, AdvancedSearchResultEntity searchEntity)
+        {
+            CurrentNavigationLevel = NavigationLevel.TvShow;
+            // get the tv show from the media library with an id and title similar to the searched entity
+            var tvshow = mediaLibrary.Library.TvShows.Where(t => t.Id == searchEntity.Id)
+                                                     .FirstOrDefault();
+            // get the media type of the above tv show
+            MediaTypeEntity mediaType = mediaLibrary.Library.MediaTypes.Where(mt => mt.Id == tvshow.MediaTypeId)
+                                                                       .FirstOrDefault();
+            currentMediaName = mediaType.MediaName;
+            // return the media navigation list containing the searched tv show
+            return GetTvShowsNavigationList(mediaLibrary, mediaFactory, mediaType.MediaName);
+        }
+
+        /// <summary>
+        /// Navigates to the song media list from a song advanced search result
+        /// </summary>
+        /// <param name="mediaLibrary">The library from which to take the songs to be displayed</param>
+        /// <param name="mediaFactory">The factory for creating new instances of type <see cref="IMediaEntity"/></param>
+        /// <param name="searchEntity">The advanced search entity that initiated the navigation</param>
+        /// <returns>An IEnumerable of media items representing the songs containing the <paramref name="searchEntity"/></returns>
+        public IEnumerable<IMediaEntity> NavigateToSongSearchResult(IMediaLibrary mediaLibrary, Func<IMediaEntity> mediaFactory, AdvancedSearchResultEntity searchEntity)
+        {
+            CurrentNavigationLevel = NavigationLevel.Song;
+            // get the song from the media library with an id and title similar to the searched entity
+            var song = mediaLibrary.Library.Artists.SelectMany(t => t.Albums)
+                                                   .SelectMany(s => s.Songs)
+                                                   .Where(e => e.Id == searchEntity.Id && e.Title == searchEntity.MediaTitle)
+                                                   .FirstOrDefault();
+            // get the album of the above song
+            var album = mediaLibrary.Library.Artists.SelectMany(t => t.Albums)
+                                                    .Where(s => s.Songs.Where(e => e.Id == song.Id)
+                                                                       .Count() > 0)
+                                                    .FirstOrDefault();
+            // get the artist of the above album
+            var artist = mediaLibrary.Library.Artists.Where(t => t.Albums.Where(s => s.Id == album.Id)
+                                                                         .Count() > 0)
+                                                     .FirstOrDefault();
+            // get the media type of the above artist
+            MediaTypeEntity mediaType = mediaLibrary.Library.MediaTypes.Where(mt => mt.Id == artist.MediaTypeId)
+                                                                       .FirstOrDefault();
+            currentMediaName = mediaType.MediaName;
+            // update the displayed elements for artist songs
+            GetArtistMediaInfo(mediaLibrary, artist.Id);
+            GetAlbumMediaInfo(mediaLibrary, artist.Id, album.Id);
+            GetSongMediaInfo(mediaLibrary, artist.Id, album.Id, song.Title);
+            // return the media navigation list containing the searched song
+            IMediaEntity mediaEntity = mediaFactory.Invoke();
+            mediaEntity.SeasonOrAlbumId = album.Id;
+            mediaEntity.Id = artist.Id;
+            mediaEntity.Year = album.Year;
+            return GetSongsNavigationList(mediaLibrary, mediaEntity, mediaFactory);
+        }
+
+        /// <summary>
+        /// Navigates to the album media list from an album advanced search result
+        /// </summary>
+        /// <param name="mediaLibrary">The library from which to take the albums to be displayed</param>
+        /// <param name="mediaFactory">The factory for creating new instances of type <see cref="IMediaEntity"/></param>
+        /// <param name="searchEntity">The advanced search entity that initiated the navigation</param>
+        /// <returns>An IEnumerable of media items representing the albums containing the <paramref name="searchEntity"/></returns>
+        public IEnumerable<IMediaEntity> NavigateToAlbumSearchResult(IMediaLibrary mediaLibrary, Func<IMediaEntity> mediaFactory, AdvancedSearchResultEntity searchEntity)
+        {
+            CurrentNavigationLevel = NavigationLevel.Album;
+            // get the album from the media library with an id and title similar to the searched entity
+            var album = mediaLibrary.Library.Artists.SelectMany(t => t.Albums)
+                                                    .Where(s => s.Id == searchEntity.Id && s.Title == searchEntity.MediaTitle)
+                                                    .FirstOrDefault();
+            // get the artist of the above album
+            var artist = mediaLibrary.Library.Artists.Where(t => t.Albums.Where(s => s.Id == album.Id)
+                                                                         .Count() > 0)
+                                                     .FirstOrDefault();
+            // get the media type of the above artist
+            MediaTypeEntity mediaType = mediaLibrary.Library.MediaTypes.Where(mt => mt.Id == artist.MediaTypeId)
+                                                                       .FirstOrDefault();
+            currentMediaName = mediaType.MediaName;
+            // update the displayed elements for artist
+            GetArtistMediaInfo(mediaLibrary, artist.Id);
+            // return the media navigation list containing the searched album
+            IMediaEntity mediaEntity = mediaFactory.Invoke();
+            mediaEntity.Id = artist.Id;
+            return GetAlbumsNavigationListFromSong(mediaLibrary, mediaEntity, mediaFactory);
+        }
+
+        /// <summary>
+        /// Navigates to the artist media list from an artist advanced search result
+        /// </summary>
+        /// <param name="mediaLibrary">The library from which to take the artists to be displayed</param>
+        /// <param name="mediaFactory">The factory for creating new instances of type <see cref="IMediaEntity"/></param>
+        /// <param name="searchEntity">The advanced search entity that initiated the navigation</param>
+        /// <returns>An IEnumerable of media items representing the artists containing the <paramref name="searchEntity"/></returns>
+        public IEnumerable<IMediaEntity> NavigateToArtistSearchResult(IMediaLibrary mediaLibrary, Func<IMediaEntity> mediaFactory, AdvancedSearchResultEntity searchEntity)
+        {
+            CurrentNavigationLevel = NavigationLevel.Artist;
+            // get the artist from the media library with an id and title similar to the searched entity
+            var artist = mediaLibrary.Library.Artists.Where(t => t.Id == searchEntity.Id)
+                                                     .FirstOrDefault();
+            // get the media type of the above artist
+            MediaTypeEntity mediaType = mediaLibrary.Library.MediaTypes.Where(mt => mt.Id == artist.MediaTypeId)
+                                                                       .FirstOrDefault();
+            currentMediaName = mediaType.MediaName;
+            // return the media navigation list containing the searched artist
+            return GetArtistsNavigationList(mediaLibrary, mediaFactory, mediaType.MediaName);
+        }
+
+        /// <summary>
+        /// Navigates to the movie media list from a movie advanced search result
+        /// </summary>
+        /// <param name="mediaLibrary">The library from which to take the movies to be displayed</param>
+        /// <param name="mediaFactory">The factory for creating new instances of type <see cref="IMediaEntity"/></param>
+        /// <param name="searchEntity">The advanced search entity that initiated the navigation</param>
+        /// <returns>An IEnumerable of media items representing the movies containing the <paramref name="searchEntity"/></returns>
+        public IEnumerable<IMediaEntity> NavigateToMovieSearchResult(IMediaLibrary mediaLibrary, Func<IMediaEntity> mediaFactory, AdvancedSearchResultEntity searchEntity)
+        {
+            CurrentNavigationLevel = NavigationLevel.Movie;
+            // get the movie from the media library with an id and title similar to the searched entity
+            var movie = mediaLibrary.Library.Movies.Where(t => t.Id == searchEntity.Id)
+                                                   .FirstOrDefault();
+            // get the media type of the above movie
+            MediaTypeEntity mediaType = mediaLibrary.Library.MediaTypes.Where(mt => mt.Id == movie.MediaTypeId)
+                                                                       .FirstOrDefault();
+            currentMediaName = mediaType.MediaName;
+            // return the media navigation list containing the searched movie
+            return GetMoviesNavigationList(mediaLibrary, mediaFactory, mediaType.MediaName);
+        }
+
+        /// <summary>
         /// Updates the displayed elements for tv shows or artists
         /// </summary>
         private void SetTvShowOrArtistDisplayedElements()
         {
             IsTvShow = true;
             IsFanartVisible = true;
-            IsWritersVisible = false;
+            AreWritersVisible = false;
             IsDirectorVisible = false;
-            IsNumberOfSeasonsVisible = true;
+            AreNumberOfSeasonsVisible = true;
         }
 
         /// <summary>
@@ -860,9 +1146,9 @@ namespace Leya.Models.Core.Navigation
         private void SetSeasonOrAlbumDisplayedElements()
         {
             IsFanartVisible = false;
-            IsWritersVisible = false;
+            AreWritersVisible = false;
             IsDirectorVisible = false;
-            IsNumberOfSeasonsVisible = true;
+            AreNumberOfSeasonsVisible = true;
         }
 
         /// <summary>
@@ -871,9 +1157,9 @@ namespace Leya.Models.Core.Navigation
         private void SetEpisodeDisplayedElements()
         {
             IsFanartVisible = true;
-            IsWritersVisible = true;
+            AreWritersVisible = true;
             IsDirectorVisible = true;
-            IsNumberOfSeasonsVisible = false;
+            AreNumberOfSeasonsVisible = false;
         }
 
         /// <summary>
@@ -883,9 +1169,9 @@ namespace Leya.Models.Core.Navigation
         {
             IsTvShow = false;
             IsFanartVisible = true;
-            IsWritersVisible = true;
+            AreWritersVisible = true;
             IsDirectorVisible = true;
-            IsNumberOfSeasonsVisible = false;
+            AreNumberOfSeasonsVisible = false;
         }
 
         /// <summary>
@@ -894,9 +1180,9 @@ namespace Leya.Models.Core.Navigation
         private void SetSongDisplayedElements()
         {
             IsFanartVisible = true;
-            IsWritersVisible = false;
+            AreWritersVisible = false;
             IsDirectorVisible = false;
-            IsNumberOfSeasonsVisible = false;
+            AreNumberOfSeasonsVisible = false;
         }
 
         /// <summary>

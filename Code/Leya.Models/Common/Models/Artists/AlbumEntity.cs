@@ -1,10 +1,13 @@
 ﻿/// Written by: Yulia Danilova
 /// Creation Date: 09th of December, 2020
 /// Purpose: Data transfer object for the music artist's albums 
+#region ========================================================================= USING =====================================================================================
+using Leya.Models.Common.Models.Media;
+#endregion
 
 namespace Leya.Models.Common.Models.Artists
 {
-    public class AlbumEntity
+    public class AlbumEntity : IMedia
     {
         #region ================================================================ PROPERTIES =================================================================================
         public int Id { get; set; }

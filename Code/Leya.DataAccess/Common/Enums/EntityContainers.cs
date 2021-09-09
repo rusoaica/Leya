@@ -13,18 +13,18 @@ namespace Leya.DataAccess.Common.Enums
         BandMembers,                      // BandMembers
         EpisodeActors,                    // EpisodeActors
         EpisodeCredits,                   // EpisodeCredits
-        EpisodeGenre,                     // EpisodeGenre
+        EpisodeGenres,                    // EpisodeGenres
         EpisodeRatings,                   // EpisodeRatings
         Episodes,                         // Episodes
         MediaTypes,                       // MediaTypes
         MediaTypeSources,                 // MediaTypeSources
         MovieActors,                      // MovieActors
         MovieAudioInfo,                   // MovieAudioInfo
-        MovieCountry,                     // MovieCountry
+        MovieCountries,                   // MovieCountries
         MovieCredits,                     // MovieCredits
         MovieDirectors,                   // MovieDirectors
         MovieFileInfo,                    // MovieFileInfo
-        MovieGenre,                       // MovieGenre
+        MovieGenres,                      // MovieGenres
         MovieRatings,                     // MovieRatings
         MovieResume,                      // MovieResume
         Movies,                           // Movies
@@ -35,7 +35,7 @@ namespace Leya.DataAccess.Common.Enums
         Seasons,                          // Seasons
         Songs,                            // Songs
         TvShowActors,                     // TvShowActors
-        TvShowGenre,                      // TvShowGenre
+        TvShowGenres,                     // TvShowGenres
         TvShowRatings,                    // TvShowRatings
         TvShowResume,                     // TvShowResume
         TvShows,                          // TvShows

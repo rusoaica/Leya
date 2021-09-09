@@ -84,7 +84,7 @@ namespace Leya.DataAccess.Repositories.Artists
             dataAccess.OpenTransaction();
             // get the artists data
             ApiResponse<ArtistEntity> artists = await dataAccess.SelectAsync<ArtistEntity>(EntityContainers.Artists,
-                "Id, MediaTypeSourceId, MediaTypeId, ArtistNamedName, ArtistName, MusicBrainzArtistID, Formed, FormedIn, Biography, VideoClipLink, IsDisbanded, IsListened, Created, IsFavorite");
+                "Id, MediaTypeSourceId, MediaTypeId, NamedTitle, Title, MusicBrainzArtistID, Formed, FormedIn, Biography, VideoClipLink, IsDisbanded, IsListened, Created, IsFavorite");
             if (artists.Data != null)
             {
                 await Task.Run(async () =>
@@ -113,7 +113,7 @@ namespace Leya.DataAccess.Repositories.Artists
             dataAccess.OpenTransaction();
             // get the artist data
             ApiResponse<ArtistEntity> artist = await dataAccess.SelectAsync<ArtistEntity>(EntityContainers.Artists,
-                "Id, MediaTypeSourceId, MediaTypeId, ArtistNamedName, ArtistName, MusicBrainzArtistID, Formed, FormedIn, Biography, VideoClipLink, IsDisbanded, IsListened, Created, IsFavorite", new { MediaTypeSourceId = id });
+                "Id, MediaTypeSourceId, MediaTypeId, NamedTitle, Title, MusicBrainzArtistID, Formed, FormedIn, Biography, VideoClipLink, IsDisbanded, IsListened, Created, IsFavorite", new { MediaTypeSourceId = id });
             if (artist.Data != null)
             {
                 await Task.Run(async () =>
@@ -179,8 +179,8 @@ namespace Leya.DataAccess.Repositories.Artists
             ApiResponse artist = await dataAccess.UpdateAsync(EntityContainers.Artists,
                 "MediaTypeSourceId = '" + entity.MediaTypeSourceId +
                 "', MediaTypeId = '" + entity.MediaTypeId +
-                "', ArtistName = '" + entity.ArtistName +
-                "', ArtistNamedName = '" + entity.ArtistNamedName +
+                "', Title = '" + entity.Title +
+                "', NamedTitle = '" + entity.NamedTitle +
                 "', MusicBrainzArtistID = '" + entity.MusicBrainzArtistID +
                 "', Formed = '" + entity.Formed +
                 "', FormedIn = '" + entity.FormedIn +

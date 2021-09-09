@@ -4,7 +4,10 @@
 #region ========================================================================= USING =====================================================================================
 using System;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using Leya.Models.Core.Navigation;
 using Leya.Models.Common.Models.Media;
+using Leya.Models.Common.Models.Common;
 #endregion
 
 namespace Leya.Models.Core.MediaLibrary
@@ -19,7 +22,10 @@ namespace Leya.Models.Core.MediaLibrary
         #region ================================================================ PROPERTIES =================================================================================
         IMediaCast MediaCast { get; }
         IMediaState MediaState { get; }
+        IMediaStatistics MediaStatistics { get; }
+        IMediaLibraryNavigation Navigation { get; }
         MediaLibraryEntity Library { get; set; }
+        List<SearchEntity> SourceSearch { get; set; }
         #endregion
 
         #region ================================================================= METHODS ===================================================================================

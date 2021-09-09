@@ -42,13 +42,13 @@ namespace Leya.DataAccess.Repositories.TvShows
             ApiResponse deleteTvShows = await dataAccess.DeleteAsync(EntityContainers.TvShows);
             ApiResponse deleteEpisodes = await dataAccess.DeleteAsync(EntityContainers.Episodes);
             ApiResponse deleteTvShowRatings = await dataAccess.DeleteAsync(EntityContainers.TvShowRatings);
-            ApiResponse deleteTvShowGenres = await dataAccess.DeleteAsync(EntityContainers.TvShowGenre);
+            ApiResponse deleteTvShowGenres = await dataAccess.DeleteAsync(EntityContainers.TvShowGenres);
             ApiResponse deleteTvShowActors = await dataAccess.DeleteAsync(EntityContainers.TvShowActors);
             ApiResponse deleteSeasons = await dataAccess.DeleteAsync(EntityContainers.Seasons);
             ApiResponse deleteTvShowResume = await dataAccess.DeleteAsync(EntityContainers.TvShowResume);
             ApiResponse deleteEpisodeActors = await dataAccess.DeleteAsync(EntityContainers.EpisodeActors);
             ApiResponse deleteEpisodeCredits = await dataAccess.DeleteAsync(EntityContainers.EpisodeCredits);
-            ApiResponse deleteEpisodeGenres = await dataAccess.DeleteAsync(EntityContainers.EpisodeGenre);
+            ApiResponse deleteEpisodeGenres = await dataAccess.DeleteAsync(EntityContainers.EpisodeGenres);
             ApiResponse deleteEpisodeRatings = await dataAccess.DeleteAsync(EntityContainers.EpisodeRatings);
             dataAccess.CloseTransaction();
             // check if any of the queries resulted in an error
@@ -73,13 +73,13 @@ namespace Leya.DataAccess.Repositories.TvShows
             ApiResponse deleteTvShow = await dataAccess.DeleteAsync(EntityContainers.TvShows, new { Id = id });
             ApiResponse deleteEpisode = await dataAccess.DeleteAsync(EntityContainers.Episodes, new { TvShowId = id });
             ApiResponse deleteTvShowRating = await dataAccess.DeleteAsync(EntityContainers.TvShowRatings, new { TvShowId = id });
-            ApiResponse deleteTvShowGenre = await dataAccess.DeleteAsync(EntityContainers.TvShowGenre, new { TvShowId = id });
+            ApiResponse deleteTvShowGenre = await dataAccess.DeleteAsync(EntityContainers.TvShowGenres, new { TvShowId = id });
             ApiResponse deleteTvShowActors = await dataAccess.DeleteAsync(EntityContainers.TvShowActors, new { TvShowId = id });
             ApiResponse deleteSeasons = await dataAccess.DeleteAsync(EntityContainers.Seasons, new { TvShowId = id });
             ApiResponse deleteTvShowResume = await dataAccess.DeleteAsync(EntityContainers.TvShowResume, new { TvShowId = id }); 
             ApiResponse deleteEpisodeActors = await dataAccess.DeleteAsync(EntityContainers.EpisodeActors, new { EpisodeId = id });
             ApiResponse deleteEpisodeCredits = await dataAccess.DeleteAsync(EntityContainers.EpisodeCredits, new { EpisodeId = id });
-            ApiResponse deleteEpisodeGenres = await dataAccess.DeleteAsync(EntityContainers.EpisodeGenre, new { EpisodeId = id });
+            ApiResponse deleteEpisodeGenres = await dataAccess.DeleteAsync(EntityContainers.EpisodeGenres, new { EpisodeId = id });
             ApiResponse deleteEpisodeRatings = await dataAccess.DeleteAsync(EntityContainers.EpisodeRatings, new { EpisodeId = id });
             dataAccess.CloseTransaction();
             // check is any of the queries resulted in an error
@@ -101,7 +101,7 @@ namespace Leya.DataAccess.Repositories.TvShows
             dataAccess.OpenTransaction();
             // get the tv shows data
             ApiResponse<TvShowEntity> tvShows = await dataAccess.SelectAsync<TvShowEntity>(EntityContainers.TvShows,
-                "Id, MediaTypeSourceId, MediaTypeId, TvShowNamedTitle, TvShowTitle, NumberOfSeasons, NumberOfEpisodes, Synopsis, TagLine, Runtime, MPAA, " +
+                "Id, MediaTypeSourceId, MediaTypeId, NamedTitle, Title, NumberOfSeasons, NumberOfEpisodes, Synopsis, TagLine, Runtime, MPAA, " +
                 "LastPlayed, ImDbId, TvDbId, TmDbId, Aired, IsEnded, Trailer, Studio, IsWatched, IsFavorite, Created");
             if (tvShows.Data != null)
             {
@@ -111,9 +111,9 @@ namespace Leya.DataAccess.Repositories.TvShows
                     {
                         // get the data associated with the tv show
                         tvShows.Data[i].Ratings = (await dataAccess.SelectAsync<TvShowRatingEntity>(EntityContainers.TvShowRatings, "Id, TvShowId, Name, Max, Value, Votes", new { TvShowId = tvShows.Data[i].Id })).Data;
-                        tvShows.Data[i].Genres = (await dataAccess.SelectAsync<TvShowGenreEntity>(EntityContainers.TvShowGenre, "Genre, TvShowId, Id", new { TvShowId = tvShows.Data[i].Id })).Data;
+                        tvShows.Data[i].Genres = (await dataAccess.SelectAsync<TvShowGenreEntity>(EntityContainers.TvShowGenres, "Genre, TvShowId, Id", new { TvShowId = tvShows.Data[i].Id })).Data;
                         tvShows.Data[i].Actors = (await dataAccess.SelectAsync<TvShowActorEntity>(EntityContainers.TvShowActors, "Id, TvShowId, Name, Role, `Order`, Thumb", new { TvShowId = tvShows.Data[i].Id })).Data;
-                        //tvShows.Data[i].Seasons = (await dataAccess.SelectAsync<SeasonEntity>(EntityContainers.Seasons, "Id, TvShowId, SeasonNumber, SeasonName, IsWatched, IsFavorite, Year, Synopsis, Premiered", new { TvShowId = tvShows.Data[i].Id })).Data;
+                        //tvShows.Data[i].Seasons = (await dataAccess.SelectAsync<SeasonEntity>(EntityContainers.Seasons, "Id, TvShowId, Number, Title, IsWatched, IsFavorite, Year, Synopsis, Premiered", new { TvShowId = tvShows.Data[i].Id })).Data;
                         tvShows.Data[i].Resume = (await dataAccess.SelectAsync<TvShowResumeEntity>(EntityContainers.TvShowResume, "TvShowId, SeasonId, EpisodeId, Position, Total", new { TvShowId = tvShows.Data[i].Id, SeasonId = 0, EpisodeId = 0 })).Data?[0];
                     }
                 });
@@ -132,7 +132,7 @@ namespace Leya.DataAccess.Repositories.TvShows
             // get the tv show data
             dataAccess.OpenTransaction();
             ApiResponse<TvShowEntity> output = await dataAccess.SelectAsync<TvShowEntity>(EntityContainers.TvShows,
-                "Id, MediaTypeSourceId, MediaTypeId, TvShowNamedTitle, TvShowTitle, NumberOfSeasons, NumberOfEpisodes, Synopsis, TagLine, Runtime, MPAA, " +
+                "Id, MediaTypeSourceId, MediaTypeId, NamedTitle, Title, NumberOfSeasons, NumberOfEpisodes, Synopsis, TagLine, Runtime, MPAA, " +
                 "LastPlayed, ImDbId, TvDbId, TmDbId, Aired, IsEnded, Trailer, Studio, IsWatched, IsFavorite, Created", new { Id = id });
             if (output.Data != null)
             {
@@ -140,9 +140,9 @@ namespace Leya.DataAccess.Repositories.TvShows
                 {
                     // get the data assoviated with the tv show
                     output.Data[0].Ratings = (await dataAccess.SelectAsync<TvShowRatingEntity>(EntityContainers.TvShowRatings, "Id, TvShowId, Name, Max, Value, Votes", new { TvShowId = output.Data[0].Id })).Data;
-                    output.Data[0].Genres = (await dataAccess.SelectAsync<TvShowGenreEntity>(EntityContainers.TvShowGenre, "Genre, TvShowId, Id", new { TvShowId = output.Data[0].Id })).Data;
+                    output.Data[0].Genres = (await dataAccess.SelectAsync<TvShowGenreEntity>(EntityContainers.TvShowGenres, "Genre, TvShowId, Id", new { TvShowId = output.Data[0].Id })).Data;
                     output.Data[0].Actors = (await dataAccess.SelectAsync<TvShowActorEntity>(EntityContainers.TvShowActors, "Id, TvShowId, Name, Role, `Order`, Thumb", new { TvShowId = output.Data[0].Id })).Data;
-                    //output.Data[0].Seasons = (await dataAccess.SelectAsync<SeasonEntity>(EntityContainers.Seasons, "Id, TvShowId, SeasonNumber, SeasonName, IsWatched, IsFavorite, Year, Synopsis, Premiered", new { TvShowId = _output.Data[0].Id })).Data;
+                    //output.Data[0].Seasons = (await dataAccess.SelectAsync<SeasonEntity>(EntityContainers.Seasons, "Id, TvShowId, Number, Title, IsWatched, IsFavorite, Year, Synopsis, Premiered", new { TvShowId = _output.Data[0].Id })).Data;
                     output.Data[0].Resume = (await dataAccess.SelectAsync<TvShowResumeEntity>(EntityContainers.TvShowResume, "TvShowId, SeasonId, EpisodeId, Position, Total", new { TvShowId = output.Data[0].Id, SeasonId = 0, EpisodeId = 0 })).Data?[0];
                 });
             }
@@ -175,7 +175,7 @@ namespace Leya.DataAccess.Repositories.TvShows
                     foreach (TvShowGenreEntity genre in entity?.Genres ?? Enumerable.Empty<object>())
                     {
                         genre.TvShowId = tvShow.Data[0].Id;
-                        await dataAccess.InsertAsync(EntityContainers.TvShowGenre, genre);
+                        await dataAccess.InsertAsync(EntityContainers.TvShowGenres, genre);
                     }
                     // insert the actors
                     foreach (TvShowActorEntity actor in entity?.Actors ?? Enumerable.Empty<object>())
@@ -216,8 +216,8 @@ namespace Leya.DataAccess.Repositories.TvShows
             ApiResponse tvShow = await dataAccess.UpdateAsync(EntityContainers.TvShows,
                 "MediaTypeSourceId = '" + entity.MediaTypeSourceId +
                 "', MediaTypeId = '" + entity.MediaTypeId +
-                "', TvShowTitle = '" + entity.TvShowTitle +
-                "', TvShowNamedTitle = '" + entity.TvShowNamedTitle +
+                "', Title = '" + entity.Title +
+                "', NamedTitle = '" + entity.NamedTitle +
                 "', NumberOfSeasons = '" + entity.NumberOfSeasons +
                 "', NumberOfEpisodes = '" + entity.NumberOfEpisodes +
                 "', Synopsis = '" + entity.Synopsis +
@@ -248,7 +248,7 @@ namespace Leya.DataAccess.Repositories.TvShows
                     "Id", "'" + rating.Id + "'"))?.Error ?? tvShow.Error;
                 }
                 foreach (TvShowGenreEntity genre in entity.Genres)
-                    tvShow.Error = (await dataAccess.UpdateAsync(EntityContainers.TvShowGenre, "Genre = '" + genre.Genre + "'", "Id", "'" + genre.Id + "'"))?.Error ?? tvShow.Error;
+                    tvShow.Error = (await dataAccess.UpdateAsync(EntityContainers.TvShowGenres, "Genre = '" + genre.Genre + "'", "Id", "'" + genre.Id + "'"))?.Error ?? tvShow.Error;
                 foreach (TvShowActorEntity actor in entity.Actors)
                 {
                     tvShow.Error = (await dataAccess.UpdateAsync(EntityContainers.TvShowActors,
@@ -262,8 +262,8 @@ namespace Leya.DataAccess.Repositories.TvShows
                 //{
                 //    tvShow.Error = (await dataAccess.UpdateAsync(EntityContainers.Seasons,
                 //    "Year = '" + season.Year +
-                //    "', SeasonNumber = '" + season.SeasonNumber +
-                //    "', SeasonName = '" + season.SeasonName +
+                //    "', Number = '" + season.Number +
+                //    "', Title = '" + season.Title +
                 //    "', IsWatched = '" + season.IsWatched +
                 //    "', IsFavorite = '" + season.IsFavorite +
                 //    "', Synopsis = '" + season.Synopsis +

@@ -17,6 +17,7 @@ using Leya.Models.Core.Movies;
 using Leya.Models.Core.Navigation;
 using Leya.Models.Core.Options;
 using Leya.Models.Core.Player;
+using Leya.Models.Core.Search;
 using Leya.Models.Core.Security;
 using Leya.Models.Core.TvShows;
 using Leya.ViewModels.Common.Clipboard;
@@ -166,6 +167,14 @@ namespace Leya.Views.Common.Configuration
 //#endif
                    .SingleInstance();
 
+            builder.RegisterType<Library>()
+                   .As<ILibrary>()
+//#if !DEBUG
+                   .EnableInterfaceInterceptors()
+                   .InterceptedBy(typeof(LoggerInterceptor))
+//#endif
+                   .SingleInstance();
+
             builder.RegisterType<MediaLibraryNavigation>()
                    .As<IMediaLibraryNavigation>()
 //#if !DEBUG
@@ -233,6 +242,14 @@ namespace Leya.Views.Common.Configuration
 
             builder.RegisterType<MediaStatistics>()
                    .As<IMediaStatistics>()
+//#if !DEBUG
+                   .EnableInterfaceInterceptors()
+                   .InterceptedBy(typeof(LoggerInterceptor))
+//#endif
+                   .SingleInstance();
+
+            builder.RegisterType<Search>()
+                   .As<ISearch>()
 //#if !DEBUG
                    .EnableInterfaceInterceptors()
                    .InterceptedBy(typeof(LoggerInterceptor))

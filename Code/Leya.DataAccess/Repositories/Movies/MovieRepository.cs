@@ -48,7 +48,7 @@ namespace Leya.DataAccess.Repositories.Movies
             ApiResponse deleteMovieVideoInfo = await dataAccess.DeleteAsync(EntityContainers.MovieVideoInfo);
             ApiResponse deleteMovieTags = await dataAccess.DeleteAsync(EntityContainers.MovieTags);
             ApiResponse deleteMovieSubtitles = await dataAccess.DeleteAsync(EntityContainers.MovieSubtitles);
-            ApiResponse deleteMovieCountries = await dataAccess.DeleteAsync(EntityContainers.MovieCountry);
+            ApiResponse deleteMovieCountries = await dataAccess.DeleteAsync(EntityContainers.MovieCountries);
             ApiResponse deleteMovieDirectors = await dataAccess.DeleteAsync(EntityContainers.MovieDirectors);
             dataAccess.CloseTransaction();
             // check is any of the queries resulted in an error
@@ -81,7 +81,7 @@ namespace Leya.DataAccess.Repositories.Movies
             ApiResponse deleteMovieVideoInfo = await dataAccess.DeleteAsync(EntityContainers.MovieVideoInfo, new { MovieId = id });
             ApiResponse deleteMovieTags = await dataAccess.DeleteAsync(EntityContainers.MovieTags, new { MovieId = id });
             ApiResponse deleteMovieSubtitles = await dataAccess.DeleteAsync(EntityContainers.MovieSubtitles, new { MovieId = id });
-            ApiResponse deleteMovieCountries = await dataAccess.DeleteAsync(EntityContainers.MovieCountry, new { MovieId = id });
+            ApiResponse deleteMovieCountries = await dataAccess.DeleteAsync(EntityContainers.MovieCountries, new { MovieId = id });
             ApiResponse deleteMovieDirectors = await dataAccess.DeleteAsync(EntityContainers.MovieDirectors, new { MovieId = id });
             dataAccess.CloseTransaction();
             // check is any of the queries resulted in an error
@@ -104,7 +104,7 @@ namespace Leya.DataAccess.Repositories.Movies
             dataAccess.OpenTransaction();
             // get the movie data
             ApiResponse<MovieEntity> movies = await dataAccess.SelectAsync<MovieEntity>(EntityContainers.Movies,
-                "Id, MediaTypeSourceId, MediaTypeId, MovieTitle, OriginalTitle, NamedTitle, Synopsis, TagLine, Runtime, MPAA, LastPlayed, ImDbId, " +
+                "Id, MediaTypeSourceId, MediaTypeId, Title, OriginalTitle, NamedTitle, Synopsis, TagLine, Runtime, MPAA, LastPlayed, ImDbId, " +
                 "TmDbId, `Set`, Premiered, IsEnded, Studio, Trailer, TvShowLink, IsWatched, IsFavorite, Created");
             if (movies.Data != null)
             {
@@ -114,10 +114,10 @@ namespace Leya.DataAccess.Repositories.Movies
                     {
                         // get the data associated with the movie
                         movies.Data[i].Ratings = (await dataAccess.SelectAsync<MovieRatingEntity>(EntityContainers.MovieRatings, "Id, MovieId, Name, Max, Value, Votes", new { MovieId = movies.Data[i].Id })).Data;
-                        movies.Data[i].Genre = (await dataAccess.SelectAsync<MovieGenreEntity>(EntityContainers.MovieGenre, "Genre, MovieId, Id", new { MovieId = movies.Data[i].Id })).Data;
-                        movies.Data[i].Country = (await dataAccess.SelectAsync<MovieCountryEntity>(EntityContainers.MovieCountry, "Country, MovieId, Id", new { MovieId = movies.Data[i].Id })).Data;
+                        movies.Data[i].Genres = (await dataAccess.SelectAsync<MovieGenreEntity>(EntityContainers.MovieGenres, "Genre, MovieId, Id", new { MovieId = movies.Data[i].Id })).Data;
+                        movies.Data[i].Countries = (await dataAccess.SelectAsync<MovieCountryEntity>(EntityContainers.MovieCountries, "Country, MovieId, Id", new { MovieId = movies.Data[i].Id })).Data;
                         movies.Data[i].Credits = (await dataAccess.SelectAsync<MovieCreditEntity>(EntityContainers.MovieCredits, "Credit, MovieId, Id", new { MovieId = movies.Data[i].Id })).Data;
-                        movies.Data[i].Director = (await dataAccess.SelectAsync<MovieDirectorEntity>(EntityContainers.MovieDirectors, "Director, MovieId, Id", new { MovieId = movies.Data[i].Id })).Data;
+                        movies.Data[i].Directors = (await dataAccess.SelectAsync<MovieDirectorEntity>(EntityContainers.MovieDirectors, "Director, MovieId, Id", new { MovieId = movies.Data[i].Id })).Data;
                         movies.Data[i].Tags = (await dataAccess.SelectAsync<MovieTagEntity>(EntityContainers.MovieTags, "Tag, MovieId, Id", new { MovieId = movies.Data[i].Id })).Data;
                         movies.Data[i].FileInfo = (await dataAccess.SelectAsync<FileInfoEntity>(EntityContainers.MovieFileInfo, "MovieId, Id", new { MovieId = movies.Data[i].Id })).Data[0];
                         movies.Data[i].FileInfo.StreamDetails = (await dataAccess.SelectAsync<StreamDetailEntity>(EntityContainers.MovieStreamDetails, "MovieId, Id", new { MovieId = movies.Data[i].Id })).Data[0];
@@ -143,7 +143,7 @@ namespace Leya.DataAccess.Repositories.Movies
             dataAccess.OpenTransaction();
             // get the movie data
             ApiResponse<MovieEntity> output = await dataAccess.SelectAsync<MovieEntity>(EntityContainers.Movies,
-                "Id, MediaTypeSourceId, MediaTypeId, MovieTitle, OriginalTitle, NamedTitle, Synopsis, TagLine, Runtime, MPAA, LastPlayed, ImDbId, " +
+                "Id, MediaTypeSourceId, MediaTypeId, Title, OriginalTitle, NamedTitle, Synopsis, TagLine, Runtime, MPAA, LastPlayed, ImDbId, " +
                 "TmDbId, Set, Premiered, IsEnded, Studio, Trailer, TvShowLink, IsWatched, IsFavorite, Created", new { MediaTypeSourceId = id });
             if (output.Data != null && output.Data.Length > 0)
             {
@@ -151,10 +151,10 @@ namespace Leya.DataAccess.Repositories.Movies
                 {
                     // get the data associated with the movie
                     output.Data[0].Ratings = (await dataAccess.SelectAsync<MovieRatingEntity>(EntityContainers.MovieRatings, "Id, MovieId, Name, Max, Value, Votes", new { MovieId = output.Data[0].Id })).Data;
-                    output.Data[0].Genre = (await dataAccess.SelectAsync<MovieGenreEntity>(EntityContainers.MovieGenre, "Genre, MovieId, Id", new { MovieId = output.Data[0].Id })).Data;
-                    output.Data[0].Country = (await dataAccess.SelectAsync<MovieCountryEntity>(EntityContainers.MovieCountry, "Country, MovieId, Id", new { MovieId = output.Data[0].Id })).Data;
+                    output.Data[0].Genres = (await dataAccess.SelectAsync<MovieGenreEntity>(EntityContainers.MovieGenres, "Genre, MovieId, Id", new { MovieId = output.Data[0].Id })).Data;
+                    output.Data[0].Countries = (await dataAccess.SelectAsync<MovieCountryEntity>(EntityContainers.MovieCountries, "Country, MovieId, Id", new { MovieId = output.Data[0].Id })).Data;
                     output.Data[0].Credits = (await dataAccess.SelectAsync<MovieCreditEntity>(EntityContainers.MovieCredits, "Credit, MovieId, Id", new { MovieId = output.Data[0].Id })).Data;
-                    output.Data[0].Director = (await dataAccess.SelectAsync<MovieDirectorEntity>(EntityContainers.MovieDirectors, "Director, MovieId, Id", new { MovieId = output.Data[0].Id })).Data;
+                    output.Data[0].Directors = (await dataAccess.SelectAsync<MovieDirectorEntity>(EntityContainers.MovieDirectors, "Director, MovieId, Id", new { MovieId = output.Data[0].Id })).Data;
                     output.Data[0].Tags = (await dataAccess.SelectAsync<MovieTagEntity>(EntityContainers.MovieTags, "Tag, MovieId, Id", new { MovieId = output.Data[0].Id })).Data;
                     output.Data[0].FileInfo = (await dataAccess.SelectAsync<FileInfoEntity>(EntityContainers.MovieFileInfo, "MovieId, Id", new { MovieId = output.Data[0].Id })).Data[0];
                     output.Data[0].FileInfo.StreamDetails = (await dataAccess.SelectAsync<StreamDetailEntity>(EntityContainers.MovieStreamDetails, "MovieId, Id", new { MovieId = output.Data[0].Id })).Data[0];
@@ -188,16 +188,16 @@ namespace Leya.DataAccess.Repositories.Movies
                     await dataAccess.InsertAsync(EntityContainers.MovieRatings, rating);
                 }
                 // insert the genre
-                foreach (MovieGenreEntity genre in entity.Genre)
+                foreach (MovieGenreEntity genre in entity.Genres)
                 {
                     genre.MovieId = movie.Data[0].Id;
-                    await dataAccess.InsertAsync(EntityContainers.MovieGenre, genre);
+                    await dataAccess.InsertAsync(EntityContainers.MovieGenres, genre);
                 }
                 // insert the country
-                foreach (MovieCountryEntity country in entity.Country)
+                foreach (MovieCountryEntity country in entity.Countries)
                 {
                     country.MovieId = movie.Data[0].Id;
-                    await dataAccess.InsertAsync(EntityContainers.MovieCountry, country);
+                    await dataAccess.InsertAsync(EntityContainers.MovieCountries, country);
                 }
                 // insert the credits
                 foreach (MovieCreditEntity credit in entity.Credits)
@@ -206,7 +206,7 @@ namespace Leya.DataAccess.Repositories.Movies
                     await dataAccess.InsertAsync(EntityContainers.MovieCredits, credit);
                 }
                 // insert the director
-                foreach (MovieDirectorEntity director in entity.Director)
+                foreach (MovieDirectorEntity director in entity.Directors)
                 {
                     director.MovieId = movie.Data[0].Id;
                     await dataAccess.InsertAsync(EntityContainers.MovieDirectors, director);
@@ -258,7 +258,7 @@ namespace Leya.DataAccess.Repositories.Movies
             ApiResponse movie = await dataAccess.UpdateAsync(EntityContainers.Movies,
                 "MediaTypeSourceId = '" + entity.MediaTypeSourceId +
                 "', MediaTypeId = '" + entity.MediaTypeId +
-                "', MovieTitle = '" + entity.MovieTitle +
+                "', Title = '" + entity.Title +
                 "', OriginalTitle = '" + entity.OriginalTitle +
                 "', NamedTitle = '" + entity.NamedTitle +
                 "', Synopsis = '" + entity.Synopsis +
@@ -289,13 +289,13 @@ namespace Leya.DataAccess.Repositories.Movies
                     "', Votes = '" + rating.Votes + "'",
                     "MovieId", "'" + entity.Id + "'");
                 }
-                foreach (MovieGenreEntity genre in entity.Genre)
-                    await dataAccess.UpdateAsync(EntityContainers.MovieGenre, "Genre = '" + genre.Genre + "'", "MovieId", "'" + entity.Id + "'");
-                foreach (MovieCountryEntity country in entity.Country)
-                    await dataAccess.UpdateAsync(EntityContainers.MovieCountry, "Country = '" + country.Country + "'", "MovieId", "'" + entity.Id + "'");
+                foreach (MovieGenreEntity genre in entity.Genres)
+                    await dataAccess.UpdateAsync(EntityContainers.MovieGenres, "Genre = '" + genre.Genre + "'", "MovieId", "'" + entity.Id + "'");
+                foreach (MovieCountryEntity country in entity.Countries)
+                    await dataAccess.UpdateAsync(EntityContainers.MovieCountries, "Country = '" + country.Country + "'", "MovieId", "'" + entity.Id + "'");
                 foreach (MovieCreditEntity credit in entity.Credits)
                     await dataAccess.UpdateAsync(EntityContainers.MovieCredits, "Credit = '" + credit.Credit + "'", "MovieId", "'" + entity.Id + "'");
-                foreach (MovieDirectorEntity director in entity.Director)
+                foreach (MovieDirectorEntity director in entity.Directors)
                     await dataAccess.UpdateAsync(EntityContainers.MovieDirectors, "Director = '" + director.Director + "'", "MovieId", "'" + entity.Id + "'");
                 foreach (MovieTagEntity tag in entity.Tags)
                     await dataAccess.UpdateAsync(EntityContainers.MovieDirectors, "Tag = '" + tag.Tag + "'", "MovieId", "'" + entity.Id + "'");

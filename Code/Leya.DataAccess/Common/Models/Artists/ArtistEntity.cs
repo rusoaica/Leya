@@ -19,9 +19,9 @@ namespace Leya.DataAccess.Common.Models.Artists
         public int MediaTypeSourceId { get; set; }
         public string FormedIn { get; set; }
         public string Biography { get; set; }
-        public string ArtistName { get; set; }
+        public string Title { get; set; }
+        public string NamedTitle { get; set; }
         public string VideoClipLink { get; set; }
-        public string ArtistNamedName { get; set; }
         public string MusicBrainzArtistID { get; set; }
         [IgnoreOnInsert]
         public ArtistTypeEntity[] Type { get; set; }
@@ -46,7 +46,7 @@ namespace Leya.DataAccess.Common.Models.Artists
         /// <returns>Custom string value showing relevant data for current class</returns>
         public override string ToString()
         {
-            return Id + " :: " + ArtistName;
+            return Id + " :: " + Title;
         }
         #endregion
     }

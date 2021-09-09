@@ -1,11 +1,14 @@
-﻿
-using Leya.Models.Common.Infrastructure;
-/// Written by: Yulia Danilova
+﻿/// Written by: Yulia Danilova
 /// Creation Date: 09th of December, 2020
 /// Purpose: Data transfer object for the songs 
+#region ========================================================================= USING =====================================================================================
+using Leya.Models.Common.Models.Media;
+using Leya.Models.Common.Infrastructure;
+#endregion
+
 namespace Leya.Models.Common.Models.Artists
 {
-    public class SongEntity
+    public class SongEntity : IMedia
     {
         #region ================================================================ PROPERTIES =================================================================================
         public int Id { get; set; }

@@ -2,13 +2,14 @@
 /// Creation Date: 09th of December, 2020
 /// Purpose: Data transfer object for the music artists
 #region ========================================================================= USING =====================================================================================
-using Leya.Models.Common.Infrastructure;
 using System;
+using Leya.Models.Common.Models.Media;
+using Leya.Models.Common.Infrastructure;
 #endregion
 
 namespace Leya.Models.Common.Models.Artists
 {
-    public class ArtistEntity
+    public class ArtistEntity : IMedia
     {
         #region ================================================================ PROPERTIES =================================================================================
         public int Id { get; set; }
@@ -16,9 +17,9 @@ namespace Leya.Models.Common.Models.Artists
         public int MediaTypeSourceId { get; set; }
         public string FormedIn { get; set; }
         public string Biography { get; set; }
-        public string ArtistName { get; set; }
+        public string Title { get; set; }
+        public string NamedTitle { get; set; }
         public string VideoClipLink { get; set; }
-        public string ArtistNamedName { get; set; }
         public string MusicBrainzArtistID { get; set; }
         public bool? IsListened { get; set; }
         public bool IsFavorite { get; set; }
@@ -38,7 +39,7 @@ namespace Leya.Models.Common.Models.Artists
         /// <returns>Custom string value showing relevant data for current class</returns>
         public override string ToString()
         {
-            return Id + " :: " + ArtistName;
+            return Id + " :: " + Title;
         }
 
         /// <summary>
