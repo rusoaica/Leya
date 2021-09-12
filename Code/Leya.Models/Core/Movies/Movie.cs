@@ -3,14 +3,14 @@
 /// Purpose: Business model for movies
 #region ========================================================================= USING =====================================================================================
 using System;
+using System.IO;
 using Leya.DataAccess;
+using Newtonsoft.Json;
 using System.Threading.Tasks;
+using Leya.Models.Common.Models.Media;
 using Leya.Models.Common.Models.Movies;
 using Leya.Models.Common.Infrastructure;
 using Leya.DataAccess.Repositories.Movies;
-using Leya.Models.Common.Models.Media;
-using System.IO;
-using Newtonsoft.Json;
 #endregion
 
 namespace Leya.Models.Core.Movies

@@ -2,12 +2,12 @@
 /// Creation Date: 26th of November, 2020
 /// Purpose: Interface business model for user interface options
 #region ========================================================================= USING =====================================================================================
-using Leya.Infrastructure.Configuration;
-using Leya.Infrastructure.Notification;
-using Leya.Models.Common.Broadcasting;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Leya.Models.Common.Broadcasting;
+using Leya.Infrastructure.Notification;
+using Leya.Infrastructure.Configuration;
 #endregion
 
 namespace Leya.Models.Core.Options
@@ -23,7 +23,7 @@ namespace Leya.Models.Core.Options
         #endregion
 
         #region ================================================================ PROPERTIES =================================================================================
-        private string backgroundImagePath = "background.jpg"; // avares://Leya/Assets/background.jpg
+        private string backgroundImagePath = "background.jpg"; 
         public string BackgroundImagePath
         {
             get { return backgroundImagePath; }

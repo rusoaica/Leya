@@ -3,11 +3,11 @@
 /// Purpose: Explicit implementation of abstract custom file browser service
 #region ========================================================================= USING =====================================================================================
 using System;
+using System.Threading.Tasks;
 using Leya.Infrastructure.Enums;
 using Leya.Infrastructure.Dialog;
 using System.Collections.Generic;
 using Leya.ViewModels.Common.Dispatcher;
-using System.Threading.Tasks;
 #endregion
 
 namespace Leya.ViewModels.Common.Dialogs.FileBrowser
@@ -52,9 +52,9 @@ namespace Leya.ViewModels.Common.Dialogs.FileBrowser
         /// Shows a new custom folder browser dialog
         /// </summary>
         /// <returns>A <see cref="NotificationResult"/> value representing the result of the custom folder browser dialog</returns>
-        public async Task<NotificationResult> Show()
+        public async Task<NotificationResult> ShowAsync()
         {
-            return await await dispatcher?.Dispatch(new Func<Task<NotificationResult>>(async () =>
+            return await await dispatcher?.DispatchAsync(new Func<Task<NotificationResult>>(async () =>
             {
                 IFileBrowserDialogVM fileBrowserDialogVM = fileBrowserVM.Invoke();
                 fileBrowserDialogVM.Filter = Filter;
@@ -63,7 +63,7 @@ namespace Leya.ViewModels.Common.Dialogs.FileBrowser
                 fileBrowserDialogVM.AllowMultiselection = AllowMultiselection;
                 fileBrowserDialogVM.ShowNewFolderButton = ShowNewFolderButton;
                 // display the file browse dialog as modal, and await its result
-                NotificationResult result = await fileBrowserDialogVM.Show();
+                NotificationResult result = await fileBrowserDialogVM.ShowAsync();
                 // after file browse dialog is closed, relay the selected filenames
                 SelectedFiles = fileBrowserDialogVM.SelectedFiles;
                 return result; 

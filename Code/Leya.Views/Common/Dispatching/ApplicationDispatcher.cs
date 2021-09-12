@@ -32,7 +32,7 @@ namespace Leya.Views.Common.Dispatcher
         /// </summary>
         /// <param name="method">A delegate to a method that takes one argument, which is pushed onto the System.Windows.Threading.Dispatcher event queue.</param>
         /// <param name="args">An object to pass as an argument to the given method.</param>
-        public async Task Dispatch(Action method, params object[] args)
+        public async Task DispatchAsync(Action method, params object[] args)
         {
             await UnderlyingDispatcher.InvokeAsync(method, DispatcherPriority.Background);
         }
@@ -43,7 +43,7 @@ namespace Leya.Views.Common.Dispatcher
         /// <typeparam name="TResult">The type of result returned by <paramref name="callback"/></typeparam>
         /// <param name="callback">A func returning a result of type <typeparamref name="TResult"/></param>
         /// <returns>A Func callback of type <typeparamref name="TResult"/></returns>
-        public async Task<TResult> Dispatch<TResult>(Func<TResult> callback)
+        public async Task<TResult> DispatchAsync<TResult>(Func<TResult> callback)
         {
             return await UnderlyingDispatcher.InvokeAsync(callback);
         }

@@ -24,7 +24,7 @@ namespace Leya.DataAccess.Common.Models.Episodes
         /// <returns>Custom string value showing relevant data for current class</returns>
         public override string ToString()
         {
-            return Id + " :: " + EpisodeId;
+            return Id + " :: " + Genre;
         }
         #endregion
     }

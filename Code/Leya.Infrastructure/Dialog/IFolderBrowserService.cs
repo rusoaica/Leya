@@ -2,8 +2,8 @@
 /// Creation Date: 30th of June, 2021
 /// Purpose: Interface for custom folder browser dialogs
 #region ========================================================================= USING =====================================================================================
-using Leya.Infrastructure.Enums;
 using System.Threading.Tasks;
+using Leya.Infrastructure.Enums;
 #endregion
 
 namespace Leya.Infrastructure.Dialog
@@ -22,7 +22,7 @@ namespace Leya.Infrastructure.Dialog
         /// Shows a new folder browser dialog
         /// </summary>
         /// <returns>A <see cref="NotificationResult"/> representing the result of displaying the custom folder browser dialog</returns>
-        Task<NotificationResult> Show();
+        Task<NotificationResult> ShowAsync();
         #endregion
     }
 }

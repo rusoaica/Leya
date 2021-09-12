@@ -2,9 +2,9 @@
 /// Creation Date: 10th of November, 2020
 /// Purpose: Interface for the view model for the message box view
 #region ========================================================================= USING =====================================================================================
+using System.Threading.Tasks;
 using Leya.Infrastructure.Enums;
 using Leya.ViewModels.Common.MVVM;
-using System.Threading.Tasks;
 #endregion
 
 namespace Leya.ViewModels.Common.Dialogs.MessageBox

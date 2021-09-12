@@ -72,7 +72,7 @@ namespace Leya.Views.Common.Dialogs
         /// <summary>
         /// Shows the current window as a modal dialog
         /// </summary>
-        public async Task<bool?> ShowDialog()
+        public async Task<bool?> ShowDialogAsync()
         {
             return await ShowDialog<bool?>(StartupV.Instance);
         }

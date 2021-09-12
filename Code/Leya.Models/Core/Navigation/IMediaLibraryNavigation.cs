@@ -41,6 +41,7 @@ namespace Leya.Models.Core.Navigation
         bool IsDirectorVisible { get; set; }
         bool IsMediaCoverVisible { get; set; }
         bool IsHelpButtonVisible { get; set; }
+        bool IsSystemOptionVisible { get; set; }
         bool IsPlayerOptionVisible { get; set; }
         bool IsMediaContainerVisible { get; set; }
         bool IsInterfaceOptionVisible { get; set; }
@@ -67,6 +68,11 @@ namespace Leya.Models.Core.Navigation
         /// Exits the interface options view and returns to the options list
         /// </summary>
         void ExitInterfaceOptions();
+
+        /// <summary>
+        /// Exits the system options view and returns to the options list
+        /// </summary>
+        void ExitSystemOptions();
 
         /// <summary>
         /// Exits the player options view and returns to the options list

@@ -2,8 +2,8 @@
 /// Creation Date: 14th of May, 2021
 /// Purpose: Interface for the application's configuration
 #region ========================================================================= USING =====================================================================================
-using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 #endregion
 
 namespace Leya.Infrastructure.Configuration

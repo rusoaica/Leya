@@ -24,7 +24,7 @@ namespace Leya.Models.Core.MediaLibrary
         IEnumerable<CastEntity> ShowEpisodeMediaCastAsync(IMediaLibrary mediaLibrary, IMediaEntity media);
 
         /// <summary>
-        /// Gets the list of actors of a tv show episodes
+        /// Gets the list of actors of a tv show's episodes
         /// </summary>
         /// <param name="mediaLibrary">The library from which to take the tv show episodes for which to get the list of actors</param>
         /// <param name="media">The navigation media entity containing the id of the tv show for which to get the list of actors</param>

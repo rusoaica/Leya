@@ -54,10 +54,9 @@ namespace Leya.Models.Core.MediaLibrary
         /// </summary>
         public async Task GetMediaLibraryAsync()
         {
-            // get the media types and raise an event when finished, so that an eventual UI can be 
-            // able to display the main menu items before waiting for the whole library to load
+            // get the media types and their sources from the storage medium
             await mediaTypes.GetMediaTypesAsync();
-            // load the rest of the media library and notify an eventual UI when done
+            // load the rest of the media library 
             await tvShows.GetAllAsync();
             await movies.GetAllAsync();
             await artists.GetAllAsync();
@@ -68,9 +67,11 @@ namespace Leya.Models.Core.MediaLibrary
         /// </summary>
         public async Task UpdateMediaLibraryAsync()
         {
+            // delete all the media library before re-inserting it
             await tvShows.DeleteAllAsync();
             await movies.DeleteAllAsync();
             await artists.DeleteAllAsync();
+            // insert all media items that are actual media
             foreach (MediaTypeEntity mediaType in mediaTypes.MediaTypes.Where(mt => mt.IsMedia))
             {
                 foreach (MediaTypeSourceEntity mediaTypeSource in mediaType.MediaTypeSources)

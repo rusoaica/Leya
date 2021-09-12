@@ -81,6 +81,7 @@
     <None Remove="Common\Styles\Label.xaml" />
     <None Remove="Common\Styles\Light.xaml" />
     <None Remove="Common\Styles\ListBox.xaml" />
+    <None Remove="Common\Styles\RadioButton.xaml" />
     <None Remove="Common\Styles\RepeatButton.xaml" />
     <None Remove="Common\Styles\ScrollBar.xaml" />
     <None Remove="Common\Styles\ScrollViewer.xaml" />
@@ -153,6 +154,11 @@
   </ItemGroup>
   <ItemGroup>
     <AvaloniaResource Include="Common\Styles\Expander.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </AvaloniaResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AvaloniaResource Include="Common\Styles\RadioButton.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </AvaloniaResource>
   </ItemGroup>

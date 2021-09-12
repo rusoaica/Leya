@@ -3,15 +3,15 @@
 /// Purpose: Business model for tv shows
 #region ========================================================================= USING =====================================================================================
 using System;
+using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
 using Leya.DataAccess;
 using System.Threading.Tasks;
+using Leya.Models.Common.Models.Media;
 using Leya.Models.Common.Infrastructure;
 using Leya.Models.Common.Models.TvShows;
 using Leya.DataAccess.Repositories.TvShows;
-using Leya.Models.Common.Models.Media;
-using System.IO;
-using Newtonsoft.Json;
 #endregion
 
 namespace Leya.Models.Core.TvShows

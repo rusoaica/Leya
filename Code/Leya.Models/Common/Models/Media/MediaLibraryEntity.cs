@@ -12,8 +12,8 @@ namespace Leya.Models.Common.Models.Media
     public class MediaLibraryEntity
     {
         #region ================================================================ PROPERTIES =================================================================================
-        public TvShowEntity[] TvShows { get; set; }
         public MovieEntity[] Movies { get; set; }
+        public TvShowEntity[] TvShows { get; set; }
         public ArtistEntity[] Artists { get; set; }
         public MediaTypeEntity[] MediaTypes { get; set; }
         #endregion

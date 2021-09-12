@@ -1,5 +1,5 @@
 ﻿/// Written by: Yulia Danilova
-/// Creation Date: 0tth of August, 2021
+/// Creation Date: 05th of September, 2021
 /// Purpose: Interface for common media library entities
 
 namespace Leya.Models.Common.Models.Media

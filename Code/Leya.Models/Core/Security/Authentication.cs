@@ -6,7 +6,6 @@ using System;
 using Leya.DataAccess;
 using System.Threading.Tasks;
 using Leya.Infrastructure.Security;
-using Leya.Models.Common.Extensions;
 using Leya.Models.Common.Models.Users;
 using Leya.Infrastructure.Notification;
 using Leya.Models.Common.Infrastructure;
@@ -168,7 +167,7 @@ namespace Leya.Models.Core.Security
                             User.Password = User.Username;
                             await userRepository.ChangePasswordAsync(User.ToStorageEntity());
                             if (string.IsNullOrEmpty(result.Error))
-                                notificationService.ShowAsync("Your password has been changed to " + User.Username + "!\nChange it to a secure password as soon as you log in!", "LEYA - Success");
+                                await notificationService.ShowAsync("Your password has been changed to " + User.Username + "!\nChange it to a secure password as soon as you log in!", "LEYA - Success");
                             else
                                 throw new InvalidOperationException("Error updating the password of the account! " + (result.Error ?? string.Empty));
                         }

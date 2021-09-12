@@ -67,7 +67,6 @@ namespace Leya.Models.Core.MediaLibrary
             });
         }
 
-
         /// <summary>
         /// Deletes an entity identified by <paramref name="id"/> from the storage medium
         /// </summary>

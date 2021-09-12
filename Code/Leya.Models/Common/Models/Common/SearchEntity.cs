@@ -1,5 +1,5 @@
 ﻿/// Written by: Yulia Danilova
-/// Creation Date: 5th of November, 2019
+/// Creation Date: 05th of November, 2019
 /// Purpose: Custom generic model with properties for the displayed member, hidden value and mouse hover tooltip text
 
 namespace Leya.Models.Common.Models.Common

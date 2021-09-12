@@ -3,7 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
-        xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"        
+        xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
         xmlns:iac="using:Avalonia.Xaml.Interactions.Custom"
         xmlns:converters="clr-namespace:Leya.Views.Common.Converters"
         xmlns:controls="clr-namespace:Leya.Views.Common.Controls"
@@ -43,7 +43,6 @@
         <TextBlock Text="{Binding Fahrenheit, StringFormat='{}({0:#,##0}°F)'}" Foreground="{DynamicResource textForeground}" FontStyle="Italic" FontWeight="Bold" FontSize="20" Padding="0" HorizontalAlignment="Right" Width="60" Margin="0,0,454,0"/>
         <TextBlock Text="{Binding Celsius, StringFormat='{}{0:#,##0}°C'}" Foreground="{DynamicResource textForeground}" FontStyle="Italic" FontWeight="Bold" FontSize="20" Padding="0" HorizontalAlignment="Right" Width="60" Margin="0,0,510,0"/>
 
-
         <TextBlock Foreground="{DynamicResource WindowForeColor}" Text="|" FontStyle="Italic" FontWeight="Bold" FontSize="20" Padding="0" HorizontalAlignment="Right" Width="7" Margin="0,0,445,0"/>
         <TextBlock Foreground="{DynamicResource WindowForeColor}" Text="{Binding CurrentTime, StringFormat='{}{0:dddd, dd.MM.yyyy}'}" FontStyle="Italic" FontWeight="Bold" FontSize="20" Padding="0" HorizontalAlignment="Right" Width="221" Margin="0,0,219,0"/>
         <TextBlock Foreground="{DynamicResource WindowForeColor}" Text="|" FontStyle="Italic" FontWeight="Bold" FontSize="20" Padding="0" HorizontalAlignment="Right" Width="7" Margin="0,0,212,0"/>
@@ -67,8 +66,8 @@
         <Label Content="UNWATCHED" Foreground="{DynamicResource WindowForeColor}" Cursor="Hand" FontStyle="Italic" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="20" Padding="0" HorizontalAlignment="Left" Width="145" Margin="295,0,0,0" Opacity="0.7"/>
         <Label Content="RECENTLY ADDED" Foreground="{DynamicResource WindowForeColor}" Cursor="Hand" FontStyle="Italic" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="20" Padding="0" HorizontalAlignment="Left" Width="189" Margin="482,0,0,0" Opacity="0.7"/>
         <Label Content="GENRES" Foreground="{DynamicResource WindowForeColor}" Cursor="Hand" FontStyle="Italic" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="20" Padding="0" HorizontalAlignment="Left" Width="157" Margin="679,0,0,0" Opacity="0.7"/>
-        <Label Content="SEARCH" Foreground="{DynamicResource WindowForeColor}" FontStyle="Italic" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="20" Padding="0" HorizontalAlignment="Left" Width="86" Margin="841,0,0,0" Opacity="0.7"/>
-        <AutoCompleteBox Items="{Binding SourceSearch}" x:Name="acbSearchMediaLibrary" ValueMemberBinding="{Binding Text}" SelectedItem="{Binding SearchSelectedItem, Mode=TwoWay}" Classes="autoCompleteBox" FilterMode="Custom" IsTextCompletionEnabled="True" Margin="950,4,10,4" FontSize="14" FontWeight="Bold" MinimumPrefixLength="0" MaxDropDownHeight="500" Opacity="1">
+        <Label Content="QUICK SEARCH" Foreground="{DynamicResource WindowForeColor}" FontStyle="Italic" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="20" Padding="0" HorizontalAlignment="Left" Width="155" Margin="841,0,0,0" Opacity="0.7"/>
+        <AutoCompleteBox Items="{Binding SourceQuickSearch}" x:Name="acbSearchMediaLibrary" ValueMemberBinding="{Binding ChildTitle}" SelectedItem="{Binding QuickSearchSelectedItem, Mode=TwoWay}" Classes="autoCompleteBox" FilterMode="Custom" IsTextCompletionEnabled="True" Margin="1010,4,10,4" FontSize="14" FontWeight="Bold" MinimumPrefixLength="0" MaxDropDownHeight="500" Opacity="1">
           <AutoCompleteBox.ItemTemplate>
             <DataTemplate>
               <Grid>
@@ -76,8 +75,8 @@
                   <ColumnDefinition Width="300" />
                   <ColumnDefinition Width="300" />
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="{Binding Text}" Foreground="{DynamicResource textForeground}"/>
-                <TextBlock Text="{Binding Value}" Foreground="Gray" HorizontalAlignment="Right" Grid.Column="1" />
+                <TextBlock Text="{Binding ChildTitle}" Foreground="{DynamicResource textForeground}"/>
+                <TextBlock Text="{Binding ParentTitle}" Foreground="Gray" HorizontalAlignment="Right" Grid.Column="1" />
               </Grid>
             </DataTemplate>
           </AutoCompleteBox.ItemTemplate>
@@ -89,17 +88,8 @@
               <ia:InvokeCommandAction Command="{Binding SearchLibraryDropDownClosingAsync_Command}"/>
             </ia:EventTriggerBehavior>
           </i:Interaction.Behaviors>
-          <!--<AutoCompleteBox.InputBindings>
-            <KeyBinding Key="Enter" Command="{Binding Search_EnterKeyUpAsync_Command}" />
-          </AutoCompleteBox.InputBindings>-->
-          <!--<i:Interaction.Triggers>
-            <i:EventTrigger EventName="DropDownClosing">
-              <i:InvokeCommandAction Command="{Binding Search_DropDownClosingAsync_Command}"/>
-            </i:EventTrigger>
-          </i:Interaction.Triggers>-->
         </AutoCompleteBox>
       </Grid>
-
     </Grid>
     <Grid x:Name="grdMedia" IsVisible="{Binding IsMediaContainerVisible}" >
       <Grid.ColumnDefinitions>
@@ -142,28 +132,20 @@
           </ContextMenu>
         </ListBox.ContextMenu>
       </ListBox>
-      <AutoCompleteBox ValueMemberBinding="{Binding Text}" Text="{Binding FilterText, Mode=TwoWay}" FilterMode="Custom" IsTextCompletionEnabled="True" Items="{Binding SourceFilter}" Margin="10,0,10,33" FontSize="14" FontWeight="Bold" MinimumPrefixLength="0" MaxDropDownHeight="800" Opacity="0.7" Grid.Column="0" Height="22" VerticalAlignment="Bottom">
+      <AutoCompleteBox Items="{Binding SourceFilter}" Text="{Binding FilterText, Mode=TwoWay}" Classes="autoCompleteBox" IsTextCompletionEnabled="True" Margin="10,0,10,33" FontSize="14" FontWeight="Bold" MinimumPrefixLength="0" MaxDropDownHeight="500" Opacity="1" VerticalAlignment="Bottom">
         <AutoCompleteBox.ItemTemplate>
           <DataTemplate>
-            <Grid>
-              <!--for each item in list-->
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="500" />
-                <ColumnDefinition Width="500" />
-              </Grid.ColumnDefinitions>
-              <TextBlock Text="{Binding Text}"/>
-              <TextBlock HorizontalAlignment="Right" Foreground="Gray" Text="{Binding Value}" Grid.Column="1"/>
-            </Grid>
+            <TextBlock Text="{Binding}"/>
           </DataTemplate>
         </AutoCompleteBox.ItemTemplate>
-        <!--<AutoCompleteBox.InputBindings>
-          <KeyBinding Key="Enter" Command="{Binding Filter_EnterKeyUp_Command}" />
-        </AutoCompleteBox.InputBindings>
-        <i:Interaction.Triggers>
-          <i:EventTrigger EventName="DropDownClosing">
-            <i:InvokeCommandAction Command="{Binding Filter_DropDownClosing_Command}"/>
-          </i:EventTrigger>
-        </i:Interaction.Triggers>-->
+        <AutoCompleteBox.KeyBindings>
+          <KeyBinding Gesture="Enter" Command="{Binding FilterLibrary_Command}" />
+        </AutoCompleteBox.KeyBindings>
+        <i:Interaction.Behaviors>
+          <ia:EventTriggerBehavior EventName="DropDownClosing">
+            <ia:InvokeCommandAction Command="{Binding FilterLibrary_Command}"/>
+          </ia:EventTriggerBehavior>
+        </i:Interaction.Behaviors>
       </AutoCompleteBox>
       <Image Cursor="Hand" x:Name="imgNavigateUp" ToolTip.Tip="Up one level" Grid.Column="1" Margin="10,10,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Source="avares://Leya/Assets/Previous-icon.png" Height="20" Width="20" RenderTransformOrigin="0.5,0.5" PointerReleased="NavigateUp_PointerReleased">
         <Image.RenderTransform>
@@ -192,7 +174,7 @@
         <Label Content="{Binding TagLine}" Foreground="{DynamicResource textForeground}" Margin="0,18,0,0" FontSize="38" FontWeight="Bold" FontStyle="Italic" VerticalAlignment="Top" Padding="0" Grid.Row="0" Grid.ColumnSpan="3" HorizontalContentAlignment="Center" FontFamily="avares://Leya/Assets/LCARS.ttf#Swiss911 UCm BT"/>
         <Label Content="Runtime:" Foreground="#FF00B4FF" Margin="4.5,69,0,0" FontSize="20" FontWeight="Bold" Height="20" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" Grid.Column="1" />
         <Label Content="{Binding Runtime, Converter={StaticResource TimeSpanFormatConverter}}" Foreground="{DynamicResource textForeground}" Margin="0,69,0,0" FontSize="20" FontWeight="Bold" FontStyle="Italic" VerticalAlignment="Top" Padding="0" Grid.Row="0" Grid.ColumnSpan="3" HorizontalContentAlignment="Center"/>
-        
+
         <Label Content="Seasons:" IsVisible="{Binding AreNumberOfSeasonsVisible}" Grid.Column="1" Foreground="#FF00B4FF" Margin="84.5,30,0,0" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Center" Padding="0" HorizontalAlignment="Left" Width="102" Grid.Row="2"/>
         <Label Content="{Binding NumberOfSeasons}" Foreground="{DynamicResource MainMenuForeground}" IsVisible="{Binding AreNumberOfSeasonsVisible}" FontSize="18" FontWeight="Bold" Margin="192.5,30,10,0" Height="28" VerticalAlignment="Center" Padding="0" Grid.Column="1" Grid.Row="2"/>
 
@@ -201,7 +183,7 @@
 
         <Label Content="Writers:" IsVisible="{Binding AreWritersVisible}" Grid.Column="1" Foreground="#FF00B4FF" Margin="10.5,73,0,0" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" Width="70" Grid.Row="2"/>
         <controls:Marquee SetText="{Binding DataContext.Writers, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Margin="84.5,73,10,0" IsVisible="{Binding DataContext.AreWritersVisible, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Foreground="{DynamicResource MainMenuForeground}" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Top" Padding="0" Grid.Column="1" Grid.Row="2"/>
-        
+
         <Label Content="Episodes:" IsVisible="{Binding IsTvShow}" Grid.Column="1" Foreground="#FF00B4FF" Margin="84.5,75,0,0" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Center" Padding="0" HorizontalAlignment="Left" Width="102" Grid.Row="2"/>
         <Label Content="{Binding NumberOfEpisodes}" Foreground="{DynamicResource MainMenuForeground}" IsVisible="{Binding IsTvShow}" FontSize="18" FontWeight="Bold" Margin="192.5,75,10,0" Height="28" VerticalAlignment="Center" Padding="0" Grid.Column="1" Grid.Row="2"/>
 
@@ -236,12 +218,12 @@
         <controls:Marquee SetText="{Binding DataContext.Genre, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" FontFamily="avares://Leya/Assets/LCARS.ttf#Swiss911 UCm BT" Foreground="{DynamicResource MainMenuForeground}" FontSize="26" FontWeight="Bold" Margin="81,232,15.5,0" Height="28" VerticalAlignment="Top" Padding="0"/>
 
         <Image Source="{Binding Fanart, Converter={StaticResource NullImageConverter}}" IsVisible="{Binding IsFanartVisible}" Width="NaN" Height="NaN" Margin="17,449,22.5,32" Opacity="0.5"/>
-        
+
         <Label Content="Synopsis:" Foreground="#FF00B4FF" Margin="25,330,0,0" FontSize="18" FontWeight="Bold" Height="28" VerticalAlignment="Top" Padding="0" HorizontalAlignment="Left" Width="81"/>
         <Expander x:Name="ExpanderControl" Classes="Exp" FontSize="22" FontWeight="Bold" Foreground="#FF009CFE" Margin="17,320,22.5,0" Cursor="Hand" VerticalAlignment="Top">
           <TextBlock Text="{Binding Synopsis}" Margin="0" TextWrapping="Wrap" FontSize="22" Foreground="#FF009CFE" VerticalAlignment="Top"/>
         </Expander>
-        
+
         <Separator Height="1" HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="#FF0093E7" Width="NaN" Margin="17,271,22.5,0" />
         <Separator Height="1" HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="#FF0093E7" Width="NaN" Margin="17,311,22.5,0" />
         <Image Cursor="Hand" ToolTip.Tip="Open media location" Margin="0,276,175.5,0" Height="39" Width="40" HorizontalAlignment="Right" Source="avares://Leya/Assets/folder.png" VerticalAlignment="Top">
@@ -300,35 +282,35 @@
     <controls:Marquee x:Name="scannerOutput" SetText="{Binding DataContext.ScannerOutput, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" IsVisible="{Binding DataContext.IsScannerTextVisible, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Foreground="{DynamicResource ScannerTextForeground}" FontSize="40" Height="68" VerticalAlignment="Top" Margin="10,243,10,0"/>
     <Grid x:Name="grdMaskBackground" Background="{DynamicResource ModalGridBackground}" IsVisible="{Binding IsMaskBackgroundVisible}" Opacity="0.6"/>
     <Grid x:Name="grdViewOptions" Margin="150,100,150,100" IsVisible="{Binding IsOptionsContainerVisible}" Opacity="0.9">
-        <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="25*"/>
-          <ColumnDefinition Width="25*"/>
-          <ColumnDefinition Width="25*"/>
-          <ColumnDefinition Width="25*"/>
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-          <RowDefinition Height="50*"/>
-          <RowDefinition Height="50*"/>
-        </Grid.RowDefinitions>
-        <Grid Margin="11,11,11,11" Grid.ColumnSpan="4" Grid.RowSpan="2">
-          <Path Data="M 1,0 0.5,0 Q 0,0 0,0.5 L 0,1" Fill="Transparent" HorizontalAlignment="Left" Height="6" Margin="-5" Stretch="Fill" Stroke="{DynamicResource BorderLit}" StrokeThickness="4" VerticalAlignment="Top" Width="6"/>
-          <Path Data="M 0,1 0.5,1 Q 1,1 1,0.5 L 1,0" Fill="Transparent" HorizontalAlignment="Right" Height="6" Margin="-5" Stretch="Fill" Stroke="{DynamicResource BorderUnlit}" StrokeThickness="4" VerticalAlignment="Bottom" Width="6"/>
-          <Path Data="M 0,0 0.5,0 Q 1,0 1,0.5 L 1,1" Fill="Transparent" HorizontalAlignment="Right" Height="6" Margin="-5" Stretch="Fill" Stroke="{DynamicResource AngleShadow}" StrokeThickness="4" VerticalAlignment="Top" Width="6"/>
-          <Path Data="M 0,0 0,0.5 Q 0,1 0.5,1 L 1,1" Fill="Transparent" HorizontalAlignment="Left" Height="6" Margin="-5" Stretch="Fill" Stroke="{DynamicResource AngleShadow}" StrokeThickness="4" VerticalAlignment="Bottom" Width="6"/>
-          <Line StartPoint="0,0" EndPoint="1,0" Stroke="{DynamicResource BorderLit}" Stretch="Fill" Margin="0,-5" StrokeThickness="4" HorizontalAlignment="Center" VerticalAlignment="Top"/>
-          <Line StartPoint="0,1" EndPoint="1,1" Stroke="{DynamicResource BorderUnlit}" Stretch="Fill" Margin="0,5,0,-5" StrokeThickness="4" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
-          <Line StartPoint="0,0" EndPoint="0,1" Stroke="{DynamicResource BorderLit}" Stretch="Fill" Margin="-5,-1" StrokeThickness="4" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-          <Line StartPoint="1,0" EndPoint="1,1" Stroke="{DynamicResource BorderUnlit}" Stretch="Fill" Margin="5,-1,-5,-1" StrokeThickness="4" HorizontalAlignment="Right" VerticalAlignment="Center"/>
-          <Line StartPoint="0,0" EndPoint="1,0" Stroke="{DynamicResource UpperHighlight}" Stretch="Fill" Margin="1,-5" StrokeThickness="4" HorizontalAlignment="Center" VerticalAlignment="Top"/>
-        </Grid>
-        <Border Margin="0" Grid.ColumnSpan="4" Grid.RowSpan="2" Classes="contentBorder" BoxShadow="50 50 50 25 #CC000000"/>
-        <Label Content="Media" Classes="zoomTransformLabel" ToolTip.Tip="Manage media sources" Cursor="Hand" Tag="Media" Grid.Row="0" Grid.Column="0" Foreground="{DynamicResource textForeground}" FontSize="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Height="50" VerticalAlignment="Center">
-          <i:Interaction.Behaviors>
-            <ia:EventTriggerBehavior EventName="PointerReleased">
-              <ia:InvokeCommandAction Command="{Binding ShowMediaOptions_Command}"/>
-            </ia:EventTriggerBehavior>
-          </i:Interaction.Behaviors>
-        </Label>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="25*"/>
+        <ColumnDefinition Width="25*"/>
+        <ColumnDefinition Width="25*"/>
+        <ColumnDefinition Width="25*"/>
+      </Grid.ColumnDefinitions>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="50*"/>
+        <RowDefinition Height="50*"/>
+      </Grid.RowDefinitions>
+      <Grid Margin="11,11,11,11" Grid.ColumnSpan="4" Grid.RowSpan="2">
+        <Path Data="M 1,0 0.5,0 Q 0,0 0,0.5 L 0,1" Fill="Transparent" HorizontalAlignment="Left" Height="6" Margin="-5" Stretch="Fill" Stroke="{DynamicResource BorderLit}" StrokeThickness="4" VerticalAlignment="Top" Width="6"/>
+        <Path Data="M 0,1 0.5,1 Q 1,1 1,0.5 L 1,0" Fill="Transparent" HorizontalAlignment="Right" Height="6" Margin="-5" Stretch="Fill" Stroke="{DynamicResource BorderUnlit}" StrokeThickness="4" VerticalAlignment="Bottom" Width="6"/>
+        <Path Data="M 0,0 0.5,0 Q 1,0 1,0.5 L 1,1" Fill="Transparent" HorizontalAlignment="Right" Height="6" Margin="-5" Stretch="Fill" Stroke="{DynamicResource AngleShadow}" StrokeThickness="4" VerticalAlignment="Top" Width="6"/>
+        <Path Data="M 0,0 0,0.5 Q 0,1 0.5,1 L 1,1" Fill="Transparent" HorizontalAlignment="Left" Height="6" Margin="-5" Stretch="Fill" Stroke="{DynamicResource AngleShadow}" StrokeThickness="4" VerticalAlignment="Bottom" Width="6"/>
+        <Line StartPoint="0,0" EndPoint="1,0" Stroke="{DynamicResource BorderLit}" Stretch="Fill" Margin="0,-5" StrokeThickness="4" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+        <Line StartPoint="0,1" EndPoint="1,1" Stroke="{DynamicResource BorderUnlit}" Stretch="Fill" Margin="0,5,0,-5" StrokeThickness="4" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+        <Line StartPoint="0,0" EndPoint="0,1" Stroke="{DynamicResource BorderLit}" Stretch="Fill" Margin="-5,-1" StrokeThickness="4" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <Line StartPoint="1,0" EndPoint="1,1" Stroke="{DynamicResource BorderUnlit}" Stretch="Fill" Margin="5,-1,-5,-1" StrokeThickness="4" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+        <Line StartPoint="0,0" EndPoint="1,0" Stroke="{DynamicResource UpperHighlight}" Stretch="Fill" Margin="1,-5" StrokeThickness="4" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+      </Grid>
+      <Border Margin="0" Grid.ColumnSpan="4" Grid.RowSpan="2" Classes="contentBorder" BoxShadow="50 50 50 25 #CC000000"/>
+      <Label Content="Media" Classes="zoomTransformLabel" ToolTip.Tip="Manage media sources" Cursor="Hand" Tag="Media" Grid.Row="0" Grid.Column="0" Foreground="{DynamicResource textForeground}" FontSize="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Height="50" VerticalAlignment="Center">
+        <i:Interaction.Behaviors>
+          <ia:EventTriggerBehavior EventName="PointerReleased">
+            <ia:InvokeCommandAction Command="{Binding ShowMediaOptions_Command}"/>
+          </ia:EventTriggerBehavior>
+        </i:Interaction.Behaviors>
+      </Label>
       <Label Content="Interface" Classes="zoomTransformLabel" ToolTip.Tip="Change the visual aspect of the application" Cursor="Hand" Tag="Interface" Grid.Row="0" Grid.Column="1" Foreground="{DynamicResource textForeground}" FontSize="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Height="50" VerticalAlignment="Center">
         <i:Interaction.Behaviors>
           <ia:EventTriggerBehavior EventName="PointerReleased">
@@ -336,7 +318,13 @@
           </ia:EventTriggerBehavior>
         </i:Interaction.Behaviors>
       </Label>
-        <Label Content="System" Classes="zoomTransformLabel" Cursor="Hand" Tag="System" Grid.Row="0" Grid.Column="2" Foreground="{DynamicResource textForeground}" FontSize="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Height="50" VerticalAlignment="Center"/>
+      <Label Content="System" Classes="zoomTransformLabel" Cursor="Hand" Tag="System" Grid.Row="0" Grid.Column="2" Foreground="{DynamicResource textForeground}" FontSize="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Height="50" VerticalAlignment="Center">
+        <i:Interaction.Behaviors>
+          <ia:EventTriggerBehavior EventName="PointerReleased">
+            <ia:InvokeCommandAction Command="{Binding ShowSystemOptions_Command}"/>
+          </ia:EventTriggerBehavior>
+        </i:Interaction.Behaviors>
+      </Label>
       <Label Content="Player" Classes="zoomTransformLabel" ToolTip.Tip="Display the options for the video player" Cursor="Hand" Tag="Player" Grid.Row="0" Grid.Column="3" Foreground="{DynamicResource textForeground}" FontSize="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Height="50" VerticalAlignment="Center">
         <i:Interaction.Behaviors>
           <ia:EventTriggerBehavior EventName="PointerReleased">
@@ -345,17 +333,17 @@
         </i:Interaction.Behaviors>
       </Label>
 
-        <Label Content="Security" Classes="zoomTransformLabel" ToolTip.Tip="Change your password" Cursor="Hand" Grid.Row="1" Grid.Column="0" Foreground="{DynamicResource textForeground}" FontSize="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Height="50" VerticalAlignment="Center"/>
-        <Label Content="System Info" Classes="zoomTransformLabel" ToolTip.Tip="Display hardware and software information about the current system" Cursor="Hand" Tag="System Info" Grid.Row="1" Grid.Column="1" Foreground="{DynamicResource textForeground}" FontSize="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Height="50" VerticalAlignment="Center"/>
-        <Label Content="Logging" Classes="zoomTransformLabel" ToolTip.Tip="Open logs directory" Cursor="Hand" Tag="Logging" Grid.Row="1" Grid.Column="2" Foreground="{DynamicResource textForeground}" FontSize="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Height="50" VerticalAlignment="Center">
-          <!--<i:Interaction.Triggers>
+      <Label Content="Security" Classes="zoomTransformLabel" ToolTip.Tip="Change your password" Cursor="Hand" Grid.Row="1" Grid.Column="0" Foreground="{DynamicResource textForeground}" FontSize="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Height="50" VerticalAlignment="Center"/>
+      <Label Content="System Info" Classes="zoomTransformLabel" ToolTip.Tip="Display hardware and software information about the current system" Cursor="Hand" Tag="System Info" Grid.Row="1" Grid.Column="1" Foreground="{DynamicResource textForeground}" FontSize="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Height="50" VerticalAlignment="Center"/>
+      <Label Content="Logging" Classes="zoomTransformLabel" ToolTip.Tip="Open logs directory" Cursor="Hand" Tag="Logging" Grid.Row="1" Grid.Column="2" Foreground="{DynamicResource textForeground}" FontSize="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Height="50" VerticalAlignment="Center">
+        <!--<i:Interaction.Triggers>
             <i:EventTrigger EventName="MouseUp">
               <i:InvokeCommandAction Command="{Binding OpenLoggingDirectory_Command}"/>
             </i:EventTrigger>
           </i:Interaction.Triggers>-->
-        </Label>
-        <Label Content="Help" Classes="zoomTransformLabel" ToolTip.Tip="Display application's help" Cursor="Hand" Tag="Help" Grid.Row="1" Grid.Column="3" Foreground="{DynamicResource textForeground}" FontSize="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Height="50" VerticalAlignment="Center"/>
-    </Grid>  
+      </Label>
+      <Label Content="Help" Classes="zoomTransformLabel" ToolTip.Tip="Display application's help" Cursor="Hand" Tag="Help" Grid.Row="1" Grid.Column="3" Foreground="{DynamicResource textForeground}" FontSize="20" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0" Height="50" VerticalAlignment="Center"/>
+    </Grid>
     <Grid x:Name="grdMediaTypesOptions" IsVisible="{Binding IsMediaTypesOptionVisible}" Margin="150,100,150,100" Opacity="0.9">
       <Grid Margin="11,11,11,11">
         <Path Data="M 1,0 0.5,0 Q 0,0 0,0.5 L 0,1" Fill="Transparent" HorizontalAlignment="Left" Height="6" Margin="-5" Stretch="Fill" Stroke="{DynamicResource BorderLit}" StrokeThickness="4" VerticalAlignment="Top" Width="6"/>
@@ -431,43 +419,43 @@
       </Grid>
       <Border Margin="0" Classes="contentBorder"/>
       <ListBox Items="{Binding SourceMediaCategorySources}" Background="{DynamicResource contentBackground}" Classes="ListBox" VirtualizationMode="Simple" Margin="20,30,20,74" Grid.Column="0" BorderThickness="0">
-          <i:Interaction.Behaviors>
-            <iac:NthChildBehavior />
-          </i:Interaction.Behaviors>
-          <ListBox.ItemsPanel>
-            <ItemsPanelTemplate>
-              <VirtualizingStackPanel/>
-            </ItemsPanelTemplate>
-          </ListBox.ItemsPanel>
-          <ListBox.ItemTemplate>
-            <DataTemplate>
-              <Grid Margin="0,2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                <Grid.ColumnDefinitions>
-                  <ColumnDefinition Width="*" />
-                  <ColumnDefinition Width="50" />
-                </Grid.ColumnDefinitions>
-                <Label Content="{Binding MediaSourcePath}" Foreground="{DynamicResource ListTextNormal}" FontStyle="Italic" FontSize="14" Cursor="Hand" Background="Transparent" BorderThickness="0" Margin="6,0" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" Grid.Column="0"/>
-                <DockPanel Background="#00000000" LastChildFill="True" Margin="0" Grid.Column="1">
-                  <Image Source="avares://Leya/Assets/empty_trash.png" Height="20" Width="25" Margin="0" Stretch="Fill" Cursor="Hand" Opacity="0.4">
-                    <i:Interaction.Behaviors>
-                      <ia:EventTriggerBehavior EventName="PointerReleased">
-                        <ia:InvokeCommandAction Command="{Binding DataContext.DeleteMediaTypeSource_Command, RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}}" CommandParameter="{Binding Content, RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}, Mode=FindAncestor}}"/>
-                      </ia:EventTriggerBehavior>
-                    </i:Interaction.Behaviors>
-                  </Image>
-                </DockPanel>
-              </Grid>
-            </DataTemplate>
-          </ListBox.ItemTemplate>
-        </ListBox>
-        <TextBlock Text="Edit media type sources" Foreground="{DynamicResource WindowForeColor}" TextAlignment="Center" FontWeight="Bold" Height="19" VerticalAlignment="Top" Margin="10,10,10,0"/>
-        <TextBlock Text="Media source name:" Foreground="{DynamicResource textForeground}" HorizontalAlignment="Left" Width="130" Height="17" VerticalAlignment="Bottom" Margin="20,0,0,50"/>
-        <TextBox Text="{Binding MediaName}" Classes="inputField" Height="23" MinHeight="23" VerticalAlignment="Bottom" VerticalContentAlignment="Center" Margin="160,0,285,46" Padding="2" FontSize="14"/>
-        <TextBlock Text="Media source type:" Foreground="{DynamicResource textForeground}" HorizontalAlignment="Right" Width="124" Height="17" VerticalAlignment="Bottom" Margin="0,0,150,50"/>
-        <ComboBox Items="{Binding SourceMediaCategoryTypes}" SelectedItem="{Binding SelectedMediaCategoryType}" Margin="0,0,20,46" Height="23" VerticalAlignment="Bottom" FontSize="14" IsTextSearchEnabled="False" HorizontalAlignment="Right" Width="120"/>
-        <Button Content="Browse" Classes="confirmButton" HorizontalAlignment="Left" Margin="20,0,20,15" Height="22" FontSize="12" VerticalAlignment="Bottom" Width="105" Click="Browse_Click"/>
-        <Button Content="Confirm" Classes="confirmButton" Command="{Binding RefreshMediaSourcesAsync_Command}" FontSize="12" HorizontalAlignment="Right" Margin="20,0,20,15" Height="22" VerticalAlignment="Bottom" Width="105"/>
-        <Button Content="Cancel" Classes="abortButton" Command="{Binding ExitMediaTypeSourcesOptions_Command}" Focusable="False" Margin="20,0,130,15" Height="22" FontSize="12" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="105"/>
+        <i:Interaction.Behaviors>
+          <iac:NthChildBehavior />
+        </i:Interaction.Behaviors>
+        <ListBox.ItemsPanel>
+          <ItemsPanelTemplate>
+            <VirtualizingStackPanel/>
+          </ItemsPanelTemplate>
+        </ListBox.ItemsPanel>
+        <ListBox.ItemTemplate>
+          <DataTemplate>
+            <Grid Margin="0,2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="50" />
+              </Grid.ColumnDefinitions>
+              <Label Content="{Binding MediaSourcePath}" Foreground="{DynamicResource ListTextNormal}" FontStyle="Italic" FontSize="14" Cursor="Hand" Background="Transparent" BorderThickness="0" Margin="6,0" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" Grid.Column="0"/>
+              <DockPanel Background="#00000000" LastChildFill="True" Margin="0" Grid.Column="1">
+                <Image Source="avares://Leya/Assets/empty_trash.png" Height="20" Width="25" Margin="0" Stretch="Fill" Cursor="Hand" Opacity="0.4">
+                  <i:Interaction.Behaviors>
+                    <ia:EventTriggerBehavior EventName="PointerReleased">
+                      <ia:InvokeCommandAction Command="{Binding DataContext.DeleteMediaTypeSource_Command, RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}}" CommandParameter="{Binding Content, RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}, Mode=FindAncestor}}"/>
+                    </ia:EventTriggerBehavior>
+                  </i:Interaction.Behaviors>
+                </Image>
+              </DockPanel>
+            </Grid>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+      <TextBlock Text="Edit media type sources" Foreground="{DynamicResource WindowForeColor}" TextAlignment="Center" FontWeight="Bold" Height="19" VerticalAlignment="Top" Margin="10,10,10,0"/>
+      <TextBlock Text="Media source name:" Foreground="{DynamicResource textForeground}" HorizontalAlignment="Left" Width="130" Height="17" VerticalAlignment="Bottom" Margin="20,0,0,50"/>
+      <TextBox Text="{Binding MediaName}" Classes="inputField" Height="23" MinHeight="23" VerticalAlignment="Bottom" VerticalContentAlignment="Center" Margin="160,0,285,46" Padding="2" FontSize="14"/>
+      <TextBlock Text="Media source type:" Foreground="{DynamicResource textForeground}" HorizontalAlignment="Right" Width="124" Height="17" VerticalAlignment="Bottom" Margin="0,0,150,50"/>
+      <ComboBox Items="{Binding SourceMediaCategoryTypes}" SelectedItem="{Binding SelectedMediaCategoryType}" Margin="0,0,20,46" Height="23" VerticalAlignment="Bottom" FontSize="14" IsTextSearchEnabled="False" HorizontalAlignment="Right" Width="120"/>
+      <Button Content="Browse" Classes="confirmButton" HorizontalAlignment="Left" Margin="20,0,20,15" Height="22" FontSize="12" VerticalAlignment="Bottom" Width="105" Click="Browse_Click"/>
+      <Button Content="Confirm" Classes="confirmButton" Command="{Binding RefreshMediaSourcesAsync_Command}" FontSize="12" HorizontalAlignment="Right" Margin="20,0,20,15" Height="22" VerticalAlignment="Bottom" Width="105"/>
+      <Button Content="Cancel" Classes="abortButton" Command="{Binding ExitMediaTypeSourcesOptions_Command}" Focusable="False" Margin="20,0,130,15" Height="22" FontSize="12" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="105"/>
     </Grid>
     <Grid x:Name="grdPlayerOptions" IsVisible="{Binding IsPlayerOptionVisible}" Margin="150,100,150,100" Opacity="0.9">
       <Grid Margin="11,11,11,11">
@@ -529,6 +517,28 @@
 
       <Button Command="{Binding UpdateInterfaceOptionsAsync_Command}" Content="Confirm" Classes="confirmButton" HorizontalAlignment="Right" Margin="20,0,20,15" Height="22" FontSize="12" VerticalAlignment="Bottom" Width="105"/>
       <Button Command="{Binding ExitInterfaceOptions_Command}" Classes="abortButton" Content="Back" Margin="20,0,20,15" FontSize="12" BorderThickness="0" Height="22" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="105"/>
+    </Grid>
+    <Grid x:Name="grdSystemOptions" IsVisible="{Binding IsSystemOptionVisible}" Margin="150,100,150,100" Opacity="0.9">
+      <Grid Margin="11,11,11,11">
+        <Path Data="M 1,0 0.5,0 Q 0,0 0,0.5 L 0,1" Fill="Transparent" HorizontalAlignment="Left" Height="6" Margin="-5" Stretch="Fill" Stroke="{DynamicResource BorderLit}" StrokeThickness="4" VerticalAlignment="Top" Width="6"/>
+        <Path Data="M 0,1 0.5,1 Q 1,1 1,0.5 L 1,0" Fill="Transparent" HorizontalAlignment="Right" Height="6" Margin="-5" Stretch="Fill" Stroke="{DynamicResource BorderUnlit}" StrokeThickness="4" VerticalAlignment="Bottom" Width="6"/>
+        <Path Data="M 0,0 0.5,0 Q 1,0 1,0.5 L 1,1" Fill="Transparent" HorizontalAlignment="Right" Height="6" Margin="-5" Stretch="Fill" Stroke="{DynamicResource AngleShadow}" StrokeThickness="4" VerticalAlignment="Top" Width="6"/>
+        <Path Data="M 0,0 0,0.5 Q 0,1 0.5,1 L 1,1" Fill="Transparent" HorizontalAlignment="Left" Height="6" Margin="-5" Stretch="Fill" Stroke="{DynamicResource AngleShadow}" StrokeThickness="4" VerticalAlignment="Bottom" Width="6"/>
+        <Line StartPoint="0,0" EndPoint="1,0" Stroke="{DynamicResource BorderLit}" Stretch="Fill" Margin="0,-5" StrokeThickness="4" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+        <Line StartPoint="0,1" EndPoint="1,1" Stroke="{DynamicResource BorderUnlit}" Stretch="Fill" Margin="0,5,0,-5" StrokeThickness="4" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+        <Line StartPoint="0,0" EndPoint="0,1" Stroke="{DynamicResource BorderLit}" Stretch="Fill" Margin="-5,-1" StrokeThickness="4" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <Line StartPoint="1,0" EndPoint="1,1" Stroke="{DynamicResource BorderUnlit}" Stretch="Fill" Margin="5,-1,-5,-1" StrokeThickness="4" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+        <Line StartPoint="0,0" EndPoint="1,0" Stroke="{DynamicResource UpperHighlight}" Stretch="Fill" Margin="1,-5" StrokeThickness="4" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+      </Grid>
+      <Border Margin="0" Classes="contentBorder"/>
+      <Label Content="When loading media library:" Foreground="{DynamicResource textForeground}" HorizontalContentAlignment="Left" FontSize="20" Padding="0" HorizontalAlignment="Left" Width="250" Margin="30,30,0,0" Height="30" VerticalAlignment="Top"/>
+
+      <RadioButton Content="read from database" GroupName="StorageMediumGroup" IsChecked="{Binding UsesDatabaseForStorage}" Classes="RadioButton" Foreground="{DynamicResource textForeground}" Height="23" MinHeight="23" VerticalAlignment="Top" VerticalContentAlignment="Center" Margin="300,30,30,0" Padding="2" FontSize="14"/>
+      <RadioButton Content="read from disk" GroupName="StorageMediumGroup" IsChecked="{Binding !UsesDatabaseForStorage}" Classes="RadioButton" Foreground="{DynamicResource textForeground}" Height="23" MinHeight="23" VerticalAlignment="Top" VerticalContentAlignment="Center" Margin="300,60,30,0" Padding="2" FontSize="14"/>
+      
+
+      <Button Command="{Binding UpdateSystemOptionsAsync_Command}" Content="Confirm" Classes="confirmButton" HorizontalAlignment="Right" Margin="20,0,20,15" Height="22" FontSize="12" VerticalAlignment="Bottom" Width="105"/>
+      <Button Command="{Binding ExitSystemOptions_Command}" Classes="abortButton" Content="Back" Margin="20,0,20,15" FontSize="12" BorderThickness="0" Height="22" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="105"/>
     </Grid>
     <Grid x:Name="grdSearch" IsVisible="{Binding IsSearchContainerVisible}" Margin="150,100,150,100" Opacity="0.9">
       <Grid Margin="11,11,11,11" ZIndex="-2">
@@ -608,7 +618,7 @@
           </DataTemplate>
         </ListBox.ItemTemplate>
       </ListBox>
-      
+
       <Button Command="{Binding SearchMediaLibraryAsync_Command}" Content="Search" Classes="confirmButton" HorizontalAlignment="Right" Margin="30,0,30,15" Height="22" FontSize="12" VerticalAlignment="Bottom" Width="105"/>
       <Button Classes="abortButton" Content="Clear" Command="{Binding ClearAdvancedSearchTerms_Command}" Margin="30,0,145,15" FontSize="12" BorderThickness="0" Height="22" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="105"/>
       <Button Classes="abortButton" Content="Back" Margin="30,0,30,15" FontSize="12" BorderThickness="0" Height="22" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="105" Click="DisplayMainMenu_Click"/>

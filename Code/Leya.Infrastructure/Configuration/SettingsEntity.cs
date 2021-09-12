@@ -11,12 +11,12 @@ namespace Leya.Infrastructure.Configuration
     {
         #region =============================================================== PROPERTIES ==================================================================================
         public int DialogNavigationFilterSelectedIndex { get; set; }
+        public int? MainWindowWidth { get; set; }
+        public int? MainWindowHeight { get; set; }
         public int? MainWindowPositionX { get; set; }
         public int? MainWindowPositionY { get; set; }
         public int? StartupWindowPositionX { get; set; }
         public int? StartupWindowPositionY { get; set; }
-        public int? MainWindowWidth { get; set; }
-        public int? MainWindowHeight { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
         public string PlayerPath { get; set; }
@@ -35,6 +35,7 @@ namespace Leya.Infrastructure.Configuration
         public bool RememberCredentials { get; set; }
         public bool UsesAutoscaleArgument { get; set; }
         public bool IsAlwaysOnTopArgument { get; set; }
+        public bool UsesDatabaseForStorage { get; set; }
         public bool RepeatsPlaylistArgument { get; set; }
         public bool ShufflesPlaylistArgument { get; set; }
         public bool UsesFullScreenArgument { get; set; } = true;

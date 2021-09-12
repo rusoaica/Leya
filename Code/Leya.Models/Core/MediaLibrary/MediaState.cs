@@ -61,15 +61,13 @@ namespace Leya.Models.Core.MediaLibrary
             // get the info of the episode
             EpisodeEntity episode = mediaLibrary.Library.TvShows.SelectMany(t => t.Seasons)
                                                                 .SelectMany(s => s.Episodes)
-                                                                .Where(e => e.Id == media.EpisodeOrSongId)
-                                                                .First();
+                                                                .First(e => e.Id == media.EpisodeOrSongId);
             // mark its watched status and update it in the repository
             episode.IsWatched = media.IsWatched;
             await this.episode.UpdateIsWatchedStatusAsync(media.EpisodeOrSongId, media.IsWatched);
             // check if all the episodes in the season of the current episode are watched, and if so, mark the season itself as watched
             SeasonEntity season = mediaLibrary.Library.TvShows.SelectMany(t => t.Seasons)
-                                                              .Where(s => s.Id == media.SeasonOrAlbumId)
-                                                              .First();
+                                                              .First(s => s.Id == media.SeasonOrAlbumId);
             if (season.Episodes.All(e => e.IsWatched == true))
             {
                 await this.season.UpdateIsWatchedStatusAsync(media.SeasonOrAlbumId, true);
@@ -88,8 +86,7 @@ namespace Leya.Models.Core.MediaLibrary
                 season.IsWatched = null;
             }
             // check if all the seasons in the tv show of the current episode are watched, and if so, mark the tv show itself as watched
-            TvShowEntity tvShow = mediaLibrary.Library.TvShows.Where(t => t.Id == media.Id)
-                                                              .First();
+            TvShowEntity tvShow = mediaLibrary.Library.TvShows.First(t => t.Id == media.Id);
             if (tvShow.Seasons.All(t => t.IsWatched == true))
             {
                 await this.tvShow.UpdateIsWatchedStatusAsync(media.Id, true);
@@ -130,13 +127,11 @@ namespace Leya.Models.Core.MediaLibrary
             }
             // update the watched status of the season
             SeasonEntity season = mediaLibrary.Library.TvShows.SelectMany(t => t.Seasons)
-                                                              .Where(s => s.Id == media.SeasonOrAlbumId)
-                                                              .First();
+                                                              .First(s => s.Id == media.SeasonOrAlbumId);
             season.IsWatched = media.IsWatched;
             await this.season.UpdateIsWatchedStatusAsync(season.Id, season.IsWatched);
             // check if all the seasons in the tv show of the current season are watched, and if so, mark the tv show itself as watched
-            TvShowEntity tvShow = mediaLibrary.Library.TvShows.Where(t => t.Id == media.Id)
-                                                              .First();
+            TvShowEntity tvShow = mediaLibrary.Library.TvShows.First(t => t.Id == media.Id);
             if (tvShow.Seasons.All(t => t.IsWatched == true))
             {
                 await this.tvShow.UpdateIsWatchedStatusAsync(media.Id, true);
@@ -166,8 +161,7 @@ namespace Leya.Models.Core.MediaLibrary
         public async Task SetTvShowIsWatchedStatusAsync(IMediaLibrary mediaLibrary, IMediaEntity media)
         {
             // update the watched status of the seasons of the tv show
-            foreach (SeasonEntity season in mediaLibrary.Library.TvShows.Where(t => t.Id == media.Id)
-                                                                        .First().Seasons)
+            foreach (SeasonEntity season in mediaLibrary.Library.TvShows.First(t => t.Id == media.Id).Seasons)
             {
                 season.IsWatched = media.IsWatched;
                 // update the watched status of the seasons of the tv show
@@ -182,8 +176,7 @@ namespace Leya.Models.Core.MediaLibrary
                 }
             }
             // update the watched status of the tv show
-            TvShowEntity tvShow = mediaLibrary.Library.TvShows.Where(t => t.Id == media.Id)
-                                                              .First();
+            TvShowEntity tvShow = mediaLibrary.Library.TvShows.First(t => t.Id == media.Id);
             tvShow.IsWatched = media.IsWatched;
             await this.tvShow.UpdateIsWatchedStatusAsync(tvShow.Id, tvShow.IsWatched);
             // update number of unwatched episodes
@@ -197,8 +190,7 @@ namespace Leya.Models.Core.MediaLibrary
         /// <param name="media">The media item for which to update the IsWatched status</param>
         public async Task SetMovieIsWatchedStatusAsync(IMediaLibrary mediaLibrary, IMediaEntity media)
         {
-            MovieEntity movie = mediaLibrary.Library.Movies.Where(m => m.Id == media.Id)
-                                                           .First();
+            MovieEntity movie = mediaLibrary.Library.Movies.First(m => m.Id == media.Id);
             movie.IsWatched = media.IsWatched;
             // update the watched status of the movie
             await this.movie.UpdateIsWatchedStatusAsync(movie.Id, movie.IsWatched);
@@ -214,15 +206,13 @@ namespace Leya.Models.Core.MediaLibrary
             // get the info of the song
             SongEntity song = mediaLibrary.Library.Artists.SelectMany(a => a.Albums)
                                                           .SelectMany(a => a.Songs)
-                                                          .Where(s => s.Id == media.EpisodeOrSongId)
-                                                          .First();
+                                                          .First(s => s.Id == media.EpisodeOrSongId);
             // mark its listened status and update it in the repository
             song.IsListened = media.IsWatched == true;
             await this.song.UpdateIsListenedStatusAsync(media.EpisodeOrSongId, media.IsWatched == true);
             // check if all the songs in the album of the current song are listened, and if so, mark the album itself as listened
             AlbumEntity album = mediaLibrary.Library.Artists.SelectMany(a => a.Albums)
-                                                            .Where(a => a.Id == media.SeasonOrAlbumId)
-                                                            .First();
+                                                            .First(a => a.Id == media.SeasonOrAlbumId);
             if (album.Songs.All(s => s.IsListened == true))
             {
                 await this.album.UpdateIsListenedStatusAsync(media.SeasonOrAlbumId, true);
@@ -240,8 +230,7 @@ namespace Leya.Models.Core.MediaLibrary
                 album.IsListened = null;
             }
             // check if all the albums of the artist of the current song are listened, and if so, mark the artist itself as listened
-            ArtistEntity artist = mediaLibrary.Library.Artists.Where(a => a.Id == media.Id)
-                                                              .First();
+            ArtistEntity artist = mediaLibrary.Library.Artists.First(a => a.Id == media.Id);
             if (artist.Albums.All(a => a.IsListened == true))
             {
                 await this.artist.UpdateIsListenedStatusAsync(media.Id, media.IsWatched == true);
@@ -258,7 +247,6 @@ namespace Leya.Models.Core.MediaLibrary
                 await this.artist.UpdateIsListenedStatusAsync(media.Id, media.IsWatched == null);
                 artist.IsListened = null;
             }
-
             //// update number of unwatched episodes
             //NumberOfUnwatchedEpisodes = mediaLibrary.Episodes.Where(e => e.IsWatched == false && e.NamedSeasonId == media.SeasonOrAlbumId && e.TvShowId == media.Id).Count();
         }
@@ -282,13 +270,11 @@ namespace Leya.Models.Core.MediaLibrary
             }
             // update the listened status of the album
             AlbumEntity album = mediaLibrary.Library.Artists.SelectMany(a => a.Albums)
-                                                            .Where(a => a.Id == media.SeasonOrAlbumId)
-                                                            .First();
+                                                            .First(a => a.Id == media.SeasonOrAlbumId);
             album.IsListened = media.IsWatched == true;
             await this.album.UpdateIsListenedStatusAsync(album.Id, album.IsListened);
             // check if all the albums of the artist of the current album are listened, and if so, mark the artist itself as listened
-            ArtistEntity artist = mediaLibrary.Library.Artists.Where(a => a.Id == media.Id)
-                                                              .First();
+            ArtistEntity artist = mediaLibrary.Library.Artists.First(a => a.Id == media.Id);
             if (artist.Albums.All(a => a.IsListened == true))
             {
                 await this.artist.UpdateIsListenedStatusAsync(media.Id, media.IsWatched == true);
@@ -317,8 +303,7 @@ namespace Leya.Models.Core.MediaLibrary
         public async Task SetArtistIsListenedStatusAsync(IMediaLibrary mediaLibrary, IMediaEntity media)
         {
             // update the listened status of the albums of the artist
-            foreach (AlbumEntity album in mediaLibrary.Library.Artists.Where(a => a.Id == media.Id)
-                                                                      .First().Albums)
+            foreach (AlbumEntity album in mediaLibrary.Library.Artists.First(a => a.Id == media.Id).Albums)
             {
                 album.IsListened = media.IsWatched == true;
                 // update the listened status of the albums of the artist
@@ -333,8 +318,7 @@ namespace Leya.Models.Core.MediaLibrary
                 }
             }
             // update the listened status of the artist
-            ArtistEntity artist = mediaLibrary.Library.Artists.Where(a => a.Id == media.Id)
-                                                              .First();
+            ArtistEntity artist = mediaLibrary.Library.Artists.First(a => a.Id == media.Id);
             artist.IsListened = media.IsWatched == true;
             await this.artist.UpdateIsListenedStatusAsync(artist.Id, artist.IsListened);
             // update number of unwatched episodes
@@ -351,15 +335,13 @@ namespace Leya.Models.Core.MediaLibrary
             // get the info of the episode
             EpisodeEntity episode = mediaLibrary.Library.TvShows.SelectMany(t => t.Seasons)
                                                                 .SelectMany(s => s.Episodes)
-                                                                .Where(e => e.Id == media.EpisodeOrSongId)
-                                                                .First();
+                                                                .First(e => e.Id == media.EpisodeOrSongId);
             // mark its favorite status and update it in the repository
             episode.IsFavorite = media.IsFavorite;
             await this.episode.UpdateIsFavoriteStatusAsync(media.EpisodeOrSongId, media.IsFavorite);
             // check if all the episodes in the season of the current episode are favorite, and if so, mark the season itself as favorite
             SeasonEntity season = mediaLibrary.Library.TvShows.SelectMany(t => t.Seasons)
-                                                              .Where(s => s.Id == media.SeasonOrAlbumId)
-                                                              .First();
+                                                              .First(s => s.Id == media.SeasonOrAlbumId);
             if (season.Episodes.All(e => e.IsFavorite))
             {
                 await this.season.UpdateIsFavoriteStatusAsync(media.SeasonOrAlbumId, true);
@@ -372,8 +354,7 @@ namespace Leya.Models.Core.MediaLibrary
                 season.IsFavorite = false;
             }
             // check if all the seasons in the tv show of the current episode are favorite, and if so, mark the tv show itself as favorite
-            TvShowEntity tvShow = mediaLibrary.Library.TvShows.Where(t => t.Id == media.Id)
-                                                              .First();
+            TvShowEntity tvShow = mediaLibrary.Library.TvShows.First(t => t.Id == media.Id);
             if (tvShow.Seasons.All(t => t.IsFavorite))
             {
                 await this.tvShow.UpdateIsFavoriteStatusAsync(media.Id, media.IsFavorite);
@@ -385,7 +366,6 @@ namespace Leya.Models.Core.MediaLibrary
                 await this.tvShow.UpdateIsFavoriteStatusAsync(media.Id, media.IsFavorite);
                 tvShow.IsFavorite = false;
             }
-
             //// update number of unfavorite episodes
             //NumberOfUnfavoriteEpisodes = mediaLibrary.Episodes.Where(e => e.IsFavorite == false && e.NamedSeasonId == media.SeasonOrAlbumId && e.TvShowId == media.Id).Count();
         }
@@ -409,13 +389,11 @@ namespace Leya.Models.Core.MediaLibrary
             }
             // update the favorite status of the season
             SeasonEntity season = mediaLibrary.Library.TvShows.SelectMany(t => t.Seasons)
-                                                              .Where(s => s.Id == media.SeasonOrAlbumId)
-                                                              .First();
+                                                              .First(s => s.Id == media.SeasonOrAlbumId);
             season.IsFavorite = media.IsFavorite;
             await this.season.UpdateIsFavoriteStatusAsync(season.Id, season.IsFavorite);
             // check if all the seasons in the tv show of the current season are favorite, and if so, mark the tv show itself as favorite
-            TvShowEntity tvShow = mediaLibrary.Library.TvShows.Where(t => t.Id == media.Id)
-                                                              .First();
+            TvShowEntity tvShow = mediaLibrary.Library.TvShows.First(t => t.Id == media.Id);
             if (tvShow.Seasons.All(t => t.IsFavorite))
             {
                 await this.tvShow.UpdateIsFavoriteStatusAsync(media.Id, media.IsFavorite);
@@ -439,8 +417,7 @@ namespace Leya.Models.Core.MediaLibrary
         public async Task SetTvShowIsFavoriteStatusAsync(IMediaLibrary mediaLibrary, IMediaEntity media)
         {
             // update the favorite status of the seasons of the tv show
-            foreach (SeasonEntity season in mediaLibrary.Library.TvShows.Where(t => t.Id == media.Id)
-                                                                        .First().Seasons)
+            foreach (SeasonEntity season in mediaLibrary.Library.TvShows.First(t => t.Id == media.Id).Seasons)
             {
                 season.IsFavorite = media.IsFavorite;
                 // update the favorite status of the seasons of the tv show
@@ -455,8 +432,7 @@ namespace Leya.Models.Core.MediaLibrary
                 }
             }
             // update the favorite status of the tv show
-            TvShowEntity tvShow = mediaLibrary.Library.TvShows.Where(t => t.Id == media.Id)
-                                                              .First();
+            TvShowEntity tvShow = mediaLibrary.Library.TvShows.First(t => t.Id == media.Id);
             tvShow.IsFavorite = media.IsFavorite;
             await this.tvShow.UpdateIsFavoriteStatusAsync(tvShow.Id, tvShow.IsFavorite);
             // update number of unfavorite episodes
@@ -470,8 +446,7 @@ namespace Leya.Models.Core.MediaLibrary
         /// <param name="media">The media item for which to update the IsFavorite status</param>
         public async Task SetMovieIsFavoriteStatusAsync(IMediaLibrary mediaLibrary, IMediaEntity media)
         {
-            MovieEntity movie = mediaLibrary.Library.Movies.Where(m => m.Id == media.Id)
-                                                           .First();
+            MovieEntity movie = mediaLibrary.Library.Movies.First(m => m.Id == media.Id);
             movie.IsFavorite = media.IsFavorite;
             // update the favorite status of the movie
             await this.movie.UpdateIsFavoriteStatusAsync(movie.Id, movie.IsFavorite);
@@ -487,15 +462,13 @@ namespace Leya.Models.Core.MediaLibrary
             // get the info of the song
             SongEntity song = mediaLibrary.Library.Artists.SelectMany(a => a.Albums)
                                                           .SelectMany(a => a.Songs)
-                                                          .Where(s => s.Id == media.EpisodeOrSongId)
-                                                          .First();
+                                                          .First(s => s.Id == media.EpisodeOrSongId);
             // mark its favorite status and update it in the repository
             song.IsFavorite = media.IsFavorite;
             await this.song.UpdateIsFavoriteStatusAsync(media.EpisodeOrSongId, media.IsFavorite);
             // check if all the songs in the album of the current song are favorite, and if so, mark the album itself as favorite
             AlbumEntity album = mediaLibrary.Library.Artists.SelectMany(a => a.Albums)
-                                                            .Where(a => a.Id == media.SeasonOrAlbumId)
-                                                            .First();
+                                                            .First(a => a.Id == media.SeasonOrAlbumId);
             if (album.Songs.All(s => s.IsFavorite))
             {
                 await this.album.UpdateIsFavoriteStatusAsync(media.SeasonOrAlbumId, true);
@@ -508,8 +481,7 @@ namespace Leya.Models.Core.MediaLibrary
                 album.IsFavorite = false;
             }
             // check if all the albums of the artist of the current song are favorite, and if so, mark the artist itself as favorite
-            ArtistEntity artist = mediaLibrary.Library.Artists.Where(a => a.Id == media.Id)
-                                                              .First();
+            ArtistEntity artist = mediaLibrary.Library.Artists.First(a => a.Id == media.Id);
             if (artist.Albums.All(a => a.IsFavorite))
             {
                 await this.artist.UpdateIsFavoriteStatusAsync(media.Id, media.IsFavorite);
@@ -521,7 +493,6 @@ namespace Leya.Models.Core.MediaLibrary
                 await this.artist.UpdateIsFavoriteStatusAsync(media.Id, media.IsFavorite);
                 artist.IsFavorite = false;
             }
-
             //// update number of unfavorite episodes
             //NumberOfUnfavoriteEpisodes = mediaLibrary.Episodes.Where(e => e.IsFavorite == false && e.NamedSeasonId == media.SeasonOrAlbumId && e.TvShowId == media.Id).Count();
         }
@@ -545,13 +516,11 @@ namespace Leya.Models.Core.MediaLibrary
             }
             // update the favorite status of the album
             AlbumEntity album = mediaLibrary.Library.Artists.SelectMany(a => a.Albums)
-                                                            .Where(a => a.Id == media.SeasonOrAlbumId)
-                                                            .First();
+                                                            .First(a => a.Id == media.SeasonOrAlbumId);
             album.IsFavorite = media.IsFavorite;
             await this.album.UpdateIsFavoriteStatusAsync(album.Id, album.IsFavorite);
             // check if all the albums of the artist of the current album are favorite, and if so, mark the artist itself as favorite
-            ArtistEntity artist = mediaLibrary.Library.Artists.Where(a => a.Id == media.Id)
-                                                              .First();
+            ArtistEntity artist = mediaLibrary.Library.Artists.First(a => a.Id == media.Id);
             if (artist.Albums.All(a => a.IsFavorite))
             {
                 await this.artist.UpdateIsFavoriteStatusAsync(media.Id, media.IsFavorite);
@@ -575,8 +544,7 @@ namespace Leya.Models.Core.MediaLibrary
         public async Task SetArtistIsFavoriteStatusAsync(IMediaLibrary mediaLibrary, IMediaEntity media)
         {
             // update the favorite status of the albums of the artist
-            foreach (AlbumEntity album in mediaLibrary.Library.Artists.Where(a => a.Id == media.Id)
-                                                                      .First().Albums)
+            foreach (AlbumEntity album in mediaLibrary.Library.Artists.First(a => a.Id == media.Id).Albums)
             {
                 album.IsFavorite = media.IsFavorite;
                 // update the favorite status of the albums of the artist
@@ -591,8 +559,7 @@ namespace Leya.Models.Core.MediaLibrary
                 }
             }
             // update the favorite status of the artist
-            ArtistEntity artist = mediaLibrary.Library.Artists.Where(a => a.Id == media.Id)
-                                                              .First();
+            ArtistEntity artist = mediaLibrary.Library.Artists.First(a => a.Id == media.Id);
             artist.IsFavorite = media.IsFavorite;
             await this.artist.UpdateIsFavoriteStatusAsync(artist.Id, artist.IsFavorite);
             // update number of unfavorite episodes

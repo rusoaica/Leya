@@ -3,15 +3,15 @@
 /// Purpose: Business model for artists
 #region ========================================================================= USING =====================================================================================
 using System;
+using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
 using Leya.DataAccess;
 using System.Threading.Tasks;
+using Leya.Models.Common.Models.Media;
 using Leya.Models.Common.Infrastructure;
 using Leya.Models.Common.Models.Artists;
 using Leya.DataAccess.Repositories.Artists;
-using Leya.Models.Common.Models.Media;
-using System.IO;
-using Newtonsoft.Json;
 #endregion
 
 namespace Leya.Models.Core.Artists
@@ -76,8 +76,8 @@ namespace Leya.Models.Core.Artists
         /// <summary>
         /// Saves an artist in the storage medium
         /// </summary>
-        /// <param name="mediaTypeSource">The media type source of the TV show</param>
-        /// <param name="mediaTypeId">The media type id of the TV show</param>
+        /// <param name="mediaTypeSource">The media type source of the artist</param>
+        /// <param name="mediaTypeId">The media type id of the artist</param>
         public async Task SaveAsync(MediaTypeSourceEntity mediaTypeSource, int mediaTypeId)
         {
             // read the tv show details, if any

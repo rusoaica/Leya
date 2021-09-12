@@ -2,13 +2,13 @@
 /// Creation Date: 11th of November, 2020
 /// Purpose: Code behind for the StartupV view
 #region ========================================================================= USING =====================================================================================
+using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using Leya.Infrastructure.Configuration;
-using Leya.ViewModels.Startup;
-using System;
 using System.Threading.Tasks;
+using Leya.ViewModels.Startup;
+using Leya.Infrastructure.Configuration;
 #endregion
 
 namespace Leya.Views.Startup
@@ -16,8 +16,8 @@ namespace Leya.Views.Startup
     public partial class StartupV : Window, IStartupView
     {
         #region ============================================================== FIELD MEMBERS ================================================================================
-        private readonly IAppConfig appConfig;
         private bool isWindowLoaded;
+        private readonly IAppConfig appConfig;
         #endregion
 
         #region ================================================================ PROPERTIES =================================================================================
@@ -33,8 +33,9 @@ namespace Leya.Views.Startup
         }
 
         /// <summary>
-        /// Default C-tor
+        /// Overload C-tor
         /// </summary>
+        /// <param name="appConfig">Injected application's configuration service</param>
         public StartupV(IAppConfig appConfig)
         {
             AvaloniaXamlLoader.Load(this);
@@ -52,7 +53,7 @@ namespace Leya.Views.Startup
         /// <summary>
         /// Shows the current window as a modal dialog
         /// </summary>
-        public async Task<bool?> ShowDialog()
+        public async Task<bool?> ShowDialogAsync()
         {
             return await ShowDialog<bool?>(Instance);
         }

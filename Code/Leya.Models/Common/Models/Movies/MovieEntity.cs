@@ -2,9 +2,9 @@
 /// Creation Date: 23rd of November, 2020
 /// Purpose: Data transfer object for the movies
 #region ========================================================================= USING =====================================================================================
-using Leya.Models.Common.Infrastructure;
-using Leya.Models.Common.Models.Media;
 using System;
+using Leya.Models.Common.Models.Media;
+using Leya.Models.Common.Infrastructure;
 #endregion
 
 namespace Leya.Models.Common.Models.Movies

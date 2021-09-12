@@ -2,9 +2,9 @@
 /// Creation Date: 04th of July, 2021
 /// Purpose: Interface for custom file save dialogs
 #region ========================================================================= USING =====================================================================================
+using System.Threading.Tasks;
 using Leya.Infrastructure.Enums;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 #endregion
 
 namespace Leya.Infrastructure.Dialog
@@ -24,7 +24,7 @@ namespace Leya.Infrastructure.Dialog
         /// Shows a new folder browser dialog
         /// </summary>
         /// <returns>A <see cref="NotificationResult"/> representing the result of displaying the custom folder browser dialog</returns>
-        Task<NotificationResult> Show();
+        Task<NotificationResult> ShowAsync();
         #endregion
     }
 }

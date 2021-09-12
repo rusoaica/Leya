@@ -4,15 +4,15 @@
 #region ========================================================================= USING =====================================================================================
 using System.Linq;
 using System.Threading.Tasks;
+using Leya.Infrastructure.Enums;
 using System.Collections.Generic;
 using Leya.Models.Core.MediaLibrary;
 using Leya.Models.Common.Broadcasting;
-using Leya.Models.Common.Models.Common;
 using Leya.Models.Common.Models.Media;
+using Leya.Models.Common.Models.Common;
 using Leya.Models.Common.Models.Movies;
 using Leya.Models.Common.Models.TvShows;
 using Leya.Models.Common.Models.Artists;
-using Leya.Infrastructure.Enums;
 #endregion
 
 namespace Leya.Models.Core.Search
@@ -68,6 +68,10 @@ namespace Leya.Models.Core.Search
         #endregion
 
         #region ================================================================== CTOR =====================================================================================
+        /// <summary>
+        /// Overload C-tor
+        /// </summary>
+        /// <param name="mediaLibrary">The injected media library containing the elements to be searched</param>
         public Search(IMediaLibrary mediaLibrary)
         {
             this.mediaLibrary = mediaLibrary;
@@ -75,6 +79,18 @@ namespace Leya.Models.Core.Search
         #endregion
 
         #region ================================================================= METHODS ===================================================================================
+        /// <summary>
+        /// Clears the advanced search terms
+        /// </summary>
+        public void ClearAdvancedSearchTerms()
+        {
+            SearchMediaName = string.Empty;
+            SearchMediaTag = string.Empty;
+            SearchMediaGenre = string.Empty;
+            SearchMediaMember = string.Empty;
+            SearchMediaRole = string.Empty;
+        }
+
         /// <summary>
         /// Searches the media library
         /// </summary>
@@ -253,18 +269,6 @@ namespace Leya.Models.Core.Search
                 else if (media is ArtistEntity artist && artist.Members.Select(a => a.Role.ToLower().Contains(searchTerm)).Count() > 0)
                     yield return media;
             }
-        }
-
-        /// <summary>
-        /// Clears the advanced search terms
-        /// </summary>
-        public void ClearAdvancedSearchTerms()
-        {
-            SearchMediaName = string.Empty;
-            SearchMediaTag = string.Empty;
-            SearchMediaGenre = string.Empty;
-            SearchMediaMember = string.Empty;
-            SearchMediaRole = string.Empty;
         }
         #endregion
     }

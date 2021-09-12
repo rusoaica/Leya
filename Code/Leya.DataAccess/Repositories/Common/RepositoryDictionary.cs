@@ -59,7 +59,7 @@ namespace Leya.DataAccess.Repositories.Common
         /// <returns>A repository implementing <typeparamref name="TResult"/></returns>
         public TResult Get<TResult>(Type key)
         {
-            return (TResult)container.Where(e => e.Key == key).FirstOrDefault().Value;
+            return (TResult)container.FirstOrDefault(e => e.Key == key).Value;
         }
         #endregion
     }

@@ -24,7 +24,7 @@ namespace Leya.ViewModels.Common.ViewFactory
         /// </summary>
         /// <returns>A nullable bool that specifies whether the activity was accepted (true) or canceled (false). 
         /// The return value is the value of the DialogResult property before a window closes</returns>
-        Task<bool?> ShowDialog();
+        Task<bool?> ShowDialogAsync();
         #endregion
     }
 }

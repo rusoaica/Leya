@@ -25,7 +25,7 @@ namespace Leya.ViewModels.Common.Dialogs.FileSave
         /// Shows a new instance of the folder browser dialog
         /// </summary>
         /// <returns>A <see cref="NotificationResult"/> representing the DialogResult of the folder browser dialog</returns>
-        Task<NotificationResult> Show();
+        Task<NotificationResult> ShowAsync();
         #endregion
     }
 }

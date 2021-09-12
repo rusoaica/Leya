@@ -13,24 +13,24 @@ namespace Leya.Models.Core.Search
     public interface ISearch
     {
         #region ================================================================ PROPERTIES =================================================================================
-        string SearchMediaName { get; set; }
         string SearchMediaTag { get; set; }
+        string SearchMediaName { get; set; }
+        string SearchMediaRole { get; set; }
         string SearchMediaGenre { get; set; }
         string SearchMediaMember { get; set; }
-        string SearchMediaRole { get; set; }
         MediaTypeEntity SelectedSearchMediaType { get; set; }
         #endregion
 
         #region ================================================================= METHODS ===================================================================================
         /// <summary>
-        /// Searches the media library
-        /// </summary>
-        Task<IEnumerable<AdvancedSearchResultEntity>> SearchLibraryAsync();
-
-        /// <summary>
         /// Clears the advanced search terms
         /// </summary>
         void ClearAdvancedSearchTerms();
+
+        /// <summary>
+        /// Searches the media library
+        /// </summary>
+        Task<IEnumerable<AdvancedSearchResultEntity>> SearchLibraryAsync();
         #endregion
     }
 }

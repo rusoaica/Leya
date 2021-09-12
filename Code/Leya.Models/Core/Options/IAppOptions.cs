@@ -1,6 +1,6 @@
 ﻿/// Written by: Yulia Danilova
 /// Creation Date: 28th of August, 2021
-/// Purpose: Interface business model for options
+/// Purpose: Interface business model for application options
 
 namespace Leya.Models.Core.Options
 {
@@ -9,6 +9,7 @@ namespace Leya.Models.Core.Options
         #region ================================================================ PROPERTIES =================================================================================
         IOptionsMedia OptionsMedia { get; }
         IOptionsPlayer OptionsPlayer { get; }
+        IOptionsSystem OptionsSystem { get; }
         IOptionsInterface OptionsInterface { get; }
         #endregion
     }

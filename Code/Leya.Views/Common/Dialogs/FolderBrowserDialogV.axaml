@@ -63,16 +63,7 @@
           </ia:EventTriggerBehavior>
         </i:Interaction.Behaviors>
       </AutoCompleteBox>
-      <CheckBox IsChecked="{Binding IsFavoritePath}" ToolTip.Tip="Favorite Directory" Classes="favorite" Cursor="Hand" Grid.Column="1" Height="18" Width="20" Checked="Favorite_CheckedChanged" Unchecked="Favorite_CheckedChanged">
-        <!--<i:Interaction.Behaviors>
-          <ia:EventTriggerBehavior EventName="Checked">
-            <ia:InvokeCommandAction Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SetIsFavoritePathAsync_Command}"/>
-          </ia:EventTriggerBehavior>
-          <ia:EventTriggerBehavior EventName="Unchecked">
-            <ia:InvokeCommandAction Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SetIsFavoritePathAsync_Command}"/>
-          </ia:EventTriggerBehavior>
-        </i:Interaction.Behaviors>-->
-      </CheckBox>
+      <CheckBox IsChecked="{Binding IsFavoritePath}" ToolTip.Tip="Favorite Directory" Classes="favorite" Cursor="Hand" Grid.Column="1" Height="18" Width="20" Checked="Favorite_CheckedChanged" Unchecked="Favorite_CheckedChanged"/>
       <Button Command="{Binding ShowNewFolderDialog_Command}" Content="New Folder" Classes="abortButton" IsVisible="{Binding ShowNewFolderButton}" Grid.Column="3" Height="21" Width="90" Margin="3,0,0,0" FontSize="12" VerticalAlignment="Top" Click="ShowNewFolderModalBox"/>
     </Grid>
 

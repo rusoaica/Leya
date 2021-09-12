@@ -46,6 +46,11 @@ namespace Leya.Models.Core.MediaLibrary
                 throw new InvalidOperationException("Error getting the media type sources from the repository: " + result.Error);
         }
 
+        /// <summary>
+        /// Inserts <paramref name="media"/> into the storage medium
+        /// </summary>
+        /// <param name="media">The media type source to be inserted</param>
+        /// <returns>The id of the inserted media type source</returns>
         public async Task<int> InsertMediaTypeSource(MediaTypeSourceEntity media)
         {
             var result = await mediaTypeSourceRepository.InsertAsync(media.ToStorageEntity());

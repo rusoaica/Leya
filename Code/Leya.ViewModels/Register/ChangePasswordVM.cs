@@ -3,14 +3,11 @@
 /// Purpose: View Model for the Change Password view
 #region ========================================================================= USING =====================================================================================
 using System;
-using System.Security;
 using System.Threading.Tasks;
-using Leya.Models.Core.Security;
 using Leya.Infrastructure.Enums;
+using Leya.Models.Core.Security;
 using Leya.ViewModels.Common.MVVM;
-using Leya.Models.Common.Extensions;
 using Leya.Infrastructure.Notification;
-using Leya.Infrastructure.Configuration;
 #endregion
 
 namespace Leya.ViewModels.Register
@@ -150,7 +147,7 @@ namespace Leya.ViewModels.Register
             {
                 ShowProgressBar();
                 // get the account details based on the provided username
-                authentication.GetUserAsync(Username);
+                await authentication.GetUserAsync(Username);
                 HideProgressBar();
             }
             catch (Exception ex) when (ex is InvalidOperationException)

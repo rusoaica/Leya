@@ -123,14 +123,14 @@ namespace Leya.DataAccess.Repositories.Albums
         }
 
         /// <summary>
-        /// Updates the IsFavorite status of an album identified by <paramref name="AlbumId"/> in the storage medium
+        /// Updates the IsFavorite status of an album identified by <paramref name="albumId"/> in the storage medium
         /// </summary>
-        /// <param name="AlbumId">The id of the album whose status will be updated</param>
+        /// <param name="albumId">The id of the album whose status will be updated</param>
         /// <param name="isFavorite">The IsFavorite status to be set</param>
         /// <returns>The result of updating the IsFavorite status, wrapped in a generic API container of type <see cref="ApiResponse"/></returns>
-        public async Task<ApiResponse> UpdateIsFavoriteStatusAsync(int AlbumId, bool isFavorite)
+        public async Task<ApiResponse> UpdateIsFavoriteStatusAsync(int albumId, bool isFavorite)
         {
-            return await dataAccess.UpdateAsync(EntityContainers.Albums, "IsFavorite = '" + isFavorite + "'", "Id", "'" + AlbumId + "'");
+            return await dataAccess.UpdateAsync(EntityContainers.Albums, "IsFavorite = '" + isFavorite + "'", "Id", "'" + albumId + "'");
         }
         #endregion
     }

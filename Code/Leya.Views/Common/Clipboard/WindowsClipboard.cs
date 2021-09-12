@@ -16,6 +16,7 @@ namespace Leya.Views.Common.Clipboard
         /// <param name="text">The string to be set into Windows clipboard</param>
         public void SetText(string text)
         {
+            // TODO: add platform conditional compilation
             //System.Windows.Clipboard.SetText(text);
         }
         #endregion

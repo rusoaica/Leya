@@ -50,9 +50,9 @@ namespace Leya.ViewModels.Common.Dialogs.FolderBrowser
         /// Shows a new custom folder browser dialog
         /// </summary>
         /// <returns>A <see cref="NotificationResult"/> value representing the result of the custom folder browser dialog</returns>
-        public async Task<NotificationResult> Show()
+        public async Task<NotificationResult> ShowAsync()
         {
-            return await await dispatcher?.Dispatch(new Func<Task<NotificationResult>>(async () =>
+            return await await dispatcher?.DispatchAsync(new Func<Task<NotificationResult>>(async () =>
             {
                 IFolderBrowserDialogVM folderBrowserDialogVM = folderBrowserVM.Invoke();
                 folderBrowserDialogVM.InitialFolder = InitialFolder;
@@ -60,7 +60,7 @@ namespace Leya.ViewModels.Common.Dialogs.FolderBrowser
                 folderBrowserDialogVM.ShowNewFolderButton = ShowNewFolderButton;
                 folderBrowserDialogVM.AllowMultiselection = AllowMultiselection;
                 // display the folder browse dialog as modal, and get its result
-                NotificationResult result = await folderBrowserDialogVM.Show();
+                NotificationResult result = await folderBrowserDialogVM.ShowAsync();
                 // after folder browse dialog is closed, relay the selected folders
                 SelectedDirectories = folderBrowserDialogVM.SelectedDirectories;
                 return result;

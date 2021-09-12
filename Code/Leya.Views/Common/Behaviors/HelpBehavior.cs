@@ -38,7 +38,7 @@ namespace Leya.Views.Common.Behaviors
         /// </summary>
         static HelpBehavior()
         {
-            CommandProperty.Changed.Subscribe(x => HandleCommandChanged(x.Sender));
+            CommandProperty.Changed.Subscribe(p => HandleCommandChanged(p.Sender));
         }
         #endregion
 

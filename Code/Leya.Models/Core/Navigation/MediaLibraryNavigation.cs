@@ -12,10 +12,10 @@ using Leya.Models.Core.MediaLibrary;
 using Leya.Models.Common.Broadcasting;
 using Leya.Models.Common.Models.Media;
 using Leya.Models.Common.Models.Movies;
+using Leya.Models.Common.Models.Common;
 using Leya.Models.Common.Models.TvShows;
 using Leya.Models.Common.Models.Artists;
 using Leya.Infrastructure.Miscellaneous;
-using Leya.Models.Common.Models.Common;
 #endregion
 
 namespace Leya.Models.Core.Navigation
@@ -25,26 +25,26 @@ namespace Leya.Models.Core.Navigation
         #region ============================================================== FIELD MEMBERS ================================================================================
         public event Action Navigated;
 
-        private string currentMediaName = string.Empty;
+        private string currentMediaName;
         private readonly IMediaPlayer mediaPlayer;
         #endregion
 
         #region ================================================================ PROPERTIES =================================================================================
-        private int numberOfSeasons = 0;
+        private int numberOfSeasons;
         public int NumberOfSeasons
         {
             get { return numberOfSeasons; }
             set { numberOfSeasons = value; Notify(); }
         }
 
-        private int numberOfEpisodes = 0;
+        private int numberOfEpisodes;
         public int NumberOfEpisodes
         {
             get { return numberOfEpisodes; }
             set { numberOfEpisodes = value; Notify(); }
         }
 
-        private int numberOfUnwatchedEpisodes = 0;
+        private int numberOfUnwatchedEpisodes;
         public int NumberOfUnwatchedEpisodes
         {
             get { return numberOfUnwatchedEpisodes; }
@@ -65,14 +65,14 @@ namespace Leya.Models.Core.Navigation
             set { fanart = value; Notify(); }
         }
 
-        private string banner = string.Empty;
+        private string banner;
         public string Banner
         {
             get { return banner; }
             set { banner = value; Notify(); }
         }
 
-        private string mpaa = string.Empty;
+        private string mpaa;
         public string MPAA
         {
             get { return mpaa; }
@@ -86,7 +86,7 @@ namespace Leya.Models.Core.Navigation
             set { tagLine = value; Notify(); }
         }
 
-        private string synopsis = string.Empty;
+        private string synopsis;
         public string Synopsis
         {
             get { return synopsis; }
@@ -107,21 +107,21 @@ namespace Leya.Models.Core.Navigation
             set { currentStatus = value; Notify(); }
         }
 
-        private string genre = string.Empty;
+        private string genre;
         public string Genre
         {
             get { return genre; }
             set { genre = value; Notify(); }
         }
 
-        private string writers = string.Empty;
+        private string writers;
         public string Writers
         {
             get { return writers; }
             set { writers = value; Notify(); }
         }
 
-        private string director = string.Empty;
+        private string director;
         public string Director
         {
             get { return director; }
@@ -196,6 +196,13 @@ namespace Leya.Models.Core.Navigation
         {
             get { return isPlayerOptionVisible; }
             set { isPlayerOptionVisible = value; Notify(); }
+        }
+
+        private bool isSystemOptionVisible = false;
+        public bool IsSystemOptionVisible
+        {
+            get { return isSystemOptionVisible; }
+            set { isSystemOptionVisible = value; Notify(); }
         }
 
         private bool isMediaTypesOptionVisible;
@@ -427,6 +434,15 @@ namespace Leya.Models.Core.Navigation
         public void ExitInterfaceOptions()
         {
             IsInterfaceOptionVisible = false;
+            IsHelpButtonVisible = false;
+        }
+
+        /// <summary>
+        /// Exits the system options view and returns to the options list
+        /// </summary>
+        public void ExitSystemOptions()
+        {
+            IsSystemOptionVisible = false;
             IsHelpButtonVisible = false;
         }
 

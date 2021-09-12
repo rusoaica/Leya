@@ -3,7 +3,6 @@
 /// Purpose: View Model for the Recover Password view
 #region ========================================================================= USING =====================================================================================
 using System;
-using System.Security;
 using System.Threading.Tasks;
 using Leya.Models.Core.Security;
 using Leya.Infrastructure.Enums;

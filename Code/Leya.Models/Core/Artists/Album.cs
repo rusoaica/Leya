@@ -39,7 +39,7 @@ namespace Leya.Models.Core.Artists
 
         #region ================================================================= METHODS ===================================================================================
         /// <summary>
-        /// Gets the seasons from the storage medium
+        /// Gets the albums from the storage medium
         /// </summary>
         public async Task GetAlbumsAsync()
         {

@@ -8,6 +8,7 @@ using Leya.Models.Common.Models.Movies;
 using Leya.Models.Common.Models.Artists;
 using Leya.Models.Common.Models.TvShows;
 #endregion
+
 namespace Leya.Models.Core.MediaLibrary
 {
     public interface ILibrary

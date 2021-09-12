@@ -23,6 +23,10 @@ namespace Leya.Models.Common.Models.Media
         #endregion
 
         #region ================================================================= METHODS ===================================================================================
+        /// <summary>
+        /// Notifies subscribers about a property's value being changed
+        /// </summary>
+        /// <param name="propName">The property that had the value changed</param>
         void Notify([CallerMemberName] string propertyName = null);
         #endregion
     }

@@ -7,9 +7,9 @@ using Avalonia;
 using Avalonia.Markup.Xaml;
 using Leya.ViewModels.Startup;
 using Leya.Views.Common.Styles;
+using Leya.Models.Core.Options;
 using Leya.Views.Common.Configuration;
 using Leya.ViewModels.Common.ViewFactory;
-using Leya.Models.Core.Options;
 #endregion
 
 namespace Leya.Views

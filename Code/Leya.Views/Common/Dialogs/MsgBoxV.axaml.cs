@@ -36,7 +36,7 @@ namespace Leya.Views.Common.Dialogs
         /// </summary>
         /// <returns>A nullable bool that specifies whether the activity was accepted (true) or canceled (false). 
         /// The return value is the value of the DialogResult property before a window closes</returns>
-        public async Task<bool?> ShowDialog()
+        public async Task<bool?> ShowDialogAsync()
         {
             return await ShowDialog<bool?>(StartupV.Instance);
         }

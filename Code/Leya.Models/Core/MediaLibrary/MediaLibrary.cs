@@ -3,18 +3,14 @@
 /// Purpose: Business model for media library
 #region ========================================================================= USING =====================================================================================
 using System;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
-using Leya.Models.Core.Movies;
-using Leya.Models.Core.Artists;
-using Leya.Models.Core.TvShows;
+using System.Collections.Generic;
+using Leya.Models.Core.Navigation;
 using Leya.Models.Common.Broadcasting;
 using Leya.Models.Common.Models.Media;
-using System.Linq;
 using Leya.Models.Common.Models.Common;
-using System.Collections.Generic;
-using Leya.Models.Common.Models.TvShows;
-using System.IO;
-using Leya.Models.Core.Navigation;
 #endregion
 
 namespace Leya.Models.Core.MediaLibrary
@@ -26,19 +22,15 @@ namespace Leya.Models.Core.MediaLibrary
         public event Action LibraryLoaded;
 
         private readonly ILibrary library;
-        private readonly IMediaCast mediaCast;
-        private readonly IMediaState mediaState;
-        private readonly IMediaStatistics mediaStatistics;
-        private readonly IMediaLibraryNavigation mediaLibraryNavigation;
         #endregion
 
         #region ================================================================ PROPERTIES =================================================================================
-        public IMediaCast MediaCast => mediaCast;
-        public IMediaState MediaState => mediaState;
-        public IMediaStatistics MediaStatistics => mediaStatistics;
-        public IMediaLibraryNavigation Navigation => mediaLibraryNavigation;
+        public IMediaCast MediaCast { get; }
+        public IMediaState MediaState { get; }
+        public IMediaStatistics MediaStatistics { get; }
+        public IMediaLibraryNavigation Navigation { get; }
         public MediaLibraryEntity Library { get; set; } = new MediaLibraryEntity();
-        public List<SearchEntity> SourceSearch { get; set; } = new List<SearchEntity>();
+        public List<FilterEntity> SourceQuickSearch { get; set; } = new List<FilterEntity>();
         #endregion
 
         #region ================================================================== CTOR =====================================================================================
@@ -53,10 +45,10 @@ namespace Leya.Models.Core.MediaLibrary
         public MediaLibrary(ILibrary library, IMediaState mediaState, IMediaCast mediaCast, IMediaLibraryNavigation mediaLibraryNavigation, IMediaStatistics mediaStatistics)
         {
             this.library = library;
-            this.mediaCast = mediaCast;
-            this.mediaState = mediaState;
-            this.mediaStatistics = mediaStatistics;
-            this.mediaLibraryNavigation = mediaLibraryNavigation;
+            MediaCast = mediaCast;
+            MediaState = mediaState;
+            MediaStatistics = mediaStatistics;
+            Navigation = mediaLibraryNavigation;
         }
         #endregion
 
@@ -81,56 +73,53 @@ namespace Leya.Models.Core.MediaLibrary
         /// </summary>
         private async Task GetMediaLibrarySearchListAsync()
         {
-            SourceSearch = new List<SearchEntity>();
+            SourceQuickSearch = new List<FilterEntity>();
             await Task.Run(() =>
             {
-                SourceSearch.AddRange(from tv in Library.TvShows
+                SourceQuickSearch.AddRange(from tv in Library.TvShows
                               from season in tv.Seasons
                               from episode in season.Episodes
-                              select new SearchEntity()
+                              select new FilterEntity()
                               {
                                   
-                                  Text = episode.Title,
-                                  Value = tv.Title,
-                                  Hover = episode.Actors?.Select(e => e.Role).ToArray(),
-                                  Actors = episode.Actors?.Select(a => a.Name).ToArray(),
+                                  ChildTitle = episode.Title,
+                                  ParentTitle = tv.Title,
+                                  Roles = episode.Actors?.Select(e => e.Role).ToArray(),
+                                  Members = episode.Actors?.Select(a => a.Name).ToArray(),
                                   Genres = episode.Genres?.Select(g => g.Genre).ToArray(),
                                   MediaItemPath = Library.MediaTypes.Where(mt => mt.Id == tv.MediaTypeId)
-                                                                        .Select(mt => mt.MediaTypeSources.Where(mts => mts.Id == tv.MediaTypeSourceId)
-                                                                                                         .First())
-                                                                        .First().MediaSourcePath +
-                                                       Path.DirectorySeparatorChar + season.Title +
-                                                       Path.DirectorySeparatorChar + episode.NamedTitle
+                                                                    .Select(mt => mt.MediaTypeSources.First(mts => mts.Id == tv.MediaTypeSourceId))
+                                                                    .First().MediaSourcePath +
+                                                                     Path.DirectorySeparatorChar + season.Title +
+                                                                     Path.DirectorySeparatorChar + episode.NamedTitle
                               });
-                SourceSearch.AddRange(from movie in Library.Movies
-                              select new SearchEntity()
+                SourceQuickSearch.AddRange(from movie in Library.Movies
+                              select new FilterEntity()
                               {
-                                  Text = movie.Title,
-                                  Hover = movie.Actors?.Select(e => e.Role).ToArray(),
-                                  Actors = movie.Actors?.Select(a => a.Name).ToArray(),
+                                  ChildTitle = movie.Title,
+                                  Roles = movie.Actors?.Select(e => e.Role).ToArray(),
+                                  Members = movie.Actors?.Select(a => a.Name).ToArray(),
                                   Genres = movie.Genres?.Select(g => g.Genre).ToArray(),
                                   MediaItemPath = Library.MediaTypes.Where(mt => mt.Id == movie.MediaTypeId)
-                                                                        .Select(mt => mt.MediaTypeSources.Where(mts => mts.Id == movie.MediaTypeSourceId)
-                                                                                                         .First())
-                                                                        .First().MediaSourcePath +
-                                                       Path.DirectorySeparatorChar + movie.NamedTitle
+                                                                    .Select(mt => mt.MediaTypeSources.First(mts => mts.Id == movie.MediaTypeSourceId))
+                                                                    .First().MediaSourcePath +
+                                                                     Path.DirectorySeparatorChar + movie.NamedTitle
                               });
-                SourceSearch.AddRange(from artist in Library.Artists
+                SourceQuickSearch.AddRange(from artist in Library.Artists
                               from album in artist.Albums
                               from song in album.Songs
-                              select new SearchEntity()
+                              select new FilterEntity()
                               {
-                                  Text = song.Title,
-                                  Value = artist.Title,
-                                  Hover = artist.Members?.Select(e => e.Role).ToArray(),
-                                  Actors = artist.Members?.Select(a => a.Name).ToArray(),
+                                  ChildTitle = song.Title,
+                                  ParentTitle = artist.Title,
+                                  Roles = artist.Members?.Select(e => e.Role).ToArray(),
+                                  Members = artist.Members?.Select(a => a.Name).ToArray(),
                                   Genres = artist.Genres?.Select(g => g.Genre).ToArray(),
                                   MediaItemPath = Library.MediaTypes.Where(mt => mt.Id == artist.MediaTypeId)
-                                                                        .Select(mt => mt.MediaTypeSources.Where(mts => mts.Id == artist.MediaTypeSourceId)
-                                                                                                         .First())
-                                                                        .First().MediaSourcePath +
-                                                       Path.DirectorySeparatorChar + album.NamedTitle +
-                                                       Path.DirectorySeparatorChar + song.NamedTitle
+                                                                    .Select(mt => mt.MediaTypeSources.First(mts => mts.Id == artist.MediaTypeSourceId))
+                                                                    .First().MediaSourcePath +
+                                                                     Path.DirectorySeparatorChar + album.NamedTitle +
+                                                                     Path.DirectorySeparatorChar + song.NamedTitle
                               });
             });
         }

@@ -16,5 +16,16 @@ namespace Leya.DataAccess.Common.Models.Artists
         public int ArtistId { get; set; }
         public string Type { get; set; }
         #endregion
+       
+        #region ================================================================= METHODS ===================================================================================
+        /// <summary>
+        /// Customized ToString() method
+        /// </summary>
+        /// <returns>Custom string value showing relevant data for current class</returns>
+        public override string ToString()
+        {
+            return Id + " :: " + Type;
+        }
+        #endregion
     }
 }

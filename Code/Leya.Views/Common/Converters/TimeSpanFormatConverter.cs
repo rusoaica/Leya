@@ -26,8 +26,8 @@ namespace Leya.Views.Common.Converters
         {
             if (value == null)
                 return "00:00:00";
-            else if (TimeSpan.TryParse(value.ToString(), out TimeSpan r))
-                return (r.Days > 0 ? r.Days.ToString("00") + ":" : "") + r.Hours.ToString("00") + ":" + r.Minutes.ToString("00") + ":" + r.Seconds.ToString("00");
+            else if (TimeSpan.TryParse(value.ToString(), out TimeSpan span))
+                return (span.Days > 0 ? span.Days.ToString("00") + ":" : "") + span.Hours.ToString("00") + ":" + span.Minutes.ToString("00") + ":" + span.Seconds.ToString("00");
             else
                 throw new NotSupportedException();
         }

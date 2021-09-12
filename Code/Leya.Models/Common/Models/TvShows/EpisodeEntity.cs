@@ -3,8 +3,8 @@
 /// Purpose: Data transfer object for the episodes 
 #region ========================================================================= USING =====================================================================================
 using System;
-using Leya.Models.Common.Infrastructure;
 using Leya.Models.Common.Models.Media;
+using Leya.Models.Common.Infrastructure;
 #endregion
 
 namespace Leya.Models.Common.Models.TvShows

@@ -5,7 +5,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Leya.Infrastructure.Enums;
 using System.Collections.Generic;
@@ -50,20 +49,20 @@ namespace Leya.ViewModels.Common.Dialogs.FileSave
 
         #region ============================================================= BINDING COMMANDS ==============================================================================
         public IAsyncCommand CreateNewFolder_Command { get; set; }
+        public IAsyncCommand SetIsFavoritePathAsync_Command { get; set; }
         public IAsyncCommand NavigateUpAsync_Command { get; private set; }
-        public IAsyncCommand NavigateBackAsync_Command { get; private set; }
         public IAsyncCommand ViewOpenedAsync_Command { get; private set; }
+        public IAsyncCommand NavigateBackAsync_Command { get; private set; }
         public IAsyncCommand NavigateForwardAsync_Command { get; private set; }
+        public IAsyncCommand ConfirmSelectionAsync_Command { get; private set; }
         public IAsyncCommand SelectedExtensionChangedAsync_Command { get; set; }
         public IAsyncCommand SearchDirectoriesKeyUpAsync_Command { get; private set; }
         public IAsyncCommand SearchDirectoriesDropDownClosingAsync_Command { get; private set; }
         public IAsyncCommand<string> TreeSelectedItemChangedAsync_Command { get; set; }
         public IAsyncCommand<FileSystemEntity> FolderMouseDoubleClickAsync_Command { get; private set; }
         public IAsyncCommand<INavigationTreeViewItem> NavigateToSelectedItemAsync_Command { get; private set; }
-        public IAsyncCommand SetIsFavoritePathAsync_Command { get; set; }
-        public SyncCommand ShowNewFolderDialog_Command { get; set; }
-        public AsyncCommand ConfirmSelectionAsync_Command { get; private set; }
-        public SyncCommand DiscardSelection_Command { get; private set; }
+        public ISyncCommand ShowNewFolderDialog_Command { get; set; }
+        public ISyncCommand DiscardSelection_Command { get; private set; }
         #endregion
 
         #region ============================================================ BINDING PROPERTIES ============================================================================= 
@@ -235,17 +234,17 @@ namespace Leya.ViewModels.Common.Dialogs.FileSave
         public FileSaveDialogVM(IViewFactory viewFactory, INotificationService notificationService, IDispatcher dispatcher, IAppConfig appConfig)
         {
             // TODO: fix history navigation when navigating to drives
+            ViewOpenedAsync_Command = new AsyncCommand(ViewOpenedAsync);
             NavigateUpAsync_Command = new AsyncCommand(NavigateUpAsync);
             DiscardSelection_Command = new SyncCommand(DiscardSelection);
-            SetIsFavoritePathAsync_Command = new AsyncCommand(SetIsFavoritePathAsync);
             NavigateBackAsync_Command = new AsyncCommand(NavigateBackAsync);
             NavigateForwardAsync_Command = new AsyncCommand(NavigateForwardAsync);
-            ViewOpenedAsync_Command = new AsyncCommand(ViewOpenedAsync);
-            CreateNewFolder_Command = new AsyncCommand(CreateNewFolder, CanCreateNewFolder);
+            SetIsFavoritePathAsync_Command = new AsyncCommand(SetIsFavoritePathAsync);
+            CreateNewFolder_Command = new AsyncCommand(CreateNewFolderAsync, CanCreateNewFolder);
             ShowNewFolderDialog_Command = new SyncCommand(() => { }, CanShowNewFolderDialog);
-            ConfirmSelectionAsync_Command = new AsyncCommand(ConfirmSelectionAsync, CanConfirmSelection);
             SearchDirectoriesKeyUpAsync_Command = new AsyncCommand(SearchDirectoriesKeyUpAsync);
             SelectedExtensionChangedAsync_Command = new AsyncCommand(SelectedExtensionChangedAsync);
+            ConfirmSelectionAsync_Command = new AsyncCommand(ConfirmSelectionAsync, CanConfirmSelection);
             TreeSelectedItemChangedAsync_Command = new AsyncCommand<string>(TreeSelectedItemChangedAsync);
             FolderMouseDoubleClickAsync_Command = new AsyncCommand<FileSystemEntity>(FolderMouseDoubleClickAsync);
             SearchDirectoriesDropDownClosingAsync_Command = new AsyncCommand(SearchDirectoriesDropDownClosingAsync);
@@ -368,7 +367,7 @@ namespace Leya.ViewModels.Common.Dialogs.FileSave
         /// <summary>
         /// Creates a new folder in the current directory
         /// </summary>
-        private async Task CreateNewFolder()
+        private async Task CreateNewFolderAsync()
         {
             try
             {
@@ -529,7 +528,7 @@ namespace Leya.ViewModels.Common.Dialogs.FileSave
             // check if the current path is in the list of favorite paths
             IsFavoritePath = GetIsFavoritePath();
             // re-check if the current path permits adding new folders
-            await dispatcher.Dispatch(() => ShowNewFolderDialog_Command.RaiseCanExecuteChanged(), null);
+            await dispatcher.DispatchAsync(() => ShowNewFolderDialog_Command.RaiseCanExecuteChanged(), null);
         }
 
         /// <summary>
@@ -633,14 +632,14 @@ namespace Leya.ViewModels.Common.Dialogs.FileSave
             });
             SourceDirectories = new ObservableCollection<FileSystemEntity>(drives);
             // re-check if the current path permits adding new folders
-            await dispatcher.Dispatch(() => ShowNewFolderDialog_Command.RaiseCanExecuteChanged(), null);
+            await dispatcher.DispatchAsync(() => ShowNewFolderDialog_Command.RaiseCanExecuteChanged(), null);
             HideProgressBar();
         }
 
         /// <summary>
         /// Navigates to a path selected in the navigation search bar
         /// </summary>
-        private async Task NavigateSearchablePath()
+        private async Task NavigateSearchablePathAsync()
         {
             // if the path selected in the navigation search bar is valid, navigate to it, otherwise navigate to the last path in the navigation search list
             if (SearchDirectoriesSelectedItem != null && SearchDirectoriesSelectedItem.Value != null && Directory.Exists(SearchDirectoriesSelectedItem.Value.ToString()))
@@ -657,11 +656,11 @@ namespace Leya.ViewModels.Common.Dialogs.FileSave
         /// Shows a new instance of the file browser dialog
         /// </summary>
         /// <returns>A <see cref="NotificationResult"/> representing the DialogResult of the file browser dialog</returns>
-        public async Task<NotificationResult> Show()
+        public async Task<NotificationResult> ShowAsync()
         {
             // display the file browser dialog view
             IFileSaveDialogView view = viewFactory.CreateView<IFileSaveDialogView, IFileSaveDialogVM>(this);
-            await view.ShowDialog();
+            await view.ShowDialogAsync();
             return DialogResult == true ? NotificationResult.OK : NotificationResult.None;
         }
         #endregion
@@ -694,7 +693,7 @@ namespace Leya.ViewModels.Common.Dialogs.FileSave
         /// </summary>
         private async Task SearchDirectoriesKeyUpAsync()
         {
-            await NavigateSearchablePath();
+            await NavigateSearchablePathAsync();
         }
 
         /// <summary>
@@ -702,7 +701,7 @@ namespace Leya.ViewModels.Common.Dialogs.FileSave
         /// </summary>
         private async Task SearchDirectoriesDropDownClosingAsync()
         {
-            await NavigateSearchablePath();
+            await NavigateSearchablePathAsync();
         }
 
         /// <summary>

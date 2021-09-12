@@ -223,6 +223,14 @@ namespace Leya.Views.Common.Configuration
 //#endif
                    .SingleInstance();
 
+            builder.RegisterType<OptionsSystem>()
+                   .As<IOptionsSystem>()
+//#if !DEBUG
+                   .EnableInterfaceInterceptors()
+                   .InterceptedBy(typeof(LoggerInterceptor))
+//#endif
+                   .SingleInstance();
+
             builder.RegisterType<AppOptions>()
                    .As<IAppOptions>()
 //#if !DEBUG

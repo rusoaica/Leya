@@ -21,11 +21,11 @@ namespace Leya.Models.Core.Options
         #region ============================================================== FIELD MEMBERS ================================================================================
         private readonly IMediaType mediaType;
         private readonly IMediaTypeSource mediaTypeSource;
-        public bool IsMediaTypeSourceUpdate { get; set; }
         #endregion
 
         #region ================================================================ PROPERTIES =================================================================================
         public int Id { get; set; }
+        public bool IsMediaTypeSourceUpdate { get; set; }
 
         private string mediaName;
         public string MediaName
@@ -50,6 +50,11 @@ namespace Leya.Models.Core.Options
         #endregion
 
         #region ================================================================== CTOR =====================================================================================
+        /// <summary>
+        /// Overload C-tor
+        /// </summary>
+        /// <param name="mediaType">The injected media types</param>
+        /// <param name="mediaTypeSource">the injected media type sources</param>
         public OptionsMedia(IMediaType mediaType, IMediaTypeSource mediaTypeSource)
         {
             this.mediaType = mediaType;
@@ -71,6 +76,7 @@ namespace Leya.Models.Core.Options
         /// Saves <paramref name="media"/> in the storage medium
         /// </summary>
         /// <param name="media">The media type entity to be stored</param>
+        /// <returns>The id of the saved media type</returns>
         public async Task<int> SaveMediaTypeAsync(MediaTypeEntity media)
         {
             return await mediaType.AddMediaTypeAsync(media);
@@ -88,7 +94,7 @@ namespace Leya.Models.Core.Options
         /// <summary>
         /// Gets the list of media types from the storage medium
         /// </summary>
-        /// <param name="mediaLibrary">That media library whose list of media types is refreshed</param>
+        /// <param name="mediaLibrary">The media library whose list of media types is refreshed</param>
         public async Task RefreshMediaTypes(IMediaLibrary mediaLibrary)
         {
             await mediaType.GetMediaTypesAsync();
@@ -96,14 +102,14 @@ namespace Leya.Models.Core.Options
         }
 
         /// <summary>
-        /// Adds a new media source to the selected media
+        /// Gets a list of directory paths that are used as media type sources
         /// </summary>
         /// <param name="selectedDirectories">The paths of the selected directories representing the media sources to be added</param>
         /// <param name="selectedDirectories">Indicates whether <paramref name="selectedDirectories"/> should be used, or the directories contained inside them</param>
         /// <returns>A list of directories representing the media type sources in <paramref name="selectedDirectories"/></returns>
-        public IEnumerable<string> AddMediaTypeSource(string selectedDirectories, bool containsSingleMedia)
+        public IEnumerable<string> GetMediaTypeSource(string selectedDirectories, bool containsSingleMedia)
         {
-            string[] directories = Regex.Split(selectedDirectories, "\""); // better way!
+            string[] directories = Regex.Split(selectedDirectories, "\"");
             if (directories.Where(d => !string.IsNullOrWhiteSpace(d)).All(d => Directory.Exists(d)))
             {
                 List<string> allPaths = new List<string>();

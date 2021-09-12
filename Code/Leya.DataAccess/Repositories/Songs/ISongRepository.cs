@@ -14,6 +14,15 @@ namespace Leya.DataAccess.Repositories.Songs
     {
         #region ================================================================= METHODS ===================================================================================
         /// <summary>
+        /// Gets a song whose artist id is identified by <paramref name="artistId"/> and whose album id is identified by <paramref name="albumId"/> 
+        /// and its associated data from the database
+        /// </summary>
+        /// <param name="artistId">The id of the artist of the song to get</param>
+        /// <param name="albumId">The id of the album of the song to get</param>
+        /// <returns>The song whose artist's id is identified by <paramref name="artistId"/> and album's id is identified by <paramref name="albumId"/></returns>
+        Task<ApiResponse<SongEntity>> GetByIdAsync(int artistId, int albumId);
+
+        /// <summary>
         /// Updates the IsListened status of a song identified by <paramref name="songId"/> in the storage medium
         /// </summary>
         /// <param name="songId">The id of the song whose status will be updated</param>
@@ -28,15 +37,6 @@ namespace Leya.DataAccess.Repositories.Songs
         /// <param name="isFavorite">The IsFavorite status to be set</param>
         /// <returns>The result of updating the IsFavorite status, wrapped in a generic API container of type <see cref="ApiResponse"/></returns>
         Task<ApiResponse> UpdateIsFavoriteStatusAsync(int songId, bool isFavorite);
-
-        /// <summary>
-        /// Gets a song whose artist id is identified by <paramref name="artistId"/> and whose album id is identified by <paramref name="albumId"/> 
-        /// and its associated data from the database
-        /// </summary>
-        /// <param name="artistId">The id of the artist of the song to get</param>
-        /// <param name="albumId">The id of the album of the song to get</param>
-        /// <returns>The song whose artist's id is identified by <paramref name="artistId"/> and album's id is identified by <paramref name="albumId"/></returns>
-        Task<ApiResponse<SongEntity>> GetByIdAsync(int artistId, int albumId);
         #endregion
     }
 }

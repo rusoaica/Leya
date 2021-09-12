@@ -3,7 +3,6 @@
 /// Purpose: Interface business model for authentication
 #region ========================================================================= USING =====================================================================================
 using System.Threading.Tasks;
-using Leya.Models.Common.Models;
 using Leya.Models.Common.Models.Users;
 #endregion
 

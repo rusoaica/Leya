@@ -1,6 +1,6 @@
 ﻿/// Written by: Yulia Danilova
 /// Creation Date: 25th of June, 2021
-/// Purpose: String extension method to handle conversions between string and securestring
+/// Purpose: String extension methods
 #region ========================================================================= USING =====================================================================================
 using System;
 using System.Security;

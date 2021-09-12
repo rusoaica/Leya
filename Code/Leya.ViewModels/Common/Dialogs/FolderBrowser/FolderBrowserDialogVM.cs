@@ -5,7 +5,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Leya.Infrastructure.Enums;
 using System.Collections.Generic;
@@ -49,20 +48,20 @@ namespace Leya.ViewModels.Common.Dialogs.FolderBrowser
         #endregion
 
         #region ============================================================= BINDING COMMANDS ==============================================================================
-        public IAsyncCommand CreateNewFolder_Command { get; set; }
+        public IAsyncCommand CreateNewFolder_Command { get; private set; }
         public IAsyncCommand NavigateUpAsync_Command { get; private set; }
-        public IAsyncCommand NavigateBackAsync_Command { get; private set; }
         public IAsyncCommand ViewOpenedAsync_Command { get; private set; }
+        public IAsyncCommand NavigateBackAsync_Command { get; private set; }
         public IAsyncCommand NavigateForwardAsync_Command { get; private set; }
+        public IAsyncCommand SetIsFavoritePathAsync_Command { get; private set; }
         public IAsyncCommand SearchDirectoriesKeyUpAsync_Command { get; private set; }
         public IAsyncCommand SearchDirectoriesDropDownClosingAsync_Command { get; private set; }
-        public IAsyncCommand<string> TreeSelectedItemChangedAsync_Command { get; set; }
+        public IAsyncCommand<string> TreeSelectedItemChangedAsync_Command { get; private set; }
         public IAsyncCommand<FileSystemEntity> FolderMouseDoubleClickAsync_Command { get; private set; }
         public IAsyncCommand<INavigationTreeViewItem> NavigateToSelectedItemAsync_Command { get; private set; }
-        public IAsyncCommand SetIsFavoritePathAsync_Command { get; set; }
-        public ISyncCommand ShowNewFolderDialog_Command { get; set; }
         public ISyncCommand ConfirmSelection_Command { get; private set; }
         public ISyncCommand DiscardSelection_Command { get; private set; }
+        public ISyncCommand ShowNewFolderDialog_Command { get; private set; }
         #endregion
 
         #region ============================================================ BINDING PROPERTIES ============================================================================= 
@@ -153,12 +152,12 @@ namespace Leya.ViewModels.Common.Dialogs.FolderBrowser
             // TODO: fix history navigation when navigating to drives
             NavigateUpAsync_Command = new AsyncCommand(NavigateUpAsync);
             DiscardSelection_Command = new SyncCommand(DiscardSelection);
-            SetIsFavoritePathAsync_Command = new AsyncCommand(SetIsFavoritePathAsync);
+            ViewOpenedAsync_Command = new AsyncCommand(ViewOpenedAsync);
             NavigateBackAsync_Command = new AsyncCommand(NavigateBackAsync);
             NavigateForwardAsync_Command = new AsyncCommand(NavigateForwardAsync);
-            ViewOpenedAsync_Command = new AsyncCommand(ViewOpenedAsync);
+            SetIsFavoritePathAsync_Command = new AsyncCommand(SetIsFavoritePathAsync);
             ShowNewFolderDialog_Command = new SyncCommand(()=>{ }, CanShowNewFolderDialog);
-            CreateNewFolder_Command = new AsyncCommand(CreateNewFolder, CanCreateNewFolder);
+            CreateNewFolder_Command = new AsyncCommand(CreateNewFolderAsync, CanCreateNewFolder);
             ConfirmSelection_Command = new SyncCommand(ConfirmSelection, CanConfirmSelection);
             SearchDirectoriesKeyUpAsync_Command = new AsyncCommand(SearchDirectoriesKeyUpAsync);
             TreeSelectedItemChangedAsync_Command = new AsyncCommand<string>(TreeSelectedItemChangedAsync);
@@ -226,7 +225,7 @@ namespace Leya.ViewModels.Common.Dialogs.FolderBrowser
         /// <summary>
         /// Creates a new folder in the current directory
         /// </summary>
-        private async Task CreateNewFolder()
+        private async Task CreateNewFolderAsync()
         {
             try
             {
@@ -383,7 +382,7 @@ namespace Leya.ViewModels.Common.Dialogs.FolderBrowser
             // check if the current path is in the list of favorite paths
             IsFavoritePath = GetIsFavoritePath();
             // recheck if the current path permits adding new folders
-            await dispatcher.Dispatch(() => ShowNewFolderDialog_Command.RaiseCanExecuteChanged(), null); 
+            await dispatcher.DispatchAsync(() => ShowNewFolderDialog_Command.RaiseCanExecuteChanged(), null); 
         }
 
         /// <summary>
@@ -438,14 +437,14 @@ namespace Leya.ViewModels.Common.Dialogs.FolderBrowser
             });
             SourceDirectories = new ObservableCollection<FileSystemEntity>(drives);
             // recheck if the current path permits adding new folders
-            await dispatcher.Dispatch(() => ShowNewFolderDialog_Command.RaiseCanExecuteChanged(), null);
+            await dispatcher.DispatchAsync(() => ShowNewFolderDialog_Command.RaiseCanExecuteChanged(), null);
             HideProgressBar();
         }
 
         /// <summary>
         /// Navigates to a path selected in the navigation search bar
         /// </summary>
-        private async Task NavigateSearchablePath()
+        private async Task NavigateSearchablePathAsync()
         {
             // if the path selected in the navigation search bar is valid, navigate to it, otherwise navigate to the last path in the navigation search list
             if (SearchDirectoriesSelectedItem != null && SearchDirectoriesSelectedItem.Value != null && Directory.Exists(SearchDirectoriesSelectedItem.Value.ToString()))
@@ -462,11 +461,11 @@ namespace Leya.ViewModels.Common.Dialogs.FolderBrowser
         /// Shows a new instance of the folder browser dialog
         /// </summary>
         /// <returns>A <see cref="NotificationResult"/> representing the DialogResult of the folder browser dialog</returns>
-        public async Task<NotificationResult> Show()
+        public async Task<NotificationResult> ShowAsync()
         {
             // display the folder browser dialog view
             IFolderBrowserDialogView view = viewFactory.CreateView<IFolderBrowserDialogView, IFolderBrowserDialogVM>(this);
-            await view.ShowDialog();
+            await view.ShowDialogAsync();
             return DialogResult == true ? NotificationResult.OK : NotificationResult.None;
         }
         #endregion
@@ -496,7 +495,7 @@ namespace Leya.ViewModels.Common.Dialogs.FolderBrowser
         /// </summary>
         private async Task SearchDirectoriesKeyUpAsync()
         {
-            await NavigateSearchablePath();
+            await NavigateSearchablePathAsync();
         }
 
         /// <summary>
@@ -504,7 +503,7 @@ namespace Leya.ViewModels.Common.Dialogs.FolderBrowser
         /// </summary>
         private async Task SearchDirectoriesDropDownClosingAsync()
         {
-            await NavigateSearchablePath();
+            await NavigateSearchablePathAsync();
         }
 
         /// <summary>

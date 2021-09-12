@@ -20,6 +20,11 @@ namespace Leya.Models.Core.MediaLibrary
         /// </summary>
         Task GetMediaTypeSourcesAsync();
 
+        /// <summary>
+        /// Inserts <paramref name="media"/> into the storage medium
+        /// </summary>
+        /// <param name="media">The media type source to be inserted</param>
+        /// <returns>The id of the inserted media type source</returns>
         Task<int> InsertMediaTypeSource(MediaTypeSourceEntity media);
         #endregion
     }

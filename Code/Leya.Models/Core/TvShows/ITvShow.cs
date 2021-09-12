@@ -2,7 +2,6 @@
 /// Creation Date: 05th of July, 2021
 /// Purpose: Interface business model for tv shows
 #region ========================================================================= USING =====================================================================================
-using System;
 using System.Threading.Tasks;
 using Leya.Models.Common.Models.Media;
 using Leya.Models.Common.Models.TvShows;

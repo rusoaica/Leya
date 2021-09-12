@@ -25,7 +25,7 @@ namespace Leya.Models.Core.MediaLibrary
         IMediaStatistics MediaStatistics { get; }
         IMediaLibraryNavigation Navigation { get; }
         MediaLibraryEntity Library { get; set; }
-        List<SearchEntity> SourceSearch { get; set; }
+        List<FilterEntity> SourceQuickSearch { get; set; }
         #endregion
 
         #region ================================================================= METHODS ===================================================================================

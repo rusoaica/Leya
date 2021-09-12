@@ -18,14 +18,14 @@ namespace Leya.Models.Core.Options
         #endregion
 
         #region ================================================================ PROPERTIES =================================================================================
-        private string playerPath = string.Empty;
+        private string playerPath;
         public string PlayerPath
         {
             get { return playerPath; }
             set { playerPath = value; Notify(); }
         }
 
-        private string playerArguments = string.Empty;
+        private string playerArguments;
         public string PlayerArguments
         {
             get { return playerArguments; }

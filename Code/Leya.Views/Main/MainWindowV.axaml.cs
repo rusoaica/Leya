@@ -2,64 +2,47 @@
 /// Creation Date: 09th of November, 2020
 /// Purpose: View code behind for the MainWindow window
 #region ========================================================================= USING =====================================================================================
-using Avalonia;
-using Avalonia.Animation;
-using Avalonia.Controls;
-using Avalonia.Input;
-using Avalonia.Interactivity;
-using Avalonia.LogicalTree;
-using Avalonia.Markup.Xaml;
-using Avalonia.Markup.Xaml.Styling;
-using Avalonia.Media;
-using Avalonia.Styling;
-using Avalonia.Threading;
-using Avalonia.VisualTree;
-using Leya.Infrastructure.Configuration;
-using Leya.Infrastructure.Dialog;
-using Leya.Infrastructure.Enums;
-using Leya.Models.Common.Models.Media;
-using Leya.ViewModels.Common.Models.Media;
-using Leya.ViewModels.Common.ViewFactory;
-using Leya.ViewModels.Main;
-using Leya.Views.Common.Controls;
-using Leya.Views.Common.Styles;
-using Leya.Views.Startup;
-using Leya.Views;
 using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
-using Avalonia.Controls.Templates;
-using System.Collections.Generic;
-using Leya.Infrastructure.Notification;
+using Avalonia;
 using System.IO;
+using System.Linq;
+using Avalonia.Input;
+using Avalonia.Styling;
+using Avalonia.Controls;
+using Leya.Views.Startup;
+using Avalonia.Animation;
+using Avalonia.Markup.Xaml;
+using Leya.ViewModels.Main;
+using System.Threading.Tasks;
+using Avalonia.Interactivity;
+using Leya.Infrastructure.Enums;
+using System.Collections.Generic;
+using Leya.Infrastructure.Dialog;
+using Leya.Models.Common.Models.Media;
+using Leya.Infrastructure.Notification;
 using Leya.Models.Common.Models.Common;
+using Leya.Infrastructure.Configuration;
 #endregion
 
 namespace Leya.Views.Main
 {
     public partial class MainWindowV : Window, IMainWindowView
     {
+        #region ============================================================== FIELD MEMBERS ================================================================================
+        private Grid grdWindowDrag;
+        private readonly Image imgBanner;
+        private readonly Grid grdDescription;
+        private readonly Grid grdTransitionMask;
+        private readonly AutoCompleteBox acbSearchMediaLibrary;
+        private readonly IAppConfig appConfig;
+        private readonly IFileBrowserService fileBrowserService;
+        private readonly INotificationService notificationService;
+        private readonly IFolderBrowserService folderBrowserService;
         private Animation? opacityFadeInAnimation;
         private Animation? opacityFadeOutAnimation;
-        private Clock animationPlaybackClock = new Clock();
-
-        #region ============================================================== FIELD MEMBERS ================================================================================
-        Grid grdTransitionMask;
-        Grid grdWindowDrag;
-        Grid grdDescription;
-        Image imgBanner;
-        AutoCompleteBox acbSearchMediaLibrary;
-        private readonly IFolderBrowserService folderBrowserService;
-        private readonly IFileBrowserService fileBrowserService;
-        private readonly IAppConfig appConfig;
-        private readonly INotificationService notificationService;
-        private static string lastUsedPath;
+        private readonly Clock animationPlaybackClock = new Clock();
         private bool isWindowLoaded;
         private bool isWindowDragged;
-        //private readonly IViewFactory viewFactory;
-        private string currentLibraryName = string.Empty;
         #endregion
 
         #region ================================================================== CTOR =====================================================================================
@@ -70,26 +53,31 @@ namespace Leya.Views.Main
         {
         }
 
+        /// <summary>
+        /// Overload C-tor
+        /// </summary>
+        /// <param name="folderBrowserService">Injected folder browser service</param>
+        /// <param name="fileBrowserService">Injected file browser service</param>
+        /// <param name="appConfig">Injected application's configuration service</param>
+        /// <param name="notificationService">Injected notification service</param>
         public MainWindowV(IFolderBrowserService folderBrowserService, IFileBrowserService fileBrowserService, IAppConfig appConfig, INotificationService notificationService)
         {
             AvaloniaXamlLoader.Load(this);
 #if DEBUG
             this.AttachDevTools();
 #endif
-            grdTransitionMask = this.FindControl<Grid>("grdTransitionMask");
             imgBanner = this.FindControl<Image>("imgBanner");
             grdDescription = this.FindControl<Grid>("grdDescription");
+            grdTransitionMask = this.FindControl<Grid>("grdTransitionMask");
             acbSearchMediaLibrary = this.FindControl<AutoCompleteBox>("acbSearchMediaLibrary");
-
+         
             grdTransitionMask.Clock = animationPlaybackClock;
             CreateOpacityFadeInAnimation();
             CreateOpacityFadeOutAnimation();
-            this.folderBrowserService = folderBrowserService;
-            this.fileBrowserService = fileBrowserService;
             this.appConfig = appConfig;
+            this.fileBrowserService = fileBrowserService;
             this.notificationService = notificationService;
-            //opacityAnimation.RunAsync(grdMask, animationPlaybackClock);
-            //animationPlaybackClock.PlayState = PlayState.Run;
+            this.folderBrowserService = folderBrowserService;
         }
         #endregion
 
@@ -157,7 +145,7 @@ namespace Leya.Views.Main
         /// <summary>
         /// Displays the main menu via a fading animation
         /// </summary>
-        private async Task AnimateToMainMenu()
+        private async Task AnimateToMainMenuAsync()
         {
             if ((DataContext as MainWindowVM).CurrentNavigationLevel != NavigationLevel.None)
             {
@@ -179,6 +167,14 @@ namespace Leya.Views.Main
                 return text.Contains(@"\\") ? EscapeQuotations(text.Replace(@"\\", @"\")) : text;
             else
                 return text;
+        }
+
+        /// <summary>
+        /// Shows the current window as a modal dialog
+        /// </summary>
+        public async Task<bool?> ShowDialogAsync()
+        {
+            return await ShowDialog<bool?>(StartupV.Instance);
         }
         #endregion
 
@@ -204,7 +200,6 @@ namespace Leya.Views.Main
             isWindowLoaded = true;
             BoundsProperty.Changed.AddClassHandler<Window>((s, e) => Window_SizeChanged());
 
-
             // Avalonia bug: for some reason, neither of these work for finding a child control inside a template
             //grdWindowDrag = this.FindControl<Grid>("grdWindowDrag");
             //grdWindowDrag = ((IControl)this.GetVisualChildren().FirstOrDefault())?.FindControl<Grid>("grdWindowDrag");
@@ -221,8 +216,7 @@ namespace Leya.Views.Main
             {
                 await notificationService.ShowAsync("Error getting the weather info from www.weather.com!\n" + ex.Message, "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
             }
-
-            acbSearchMediaLibrary.ItemFilter = new AutoCompleteFilterPredicate<object>(SearchMediaLibrary);
+            acbSearchMediaLibrary.ItemFilter = new AutoCompleteFilterPredicate<object>(SearchMediaLibraryCustomFilter);
         }
 
         /// <summary>
@@ -268,7 +262,7 @@ namespace Leya.Views.Main
             // if the user presses Escape, exit any view and return to main menu
             if (e.Key == Key.Escape)
             {
-                await AnimateToMainMenu();
+                await AnimateToMainMenuAsync();
                 // for some reason, the window closes when escape is pressed, so keep it handled
                 e.Handled = true;
             }
@@ -291,7 +285,6 @@ namespace Leya.Views.Main
             await (DataContext as MainWindowVM).NavigateMediaLibraryDownAsync(mediaEntity);
         }
 
-
         /// <summary>
         /// Handles advanced search results DoubleTapped event
         /// </summary>
@@ -304,38 +297,77 @@ namespace Leya.Views.Main
             await (DataContext as MainWindowVM).OpenAdvancedSearchResult((sender as Label).Tag as AdvancedSearchResultEntity);
         }
 
-        private bool SearchMediaLibrary(string search, object item)
+        /// <summary>
+        /// Provides a custom filter for media library search
+        /// </summary>
+        /// <param name="search">The term to be searched</param>
+        /// <param name="item">The control to be searched for <paramref name="search"/></param>
+        /// <returns>True if <paramref name="search"/> was found on <paramref name="item"/>, False otherwise</returns>
+        private bool SearchMediaLibraryCustomFilter(string search, object item)
         {
-            Models.Common.Models.Common.SearchEntity element = item as Models.Common.Models.Common.SearchEntity;
+            FilterEntity element = item as FilterEntity;
             // ignore casing
             search = search.ToLower().Trim();
             // check if at least one search criteria is met
-            bool hasEpisode = element.Text.ToLower().Contains(search);
-            bool hasTvShow = (element.Value?.ToString().ToLower().Contains(search) ?? false);
+            bool hasEpisode = element.ChildTitle.ToLower().Contains(search);
+            bool hasTvShow = (element.ParentTitle?.ToString().ToLower().Contains(search) ?? false);
             bool hasTags = element.Tags?.Where(t => t.ToLower().Contains(search)).Count() > 0;
             bool hasGenres = element?.Genres.Where(g => g.ToLower().Contains(search)).Count() > 0;
-            bool hasActors = element?.Actors.Where(a => a.ToLower().Contains(search)).Count() > 0;
-            bool hasRoles = (element?.Hover as string[]).Where(r => r.ToLower().Contains(search)).Count() > 0;
+            bool hasActors = element?.Members.Where(a => a.ToLower().Contains(search)).Count() > 0;
+            bool hasRoles = (element?.Roles).Where(r => r.ToLower().Contains(search)).Count() > 0;
             return hasEpisode || hasTvShow || hasTags || hasGenres || hasActors || hasRoles;
         }
 
-        ///// <summary>
-        ///// Handles MainMenu RequestBringIntoView event
-        ///// </summary>
-        //private void MainMenu_RequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
-        //{
-        //    e.Handled = true;
-        //}
+        /// <summary>
+        /// Handles the media source browse button's Click event
+        /// </summary>
+        private async void Browse_Click(object sender, RoutedEventArgs e)
+        {
+            // display the open folder dialog
+            folderBrowserService.AllowMultiselection = true;
+            if (await folderBrowserService.ShowAsync() == NotificationResult.OK)
+            {
+                string filename = folderBrowserService.SelectedDirectories;
+                // invoke the view model's method for adding a new media source
+                if (!string.IsNullOrEmpty(filename))
+                    await (DataContext as MainWindowVM).AddMediaSourceAsync_Command.ExecuteAsync(filename);
+            }
+        }
 
-        ///// <summary>
-        ///// Handles MediaContextMenu ContextMenuOpening event
-        ///// </summary>
-        //private void MediaContextMenu_ContextMenuOpening(object sender, ContextMenuEventArgs e)
-        //{
-        //    // the media context menu only makes sense on a listview item, make sure there is one selected
-        //    if (lstMedia.SelectedItem == null)
-        //        cntMedia.IsOpen = false;
-        //}
+        /// <summary>
+        /// Handles the player path browse button's Click event
+        /// </summary>
+        private async void BrowsePlayerPath_Click(object sender, RoutedEventArgs e)
+        {
+            // does not apply on Linux!
+            // fileBrowserService.Filter = new List<string>() { ".exe" };
+            if (await fileBrowserService.ShowAsync() == NotificationResult.OK && fileBrowserService.SelectedFiles != null)
+            {
+                (DataContext as MainWindowVM).PlayerPath = fileBrowserService.SelectedFiles.Length > 3 ? fileBrowserService.SelectedFiles.Substring(1, fileBrowserService.SelectedFiles.Length - 2) : null;
+                (DataContext as MainWindowVM).UpdatePlayerOptionsAsync_Command.RaiseCanExecuteChanged();
+            }
+        }
+
+        /// <summary>
+        /// Handles the background image path browse button's Click event
+        /// </summary>
+        private async void BrowseBackgroundImage_Click(object sender, RoutedEventArgs e)
+        {
+            if (await fileBrowserService.ShowAsync() == NotificationResult.OK && fileBrowserService.SelectedFiles != null)
+            {
+                fileBrowserService.Filter = new List<string>() { ".jpg", "jpeg", "png", "bmp", "webp" };
+                (DataContext as MainWindowVM).BackgroundImagePath = fileBrowserService.SelectedFiles.Length > 3 ? fileBrowserService.SelectedFiles.Substring(1, fileBrowserService.SelectedFiles.Length - 2) : null;
+                (DataContext as MainWindowVM).UpdatePlayerOptionsAsync_Command.RaiseCanExecuteChanged(); // ?
+            }
+        }
+
+        /// <summary>
+        /// Handles the media seach Back button's Click event
+        /// </summary>
+        private async void DisplayMainMenu_Click(object sender, RoutedEventArgs e)
+        {
+            await AnimateToMainMenuAsync();
+        }
 
         #region Navigation
         /// <summary>
@@ -394,87 +426,25 @@ namespace Leya.Views.Main
             await opacityFadeInAnimation.RunAsync(grdTransitionMask, animationPlaybackClock);
             await (DataContext as MainWindowVM).NavigateMediaLibraryUpAsync();
         }
-
-        public async Task<bool?> ShowDialog()
-        {
-            return await ShowDialog<bool?>(StartupV.Instance);
-        }
         #endregion
 
         ///// <summary>
-        ///// Handles Security MouseUp event
+        ///// Handles MainMenu RequestBringIntoView event
         ///// </summary>
-        //private void Security_MouseUp(object sender, MouseButtonEventArgs e)
+        //private void MainMenu_RequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
         //{
-        //    bool isOpened = false;
-        //    // iterate all opened windows
-        //    foreach (object window in Application.Current.Windows)
-        //    {
-        //        // check if a Change Password view is already opened
-        //        if (window is ChangePasswordV)
-        //        {
-        //            // brind the Change Password window to front
-        //            ((Window)window).WindowState = WindowState.Normal;
-        //            ((Window)window).Activate();
-        //            isOpened = true;
-        //            break;
-        //        }
-        //    }
-        //    // if no Change Password window is opened, open a new one
-        //    if (!isOpened)
-        //        viewFactory.CreateView<IChangePasswordView>().ShowDialog();
+        //    e.Handled = true;
         //}
 
-        /// <summary>
-        /// Handles the Browse button's Click event
-        /// </summary>
-        private async void Browse_Click(object sender, RoutedEventArgs e)
-        {
-            // display the open folder dialog
-            folderBrowserService.AllowMultiselection = true;
-            if (await folderBrowserService.Show() == NotificationResult.OK)
-            {
-                string filename = folderBrowserService.SelectedDirectories;
-                // invoke the view model's method for adding a new media source
-                if (!string.IsNullOrEmpty(filename))
-                    await (DataContext as MainWindowVM).AddMediaSourceAsync_Command.ExecuteAsync(filename);
-            }
-        }
-
-        /// <summary>
-        /// Handles the player path browse button's Click event
-        /// </summary>
-        private async void BrowsePlayerPath_Click(object sender, RoutedEventArgs e)
-        {
-            // does not apply on Linux!
-            // fileBrowserService.Filter = new List<string>() { ".exe" };
-            if (await fileBrowserService.Show() == NotificationResult.OK && fileBrowserService.SelectedFiles != null)
-            {
-                (DataContext as MainWindowVM).PlayerPath = fileBrowserService.SelectedFiles.Length > 3 ? fileBrowserService.SelectedFiles.Substring(1, fileBrowserService.SelectedFiles.Length - 2) : null;
-                (DataContext as MainWindowVM).UpdatePlayerOptionsAsync_Command.RaiseCanExecuteChanged();
-            }
-        }
-
-        /// <summary>
-        /// Handles the background image path browse button's Click event
-        /// </summary>
-        private async void BrowseBackgroundImage_Click(object sender, RoutedEventArgs e)
-        {
-            if (await fileBrowserService.Show() == NotificationResult.OK && fileBrowserService.SelectedFiles != null)
-            {
-                fileBrowserService.Filter = new List<string>() { ".jpg", "jpeg", "png", "bmp", "webp" };
-                (DataContext as MainWindowVM).BackgroundImagePath = fileBrowserService.SelectedFiles.Length > 3 ? fileBrowserService.SelectedFiles.Substring(1, fileBrowserService.SelectedFiles.Length - 2) : null;
-                (DataContext as MainWindowVM).UpdatePlayerOptionsAsync_Command.RaiseCanExecuteChanged(); // ?
-            }
-        }
-
-        /// <summary>
-        /// Handles the media seach Back button's Click event
-        /// </summary>
-        private async void DisplayMainMenu_Click(object sender, RoutedEventArgs e)
-        {
-            await AnimateToMainMenu();
-        }
+        ///// <summary>
+        ///// Handles MediaContextMenu ContextMenuOpening event
+        ///// </summary>
+        //private void MediaContextMenu_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        //{
+        //    // the media context menu only makes sense on a listview item, make sure there is one selected
+        //    if (lstMedia.SelectedItem == null)
+        //        cntMedia.IsOpen = false;
+        //}
         #endregion
     }
 }

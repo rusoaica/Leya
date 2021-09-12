@@ -3,8 +3,8 @@
 /// Purpose: Interface business model for artists
 #region ========================================================================= USING =====================================================================================
 using System.Threading.Tasks;
-using Leya.Models.Common.Models.Artists;
 using Leya.Models.Common.Models.Media;
+using Leya.Models.Common.Models.Artists;
 #endregion
 
 namespace Leya.Models.Core.Artists

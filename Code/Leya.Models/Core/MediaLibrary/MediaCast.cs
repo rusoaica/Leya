@@ -14,7 +14,7 @@ namespace Leya.Models.Core.MediaLibrary
     public class MediaCast : NotifyPropertyChanged, IMediaCast
     {
         #region ================================================================ PROPERTIES =================================================================================
-        private bool areActorsVisible = false;
+        private bool areActorsVisible;
         public bool AreActorsVisible
         {
             get { return areActorsVisible; }
@@ -31,15 +31,12 @@ namespace Leya.Models.Core.MediaLibrary
         /// <returns>An enumeration of actors of an episode</returns>
         public IEnumerable<CastEntity> ShowEpisodeMediaCastAsync(IMediaLibrary mediaLibrary, IMediaEntity media)
         {
-            var tvShow = mediaLibrary.Library.TvShows.Where(t => t.Id == media.Id)
-                                                     .First();
+            var tvShow = mediaLibrary.Library.TvShows.First(t => t.Id == media.Id);
             var episode = mediaLibrary.Library.TvShows.SelectMany(t => t.Seasons)
                                                       .SelectMany(s => s.Episodes)
-                                                      .Where(e => e.Id == media.EpisodeOrSongId)
-                                                      .First();
+                                                      .First(e => e.Id == media.EpisodeOrSongId);
             var mediaTypeSourceId = mediaLibrary.Library.MediaTypes.SelectMany(mt => mt.MediaTypeSources)
-                                                                   .Where(mts => mts.Id == tvShow.MediaTypeSourceId)
-                                                                   .FirstOrDefault();
+                                                                   .FirstOrDefault(mts => mts.Id == tvShow.MediaTypeSourceId);
             foreach (var actor in episode.Actors.GroupBy(a => a.Name)
                                                 .Select(a => a.First())
                                                 .OrderBy(a => a.Order))
@@ -50,7 +47,7 @@ namespace Leya.Models.Core.MediaLibrary
                     Role = actor.Role,
                     Order = actor.Order,
                     Thumb = string.IsNullOrEmpty(actor.Thumb) ?
-                                @"avares://Leya/Assets/no_actor.jpg" :
+                                null : 
                                 mediaTypeSourceId.MediaSourcePath + Path.DirectorySeparatorChar + ".actors" + Path.DirectorySeparatorChar + actor.Thumb
                 };
             }
@@ -64,14 +61,12 @@ namespace Leya.Models.Core.MediaLibrary
         /// <returns>An enumeration of actors of a tv show</returns>
         public IEnumerable<CastEntity> ShowTvShowMediaCastAsync(IMediaLibrary mediaLibrary, IMediaEntity media)
         {
-            var tvShow = mediaLibrary.Library.TvShows.Where(t => t.Id == media.Id)
-                                                     .First();
+            var tvShow = mediaLibrary.Library.TvShows.First(t => t.Id == media.Id);
             var episodes = mediaLibrary.Library.TvShows.SelectMany(t => t.Seasons)
                                                        .SelectMany(s => s.Episodes)
                                                        .Where(e => e.TvShowId == tvShow.Id);
             var mediaTypeSourceId = mediaLibrary.Library.MediaTypes.SelectMany(mt => mt.MediaTypeSources)
-                                                                   .Where(mts => mts.Id == tvShow.MediaTypeSourceId)
-                                                                   .FirstOrDefault();
+                                                                   .FirstOrDefault(mts => mts.Id == tvShow.MediaTypeSourceId);
             // create a list of all actors of all episodes of the tv show, without duplicates
             foreach (var actor in episodes.SelectMany(e => e.Actors)
                                           .GroupBy(a => a.Name)
@@ -84,7 +79,7 @@ namespace Leya.Models.Core.MediaLibrary
                     Role = actor.Role,
                     Order = actor.Order,
                     Thumb = string.IsNullOrEmpty(actor.Thumb) ?
-                                @"avares://Leya/Assets/no_actor.jpg" :
+                                null : 
                                 mediaTypeSourceId.MediaSourcePath + Path.DirectorySeparatorChar + ".actors" + Path.DirectorySeparatorChar + actor.Thumb
                 };
             }
@@ -98,11 +93,9 @@ namespace Leya.Models.Core.MediaLibrary
         /// <returns>An enumeration of actors of a movie</returns>
         public IEnumerable<CastEntity> ShowMovieMediaCastAsync(IMediaLibrary mediaLibrary, IMediaEntity media)
         {
-            var movie = mediaLibrary.Library.Movies.Where(m => m.Id == media.Id)
-                                                   .First();
+            var movie = mediaLibrary.Library.Movies.First(m => m.Id == media.Id);
             var mediaTypeSourceId = mediaLibrary.Library.MediaTypes.SelectMany(mt => mt.MediaTypeSources)
-                                                                   .Where(mts => mts.Id == movie.MediaTypeSourceId)
-                                                                   .FirstOrDefault();
+                                                                   .FirstOrDefault(mts => mts.Id == movie.MediaTypeSourceId);
             foreach (var actor in movie.Actors.GroupBy(a => a.Name)
                                               .Select(a => a.First())
                                               .OrderBy(a => a.Order))
@@ -113,7 +106,7 @@ namespace Leya.Models.Core.MediaLibrary
                     Role = actor.Role,
                     Order = actor.Order,
                     Thumb = string.IsNullOrEmpty(actor.Thumb) ?
-                                @"avares://Leya/Assets/no_actor.jpg" : 
+                                null : 
                                 mediaTypeSourceId.MediaSourcePath + Path.DirectorySeparatorChar + ".actors" + Path.DirectorySeparatorChar + actor.Thumb
                 };
             }

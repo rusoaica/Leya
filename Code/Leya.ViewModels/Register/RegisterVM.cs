@@ -3,12 +3,10 @@
 /// Purpose: View Model for the Register view
 #region ========================================================================= USING =====================================================================================
 using System;
-using System.Security;
 using System.Threading.Tasks;
 using Leya.Models.Core.Security;
 using Leya.Infrastructure.Enums;
 using Leya.ViewModels.Common.MVVM;
-using Leya.Models.Common.Extensions;
 using Leya.Infrastructure.Notification;
 #endregion
 
@@ -21,8 +19,8 @@ namespace Leya.ViewModels.Register
         #endregion
 
         #region ============================================================= BINDING COMMANDS ==============================================================================
-        public SyncCommand ViewOpened_Command { get; private set; }
-        public AsyncCommand RegisterAccount_Command { get; private set; }
+        public ISyncCommand ViewOpened_Command { get; private set; }
+        public IAsyncCommand RegisterAccount_Command { get; private set; }
         #endregion
 
         #region ============================================================ BINDING PROPERTIES =============================================================================

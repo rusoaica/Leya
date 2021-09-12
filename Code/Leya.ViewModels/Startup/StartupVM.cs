@@ -13,7 +13,6 @@ using Leya.Infrastructure.Security;
 using Leya.Infrastructure.Notification;
 using Leya.Infrastructure.Configuration;
 using Leya.ViewModels.Common.ViewFactory;
-using Leya.Infrastructure.Dialog;
 #endregion
 
 namespace Leya.ViewModels.Startup
@@ -154,7 +153,7 @@ namespace Leya.ViewModels.Startup
                 await authentication.LoginAsync();
                 // if login was successful, hide this view and display the main view as modal
                 HideView();
-                await viewFactory.CreateView<IMainWindowView>().ShowDialog();
+                await viewFactory.CreateView<IMainWindowView>().ShowDialogAsync();
                 ShowView();
             }
             catch (Exception ex) when (ex is InvalidOperationException || ex is ArgumentException)
@@ -200,7 +199,7 @@ namespace Leya.ViewModels.Startup
         private async Task RegisterUsernameAsync()
         {
             HideView();
-            await viewFactory.CreateView<IRegisterView>().ShowDialog();
+            await viewFactory.CreateView<IRegisterView>().ShowDialogAsync();
             ShowView();
         }
 
@@ -210,7 +209,7 @@ namespace Leya.ViewModels.Startup
         private async Task RecoverPasswordAsync()
         {
             HideView();
-            await viewFactory.CreateView<IRecoverPasswordView>(Username).ShowDialog();
+            await viewFactory.CreateView<IRecoverPasswordView>(Username).ShowDialogAsync();
             ShowView();
         }
 
@@ -220,7 +219,7 @@ namespace Leya.ViewModels.Startup
         private async Task ChangePasswordAsync()
         {
             HideView();
-            await viewFactory.CreateView<IChangePasswordView>(Username).ShowDialog();
+            await viewFactory.CreateView<IChangePasswordView>(Username).ShowDialogAsync();
             ShowView();
         }
         #endregion
@@ -231,12 +230,6 @@ namespace Leya.ViewModels.Startup
         /// </summary>
         private void ViewOpened()
         {
-            //fileBrowserService.ShowNewFolderButton = true;
-            //fileBrowserService.AllowMultiselection = true;
-            //fileBrowserService.InitialFolder = @"A:\Downloads";
-            //fileBrowserService.Filter = new System.Collections.Generic.List<string>() { ".rar", ".exe" };
-            //await fileBrowserService.Show();
-
             if (config.Settings.RememberCredentials)
             {
                 if (!string.IsNullOrEmpty(config.Settings.Username))

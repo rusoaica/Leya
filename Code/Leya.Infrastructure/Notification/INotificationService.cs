@@ -2,8 +2,8 @@
 /// Creation Date: 19th of November, 2019
 /// Purpose: Interface for custom notifications
 #region ========================================================================= USING =====================================================================================
-using Leya.Infrastructure.Enums;
 using System.Threading.Tasks;
+using Leya.Infrastructure.Enums;
 #endregion
 
 namespace Leya.Infrastructure.Notification

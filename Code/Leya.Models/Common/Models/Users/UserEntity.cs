@@ -3,7 +3,6 @@
 /// Purpose: User data transfer object
 #region ========================================================================= USING =====================================================================================
 using System;
-using System.Security;
 using Leya.Models.Common.Infrastructure;
 #endregion
 
@@ -14,10 +13,10 @@ namespace Leya.Models.Common.Models.Users
         #region ================================================================ PROPERTIES =================================================================================
         public int Id { get; set; }
         public string Username { get; set; }
-        public string SecurityQuestion { get; set; }
         public string Password { get; set; }
         public string SecurityAnswer { get; set; }
         public string PasswordConfirm { get; set; }
+        public string SecurityQuestion { get; set; }
         public string SecurityAnswerConfirm { get; set; }
         public DateTime Created { get; set; }
         #endregion

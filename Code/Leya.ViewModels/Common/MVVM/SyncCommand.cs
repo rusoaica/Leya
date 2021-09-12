@@ -42,7 +42,7 @@ namespace Leya.ViewModels.Common.MVVM
         }
 
         /// <summary>
-        /// Executes a Task
+        /// Executes a delegate synchronously
         /// </summary>
         public void ExecuteSync()
         {
@@ -123,19 +123,9 @@ namespace Leya.ViewModels.Common.MVVM
 
         #region ================================================================= METHODS ===================================================================================
         /// <summary>
-        /// Defines the method that determines whether the command can execute in its current state
+        /// Executes a delegate synchronously, with an object parameter
         /// </summary>
-        /// <param name="parameter">Data used by the command. If the command does not require data to be passed, this object can be set to null.
-        /// <returns>True if this command can be executed; otherwise, False.</returns>
-        bool ICommand.CanExecute(object parameter)
-        {
-            return parameter == null || CanExecute((T)parameter);
-        }
-
-        /// <summary>
-        /// Executes a Task
-        /// </summary>
-        /// <param name="parameter">Data used by the command. If the command does not require data to be passed, this object can be set to null.
+        /// <param name="parameter">Data used by the command. If the command does not require data to be passed, this object can be set to null</param>
         public void ExecuteSync(object parameter)
         {
             if (CanExecute((T)parameter))
@@ -161,25 +151,10 @@ namespace Leya.ViewModels.Common.MVVM
             CanExecuteChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        #region Explicit implementations
         /// <summary>
-        /// Defines the method to be called when the command is invoked.
+        /// Executes a delegate synchronously, with a strong typed parameter
         /// </summary>
-        /// <param name="parameter">Data used by the command. If the command does not require data to be passed, this object can be set to null.
-        void ICommand.Execute(object parameter)
-        {
-            try
-            {
-                ExecuteSync((T)parameter);
-            }
-            catch { }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="parameter"></param>
-        /// <returns></returns>
+        /// <param name="parameter">Data used by the command. If the command does not require data to be passed, this object can be set to null</param>
         public void ExecuteSync(T parameter)
         {
             if (CanExecute(parameter))
@@ -205,6 +180,30 @@ namespace Leya.ViewModels.Common.MVVM
         public bool CanExecute(T parameter)
         {
             return !isExecuting && (canExecute?.Invoke(parameter) ?? true);
+        }
+
+        #region Explicit implementations
+        /// <summary>
+        /// Defines the method to be called when the command is invoked.
+        /// </summary>
+        /// <param name="parameter">Data used by the command. If the command does not require data to be passed, this object can be set to null.
+        void ICommand.Execute(object parameter)
+        {
+            try
+            {
+                ExecuteSync((T)parameter);
+            }
+            catch { }
+        }
+
+        /// <summary>
+        /// Defines the method that determines whether the command can execute in its current state
+        /// </summary>
+        /// <param name="parameter">Data used by the command. If the command does not require data to be passed, this object can be set to null.
+        /// <returns>True if this command can be executed; otherwise, False.</returns>
+        bool ICommand.CanExecute(object parameter)
+        {
+            return parameter == null || CanExecute((T)parameter);
         }
         #endregion
         #endregion

@@ -3,11 +3,8 @@
 /// Purpose: Converter for text color (green to red) based on a numeric value
 #region ========================================================================= USING =====================================================================================
 using System;
-using Avalonia;
 using Avalonia.Media;
-using Avalonia.Platform;
 using System.Globalization;
-using Avalonia.Media.Imaging;
 using Avalonia.Data.Converters;
 #endregion
 
@@ -30,15 +27,15 @@ namespace Leya.Views.Common.Converters
         {
             if (value == null)
                 return null; 
-            else if (decimal.TryParse(value.ToString(), out decimal r))
+            else if (decimal.TryParse(value.ToString(), out decimal rating))
             {
-                if (r >= 0.00M && r < 2.50M)
+                if (rating >= 0.00M && rating < 2.50M)
                     return new SolidColorBrush(Color.FromRgb(255, 0, 0));
-                else if (r >= 2.50M && r < 5.00M)
+                else if (rating >= 2.50M && rating < 5.00M)
                     return new SolidColorBrush(Color.FromRgb(225, 165, 255));
-                else if (r >= 5.00M && r < 7.50M)
+                else if (rating >= 5.00M && rating < 7.50M)
                     return new SolidColorBrush(Color.FromRgb(225, 225, 0));
-                else if (r >= 7.50M && r <= 10.00M)
+                else if (rating >= 7.50M && rating <= 10.00M)
                     return new SolidColorBrush(Color.FromRgb(0, 255, 0));
                 else
                     return new SolidColorBrush(Color.FromRgb(0, 0, 0));

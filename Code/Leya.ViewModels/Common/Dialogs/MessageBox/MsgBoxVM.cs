@@ -2,12 +2,12 @@
 /// Creation Date: 08th of November, 2019
 /// Purpose: View Model for the custom MessageBox dialog
 #region ========================================================================= USING =====================================================================================
+using System.Threading.Tasks;
 using Leya.Infrastructure.Enums;
 using Leya.ViewModels.Common.MVVM;
 using Leya.ViewModels.Common.Clipboard;
 using Leya.ViewModels.Common.ViewFactory;
 using Leya.Views.Common.Dialogs.MessageBox;
-using System.Threading.Tasks;
 #endregion
 
 namespace Leya.ViewModels.Common.Dialogs.MessageBox
@@ -138,7 +138,7 @@ namespace Leya.ViewModels.Common.Dialogs.MessageBox
             IsNoVisible = false;
             IsCancelVisible = false;
             // display the message box view
-            await viewFactory.CreateView<IMsgBoxView, IMsgBoxVM>(this).ShowDialog();
+            await viewFactory.CreateView<IMsgBoxView, IMsgBoxVM>(this).ShowDialogAsync();
             return DialogResult == true ? NotificationResult.OK : NotificationResult.None;
         }
 
@@ -156,7 +156,7 @@ namespace Leya.ViewModels.Common.Dialogs.MessageBox
             IsCancelVisible = false;
             WindowTitle = caption;
             // display the message box view
-            await viewFactory.CreateView<IMsgBoxView, IMsgBoxVM>(this).ShowDialog();
+            await viewFactory.CreateView<IMsgBoxView, IMsgBoxVM>(this).ShowDialogAsync();
             return DialogResult == true ? NotificationResult.OK : NotificationResult.None;
         }
 
@@ -204,7 +204,7 @@ namespace Leya.ViewModels.Common.Dialogs.MessageBox
             Prompt = text;
             WindowTitle = caption;
             // display the message box view
-            await viewFactory.CreateView<IMsgBoxView, IMsgBoxVM>(this).ShowDialog();
+            await viewFactory.CreateView<IMsgBoxView, IMsgBoxVM>(this).ShowDialogAsync();
             switch (messageType)
             {
                 case NotificationButton.OK:
@@ -284,7 +284,7 @@ namespace Leya.ViewModels.Common.Dialogs.MessageBox
             Prompt = text;
             WindowTitle = caption;
             // display the message box view
-            await viewFactory.CreateView<IMsgBoxView, IMsgBoxVM>(this).ShowDialog();
+            await viewFactory.CreateView<IMsgBoxView, IMsgBoxVM>(this).ShowDialogAsync();
             switch (messageType)
             {
                 case NotificationButton.OK:
