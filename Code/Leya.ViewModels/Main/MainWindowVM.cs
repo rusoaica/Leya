@@ -13,6 +13,7 @@ using Leya.Models.Core.Navigation;
 using Leya.ViewModels.Common.MVVM;
 using Leya.Models.Core.MediaLibrary;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using Leya.Models.Common.Models.Media;
 using Leya.Infrastructure.Notification;
 using Leya.Models.Common.Models.Common;
@@ -20,7 +21,9 @@ using Leya.ViewModels.Common.ViewFactory;
 using Leya.ViewModels.Common.Models.Media;
 using System.IO;
 using System.Text.RegularExpressions;
+using Leya.Models.Common.Infrastructure;
 using Leya.Models.Core.Options;
+using Leya.Models.Core.Player;
 using Leya.Models.Core.Search;
 #endregion
 
@@ -31,18 +34,31 @@ namespace Leya.ViewModels.Main
 
         #region ============================================================== FIELD MEMBERS ================================================================================
         public event Action Navigated;
+        public event Func<bool, Task> PlaybackChanged;
         public event Action<bool> ValidationChanged;
         public delegate bool AutoCompleteFilterPredicate<T>(string search, T item);
 
+        private readonly Random random = new Random();
         private readonly IMediaLibrary mediaLibrary;
         private readonly ISearch search;
+        private readonly IMediaPlayer mediaPlayer;
         private readonly IMediaLibraryNavigation mediaLibraryNavigation;
         private readonly IAppOptions appOptions;
         private readonly IMediaStatistics mediaStatistics;
         #endregion
 
         #region ============================================================= BINDING COMMANDS ==============================================================================
+        public IAsyncCommand BrowseFavoritesAsync_Command { get; private set; }
+        public IAsyncCommand StopMediaPlaybackAsync_Command { get; private set; }
+        public IAsyncCommand ToggleMediaPlaybackAsync_Command { get; private set; }
+        public IAsyncCommand ShowMediaInfoAsync_Command { get; private set; }
+        public IAsyncCommand QuitMediaPlayerAsync_Command { get; private set; }
+        public IAsyncCommand GoToPreviousMediaChapterAsync_Command { get; private set; }
+        public IAsyncCommand PlayPreviousMediaAsync_Command { get; private set; }
+        public IAsyncCommand PlayNextMediaAsync_Command { get; private set; }
+        public IAsyncCommand GoToNextMediaChapterAsync_Command { get; private set; }
         public IAsyncCommand PlayAllMediaAsync_Command { get; private set; }
+        public IAsyncCommand PlayAllMediaRandomAsync_Command { get; private set; }
         public IAsyncCommand SaveMediaLibraryAsync_Command { get; private set; }
         public IAsyncCommand ViewOpenedAsync_Command { get; private set; }
         public IAsyncCommand SearchMediaLibraryAsync_Command { get; private set; }
@@ -204,7 +220,7 @@ namespace Leya.ViewModels.Main
 
         public string PlayerPath
         {
-            get { return appOptions.OptionsPlayer.PlayerPath; }
+            get { return appOptions.OptionsPlayer.PlayerPath; UpdatePlayerOptionsAsync_Command.RaiseCanExecuteChanged(); }
             set { appOptions.OptionsPlayer.PlayerPath = value; Notify(); UpdatePlayerOptionsAsync_Command.RaiseCanExecuteChanged(); }
         }
 
@@ -308,6 +324,33 @@ namespace Leya.ViewModels.Main
         {
             get { return mediaStatistics.Fahrenheit; }
             set { mediaStatistics.Fahrenheit = value; Notify(); }
+        }
+
+        public int MediaLength
+        {
+            get { return mediaPlayer.MediaLength; }
+            set { mediaPlayer.MediaLength = value; Notify(); }
+        }
+
+        public string MediaLengthDisplay
+        {
+            get
+            {
+                return TimeSpan.FromSeconds(mediaPlayer.CurrentPlaybackPosition) + " / " + 
+                       TimeSpan.FromSeconds(mediaPlayer.MediaLength - mediaPlayer.CurrentPlaybackPosition) + " / " + 
+                       TimeSpan.FromSeconds(mediaPlayer.MediaLength); 
+            }
+        }
+
+        public int CurrentPlaybackPosition
+        {
+            get { Notify(nameof(MediaLengthDisplay)); return mediaPlayer.CurrentPlaybackPosition; }
+            set
+            { 
+                mediaPlayer.CurrentPlaybackPosition = value; 
+                mediaPlayer.SetPlaybackPositionAsync(); 
+                Notify(); 
+            }
         }
 
         private bool isMediaOptionsPanelVisible;
@@ -414,6 +457,12 @@ namespace Leya.ViewModels.Main
         {
             get { return mediaLibraryNavigation.IsOptionsContainerVisible; }
             set { mediaLibraryNavigation.IsOptionsContainerVisible = value; Notify(); }
+        }
+
+        public bool IsMediaCategorySelectionVisible
+        {
+            get { return mediaLibraryNavigation.IsMediaCategorySelectionVisible; }
+            set { mediaLibraryNavigation.IsMediaCategorySelectionVisible = value; Notify(); }
         }
 
         private bool isMaskBackgroundVisible = false;
@@ -612,6 +661,13 @@ namespace Leya.ViewModels.Main
             set { sourceAdvancedSearch = value; Notify(); }
         }
 
+        private MediaTypeEntity sourceFavoritesSelectedItem;
+        public MediaTypeEntity SourceFavoritesSelectedItem
+        {
+            get { return sourceFavoritesSelectedItem; }
+            set { sourceFavoritesSelectedItem = value; Notify(); BrowseFavoritesAsync_Command?.RaiseCanExecuteChanged(); }
+        }
+
         public MediaTypeEntity SelectedSearchMediaType
         {
             get { return search.SelectedSearchMediaType; }
@@ -649,11 +705,14 @@ namespace Leya.ViewModels.Main
         /// Overload C-tor
         /// </summary>
         /// <param name="mediaLibrary">Injected media library business model</param>
+        /// <param name="search">Injected advanced search business model</param>
+        /// <param name="mediaPlayer">Injected media player business model</param>
         /// <param name="appOptions">Injected application options</param>
         /// <param name="notificationService">Injected notification service</param>
-        public MainWindowVM(IMediaLibrary mediaLibrary, ISearch search, IAppOptions appOptions, INotificationService notificationService)
+        public MainWindowVM(IMediaLibrary mediaLibrary, ISearch search, IMediaPlayer mediaPlayer, IAppOptions appOptions, INotificationService notificationService)
         {
             this.search = search;
+            this.mediaPlayer = mediaPlayer;
             this.appOptions = appOptions;
             this.mediaLibrary = mediaLibrary;
             this.notificationService = notificationService;
@@ -664,9 +723,13 @@ namespace Leya.ViewModels.Main
             this.mediaLibrary.MediaTypesLoaded += MediaLibrary_MediaTypesLoaded;
             this.mediaLibrary.LibraryLoaded += MediaLibrary_LibraryLoaded;
 
+            this.mediaPlayer.PlaybackChanged += MediaPlayerOnPlaybackChangedAsync;
+
+            BrowseFavoritesAsync_Command = new AsyncCommand(BrowseFavoriteItemsAsync, ValidateFavoritesSelection);
             //OpenMediaFolder_Command = new SyncCommand(OpenMediaFolder);
             //Filter_EnterKeyUp_Command = new SyncCommand(Filter_EnterKeyUp);
-            //PlayAllMediaAsync_Command = new AsyncCommand(PlayAllMediaAsync);
+            PlayAllMediaAsync_Command = new AsyncCommand(PlayAllMediaAsync);
+            PlayAllMediaRandomAsync_Command = new AsyncCommand(PlayAllMediaRandomAsync);
             SelectedMediaChanged_Command = new SyncCommand(SelectedMediaChanged);
             SaveMediaLibraryAsync_Command = new AsyncCommand(SaveMediaLibraryAsync);
             ClearAdvancedSearchTerms_Command = new SyncCommand(ClearAdvancedSearchTerms);
@@ -688,9 +751,17 @@ namespace Leya.ViewModels.Main
             mediaLibraryNavigation.Navigated += InitiateNavigation;
             OpenLoggingDirectory_Command = new SyncCommand(OpenLoggingDirectory);
             SearchMediaLibrary_Command = new AutoCompleteFilterPredicate<object>(SearchMediaLibrary);
-
-            mediaStatistics.PropertyChanged += DomainModelPropertyChanged;
-            mediaLibraryNavigation.PropertyChanged += DomainModelPropertyChanged;
+            StopMediaPlaybackAsync_Command = new AsyncCommand(this.mediaPlayer.StopPlaybackAsync);
+            ToggleMediaPlaybackAsync_Command = new AsyncCommand(this.mediaPlayer.TogglePlayAsync);
+            QuitMediaPlayerAsync_Command = new AsyncCommand(this.mediaPlayer.QuitMediaPlayerAsync);
+            GoToPreviousMediaChapterAsync_Command = new AsyncCommand(this.mediaPlayer.GoToPreviousMediaChapterAsync);
+            GoToNextMediaChapterAsync_Command = new AsyncCommand(this.mediaPlayer.GoToNextMediaChapterAsync);
+            ShowMediaInfoAsync_Command = new AsyncCommand(ShowMediaInfoAsync);
+            PlayPreviousMediaAsync_Command = new AsyncCommand(PlayPreviousMediaAsync);
+            PlayNextMediaAsync_Command = new AsyncCommand(PlayNextMediaAsync);
+            this.mediaStatistics.PropertyChanged += DomainModelPropertyChanged;
+            this.mediaLibraryNavigation.PropertyChanged += DomainModelPropertyChanged;
+            this.mediaPlayer.PropertyChanged += DomainModelPropertyChanged;
             this.appOptions.OptionsMedia.PropertyChanged += DomainModelPropertyChanged;
             this.appOptions.OptionsPlayer.PropertyChanged += DomainModelPropertyChanged;
             this.appOptions.OptionsInterface.PropertyChanged += DomainModelPropertyChanged;
@@ -1056,6 +1127,15 @@ namespace Leya.ViewModels.Main
         }
 
         /// <summary>
+        /// Validates the required information for browsing favorite media
+        /// </summary>
+        /// <returns>True if required information is fine, False otherwise</returns>
+        private bool ValidateFavoritesSelection()
+        {
+            return SourceFavoritesSelectedItem != null;
+        }
+        
+        /// <summary>
         /// Validates the required information for updating user interface options
         /// </summary>
         /// <returns>True if required information is fine, False otherwise</returns>
@@ -1077,11 +1157,11 @@ namespace Leya.ViewModels.Main
                 foreach (string mediaSource in appOptions.OptionsMedia.GetMediaTypeSource(selectedDirectories, response == NotificationResult.Yes))
                 {
                     // do not add same source path twice
-                    if (SourceMediaCategorySources.Count(ms => ms.MediaSourcePath == mediaSource.ToUpper()) == 0)
+                    if (SourceMediaCategorySources.Count(ms => ms.MediaSourcePath == mediaSource) == 0)
                     {
                         appOptions.OptionsMedia.SourceMediaCategorySources.Add(new MediaTypeSourceEntity()
                         {
-                            MediaSourcePath = mediaSource.ToUpper()
+                            MediaSourcePath = mediaSource
                         });
                     }
                 }
@@ -1230,10 +1310,25 @@ namespace Leya.ViewModels.Main
                 // the list is populated only when coming from the main menu, not when navigating the media library list
                 if (temp.Count() > 0)
                 {
-                    SourceMedia = new ObservableCollection<IMediaEntity>(temp);
-                    SourceFilter = new ObservableCollection<string>(temp.Select(e => e.MediaName));
+                    if (mediaLibraryNavigation.ShowsOnlyFavorites)
+                        SourceMedia = new ObservableCollection<IMediaEntity>(temp.Where(e => e.IsFavorite));
+                    else  if (mediaLibraryNavigation.ShowsOnlyUnwatched)
+                        SourceMedia = new ObservableCollection<IMediaEntity>(temp.Where(e => e.IsWatched != true));
+                    else 
+                        SourceMedia = new ObservableCollection<IMediaEntity>(temp);
+                    
+                    if (mediaLibraryNavigation.ShowsOnlyFavorites)
+                        SourceFilter = new ObservableCollection<string>(temp.Where(e => e.IsFavorite)
+                                                                                  .Select(e => e.MediaName));
+                    else  if (mediaLibraryNavigation.ShowsOnlyUnwatched)
+                        SourceFilter = new ObservableCollection<string>(temp.Where(e => e.IsWatched != true)
+                                                                            .Select(e => e.MediaName));
+                    else 
+                        SourceFilter = new ObservableCollection<string>(temp.Select(e => e.MediaName));
                 }
             }
+            else if (CurrentNavigationLevel == NavigationLevel.Favorite)
+                GetMediaTypes();
         }
 
         /// <summary>
@@ -1259,8 +1354,21 @@ namespace Leya.ViewModels.Main
                         temp = mediaLibraryNavigation.GetAlbumsNavigationListFromSong(mediaLibrary, media, () => new MediaEntity());
                 });
                 // update the displayed list with the parent items list
-                SourceMedia = new ObservableCollection<IMediaEntity>(temp);
-                SourceFilter = new ObservableCollection<string>(temp.Select(e => e.MediaName));
+                if (mediaLibraryNavigation.ShowsOnlyFavorites)
+                    SourceMedia = new ObservableCollection<IMediaEntity>(temp.Where(e => e.IsFavorite));
+                else  if (mediaLibraryNavigation.ShowsOnlyUnwatched)
+                    SourceMedia = new ObservableCollection<IMediaEntity>(temp.Where(e => e.IsWatched != true));
+                else 
+                    SourceMedia = new ObservableCollection<IMediaEntity>(temp);
+                    
+                if (mediaLibraryNavigation.ShowsOnlyFavorites)
+                    SourceFilter = new ObservableCollection<string>(temp.Where(e => e.IsFavorite)
+                                                                        .Select(e => e.MediaName));
+                else  if (mediaLibraryNavigation.ShowsOnlyUnwatched)
+                    SourceFilter = new ObservableCollection<string>(temp.Where(e => e.IsWatched != true)
+                                                                        .Select(e => e.MediaName));
+                else 
+                    SourceFilter = new ObservableCollection<string>(temp.Select(e => e.MediaName));
                 // advance current level of navigation one level higher and notify the user interface that the navigation took place
                 mediaLibraryNavigation.NavigateUp(mediaLibrary, media.Id);
                 // whether a media item was previously selected or not, select the parent item that contained the media list from which the up navigation initiated
@@ -1275,6 +1383,7 @@ namespace Leya.ViewModels.Main
             }
             else
             {
+                mediaLibraryNavigation.ShowsOnlyFavorites = false;
                 // no media in the selected category, return to main menu
                 mediaLibraryNavigation.CurrentNavigationLevel = NavigationLevel.None;
                 mediaLibraryNavigation.IsBackNavigationPossible = false;
@@ -1299,6 +1408,7 @@ namespace Leya.ViewModels.Main
                     IsMaskBackgroundVisible = false;
                     IsInterfaceOptionVisible = false;
                     IsOptionsContainerVisible = false;
+                    IsMediaCategorySelectionVisible = false;
                     IsSearchContainerVisible = false;
                     IsMediaTypesOptionVisible = false;
                     AreMediaTypeSourcesOptionVisible = false;
@@ -1308,6 +1418,8 @@ namespace Leya.ViewModels.Main
                 case NavigationLevel.Artist:
                     IsMainMenuVisible = false;
                     IsMediaContainerVisible = true;
+                    IsMaskBackgroundVisible = false;
+                    IsMediaCategorySelectionVisible = false;
                     break;
                 case NavigationLevel.System:
                     IsMainMenuVisible = false;
@@ -1320,6 +1432,9 @@ namespace Leya.ViewModels.Main
                     IsSearchContainerVisible = true;
                     break;
                 case NavigationLevel.Favorite:
+                    IsMainMenuVisible = false;
+                    IsMaskBackgroundVisible = true;
+                    IsMediaCategorySelectionVisible = true;
                     break;
                 default:
                     break;
@@ -1331,7 +1446,7 @@ namespace Leya.ViewModels.Main
         /// <summary>
         /// Navigates one level down from the current media view level, or if the media view is at lowest possible level, plays a Media
         /// </summary>
-        /// <param name="media">The MediaDisplayEntity object containing the Id of the Media to open</param>
+        /// <param name="media">The MediaEntity object containing the Id of the Media to open</param>
         public async Task NavigateMediaLibraryDownAsync(IMediaEntity media)
         {
             ShowProgressBar();
@@ -1349,26 +1464,74 @@ namespace Leya.ViewModels.Main
                     else if (CurrentNavigationLevel == NavigationLevel.Album)
                         temp = mediaLibraryNavigation.GetSongsNavigationList(mediaLibrary, media, () => new MediaEntity());
                 });
-                SourceMedia = new ObservableCollection<IMediaEntity>(temp);
-                SourceFilter = new ObservableCollection<string>(temp.Select(e => e.MediaName));
+                if (mediaLibraryNavigation.ShowsOnlyFavorites)
+                    SourceMedia = new ObservableCollection<IMediaEntity>(temp.Where(e => e.IsFavorite));
+                else  if (mediaLibraryNavigation.ShowsOnlyUnwatched)
+                    SourceMedia = new ObservableCollection<IMediaEntity>(temp.Where(e => e.IsWatched != true));
+                else 
+                    SourceMedia = new ObservableCollection<IMediaEntity>(temp);
+                    
+                if (mediaLibraryNavigation.ShowsOnlyFavorites)
+                    SourceFilter = new ObservableCollection<string>(temp.Where(e => e.IsFavorite)
+                                                                        .Select(e => e.MediaName));
+                else  if (mediaLibraryNavigation.ShowsOnlyUnwatched)
+                    SourceFilter = new ObservableCollection<string>(temp.Where(e => e.IsWatched != true)
+                                                                        .Select(e => e.MediaName));
+                else 
+                    SourceFilter = new ObservableCollection<string>(temp.Select(e => e.MediaName));
             }
             // advance current level of navigation one level higher and notify the user interface that the navigation took place
             try
             {
-                await mediaLibraryNavigation.NavigateDownAsync(mediaLibrary, media);
+                // when current navigation level is episode or movie or song, this is not further navigation, so play the media item
+                if (CurrentNavigationLevel == NavigationLevel.Episode)
+                    await mediaPlayer.PlayEpisodeAsync(mediaLibrary, media);
+                else if (CurrentNavigationLevel == NavigationLevel.Movie)
+                    await mediaPlayer.PlayMovieAsync(mediaLibrary, media);
+                else if (CurrentNavigationLevel == NavigationLevel.Song)
+                    await mediaPlayer.PlaySongAsync(mediaLibrary, media);
+                else
+                    await mediaLibraryNavigation.NavigateDownAsync(mediaLibrary, media);
             }
             catch (Exception ex) when (ex is InvalidOperationException || ex is ArgumentException)
             {
-                await notificationService.ShowAsync(ex.Message, "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
+                if (!(ex is ObjectDisposedException))
+                    await notificationService.ShowAsync(ex.Message, "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
             }
             HideProgressBar();
         }
 
         /// <summary>
+        /// Initiates the navigation for favorite items
+        /// </summary>
+        private async Task BrowseFavoriteItemsAsync()
+        {
+            await Task.Delay(500);
+            BeginMainMenuNavigation(SourceFavoritesSelectedItem);
+        }
+
+        /// <summary>
+        /// Initiates the navigation for unwatched items
+        /// </summary>
+        public async Task BrowseUnwatchedItemsAsync()
+        {
+            await Task.Delay(500);
+            IsMainMenuVisible = false;
+            IsMaskBackgroundVisible = true;
+            IsMediaCategorySelectionVisible = true;
+            mediaLibraryNavigation.ShowsOnlyUnwatched = true;
+            GetMediaTypes();
+            Navigated?.Invoke();
+        }
+        
+        /// <summary>
         /// Exits the media library list and displays the main menu
         /// </summary>
         public async Task ExitMediaLibrary()
         {
+            // exit the favorites or unwatched mode before displaying main menu
+            mediaLibraryNavigation.ShowsOnlyFavorites = false;
+            mediaLibraryNavigation.ShowsOnlyUnwatched = false;
             mediaLibraryNavigation.CurrentNavigationLevel = NavigationLevel.TvShow;
             await NavigateMediaLibraryUpAsync();
         }
@@ -1382,12 +1545,6 @@ namespace Leya.ViewModels.Main
             ResetAddMediaSourceElements_Command?.RaiseCanExecuteChanged();
             IsHelpButtonVisible = false;
         }
-
-
-
-
-
-
         #endregion
 
         /// <summary>
@@ -1409,6 +1566,124 @@ namespace Leya.ViewModels.Main
             bool hasActors = element?.Actors.Where(a => a.ToLower().Contains(search)).Count() > 0;
             bool hasRoles = (element?.Hover as string[]).Where(r => r.ToLower().Contains(search)).Count() > 0;
             return hasEpisode || hasTvShow || hasTags || hasGenres || hasActors || hasRoles;
+        }
+
+        /// <summary>
+        /// Displays information about the current media
+        /// </summary>
+        private async Task ShowMediaInfoAsync()
+        {
+            string info = await mediaPlayer.ShowMediaInfoAsync();
+            if (info != null)
+                await notificationService.ShowAsync(info, "LEYA - Information");
+        }
+
+        /// <summary>
+        /// Plays the previous media item
+        /// </summary>
+        private async Task PlayPreviousMediaAsync()
+        {
+            // enforce a media selection, or update existing one
+            if (mediaPlayer.ShufflesPlaylistArgument) // play random media
+                SourceMediaSelectedItem = sourceMedia[random.Next(0, sourceMedia.Count - 1)];
+            else
+            {
+                if (sourceMediaSelectedItem != null)
+                {
+                    if (sourceMediaSelectedItem.Index - 1 > 0) // play previous media
+                        SourceMediaSelectedItem = sourceMedia[sourceMediaSelectedItem.Index - 2];
+                    else
+                    {
+                        // if the selected media was the last in the list
+                        if (mediaPlayer.RepeatsPlaylistArgument) // if the repeat playback option was selected
+                            SourceMediaSelectedItem = sourceMedia[sourceMedia.Count - 1]; // move selection to bottom of the list
+                        else
+                            SourceMediaSelectedItem = sourceMedia[0]; // repeat playback is not enabled, maintain selection on bottom of the list
+                    }
+                }
+                else // there was no media selected, select the first one in the list
+                    SourceMediaSelectedItem = sourceMedia[0];
+            }
+            // play the selected media
+            IMediaEntity media = sourceMediaSelectedItem;
+            if (CurrentNavigationLevel == NavigationLevel.Episode)
+                await mediaPlayer.PlayEpisodeAsync(mediaLibrary, media);
+            else if (CurrentNavigationLevel == NavigationLevel.Movie)
+                await mediaPlayer.PlayMovieAsync(mediaLibrary, media);
+            else if (CurrentNavigationLevel == NavigationLevel.Song)
+                await mediaPlayer.PlaySongAsync(mediaLibrary, media);
+        }
+
+        /// <summary>
+        /// Plays the next media item
+        /// </summary>
+        private async Task PlayNextMediaAsync()
+        {
+            // enforce a media selection, or update existing one
+            if (mediaPlayer.ShufflesPlaylistArgument) // play random media
+                SourceMediaSelectedItem = sourceMedia[random.Next(0, sourceMedia.Count - 1)];
+            else
+            {
+                if (sourceMediaSelectedItem != null)
+                {
+                    if (sourceMediaSelectedItem.Index + 1 < sourceMedia.Count) // play next media 
+                        SourceMediaSelectedItem = sourceMedia[sourceMediaSelectedItem.Index + 1];
+                    else
+                    {
+                        // if the selected media was the last in the list
+                        if (mediaPlayer.RepeatsPlaylistArgument) // if the repeat playback option was selected
+                            SourceMediaSelectedItem = sourceMedia[0]; // move selection to top of the list
+                        else
+                            SourceMediaSelectedItem = sourceMedia[sourceMedia.Count - 1]; // repeat playback is not enabled, maintain selection on bottom of the list
+                    }
+                }
+                else // there was no media selected, select the first one in the list
+                    SourceMediaSelectedItem = sourceMedia[0];
+            }
+            // play the selected media
+            IMediaEntity media = sourceMediaSelectedItem;
+            if (CurrentNavigationLevel == NavigationLevel.Episode)
+                await mediaPlayer.PlayEpisodeAsync(mediaLibrary, media);
+            else if (CurrentNavigationLevel == NavigationLevel.Movie)
+                await mediaPlayer.PlayMovieAsync(mediaLibrary, media);
+            else if (CurrentNavigationLevel == NavigationLevel.Song)
+                await mediaPlayer.PlaySongAsync(mediaLibrary, media);
+        }
+
+        private async Task PlayAllMediaAsync()
+        {
+            IEnumerable<string> temp = new List<string>();
+            if (CurrentNavigationLevel == NavigationLevel.TvShow)
+            {
+                temp =  from tvShow in mediaLibrary.Library.TvShows where (SourceMediaSelectedItem != null ? tvShow.Id == SourceMediaSelectedItem?.Id : true)
+                        from season in tvShow.Seasons
+                        from episode in season.Episodes
+                        select tvShow.NamedTitle + Path.DirectorySeparatorChar + season.Title + Path.DirectorySeparatorChar + episode.NamedTitle;
+            }
+            else if (CurrentNavigationLevel == NavigationLevel.Season)
+            {
+                temp =  from tvShow in mediaLibrary.Library.TvShows where tvShow.Id == sourceMedia[0].Id
+                        from season in tvShow.Seasons where (SourceMediaSelectedItem != null ? season.Id == SourceMediaSelectedItem?.SeasonOrAlbumId : true)
+                        from episode in season.Episodes
+                        select tvShow.NamedTitle + Path.DirectorySeparatorChar + season.Title + Path.DirectorySeparatorChar + episode.NamedTitle;
+            }
+            else if (CurrentNavigationLevel == NavigationLevel.Episode)
+            {
+                temp =  from tvShow in mediaLibrary.Library.TvShows where tvShow.Id == sourceMedia[0].Id
+                        from season in tvShow.Seasons where season.Id == sourceMedia[0].SeasonOrAlbumId
+                        from episode in season.Episodes where (SourceMediaSelectedItem != null ? episode.Id == SourceMediaSelectedItem?.EpisodeOrSongId : true)
+                        select tvShow.NamedTitle + Path.DirectorySeparatorChar + season.Title + Path.DirectorySeparatorChar + episode.NamedTitle;
+            }
+            for (int i = 0; i < temp.Count(); i++)
+            {
+                //if (i == 0)
+                    //await mediaPlayer.PlayEpisodeAsync(mediaLibrary,  new MediaEntity() {  temp.First());
+            }
+        }
+
+        private async Task PlayAllMediaRandomAsync()
+        {
+            
         }
         #endregion
 
@@ -1479,6 +1754,16 @@ namespace Leya.ViewModels.Main
                 else if (CurrentNavigationLevel == NavigationLevel.Song) // if the UI displays a list of songs
                     mediaLibraryNavigation.GetSongMediaInfo(mediaLibrary, SourceMediaSelectedItem.Id, SourceMediaSelectedItem.SeasonOrAlbumId, SourceMediaSelectedItem.MediaName);
             }
+        }
+
+        /// <summary>
+        /// Handles media player's PlaybackChanged event
+        /// </summary>
+        /// <param name="isPlaying">Indicates whether the media player is playing a media or not</param>
+        private async Task MediaPlayerOnPlaybackChangedAsync(bool isPlaying)
+        {
+            isMediaPlaying = isPlaying;
+            await PlaybackChanged?.Invoke(isPlaying);
         }
 
         /// <summary>

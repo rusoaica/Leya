@@ -21,6 +21,9 @@
     <StyleInclude Source="/Common/Styles/Label.xaml"/>
     <StyleInclude Source="/Common/Styles/Expander.xaml"/>
     <StyleInclude Source="/Common/Styles/RadioButton.xaml"/>
+    <StyleInclude Source="/Common/Styles/ProgressBar.xaml"/>
+    <StyleInclude Source="/Common/Styles/ContextMenu.xaml"/>
+    <StyleInclude Source="/Common/Styles/MenuItem.xaml"/>
 
   </Application.Styles>
 </Application>

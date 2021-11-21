@@ -9,7 +9,7 @@
         xmlns:controls="clr-namespace:Leya.Views.Common.Controls"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Leya.Views.Main.MainWindowV"
-        Title="MainWindowV" Classes="styledWindow" FontFamily="Arial" HasSystemDecorations="False" Opened="Window_Opened" KeyUp="Window_KeyUp" Width="1000" Height="800" MinWidth="1024" MinHeight="768" PositionChanged="Window_PositionChanged">
+        Title="MainWindowV" Classes="styledWindow" FontFamily="Arial" Icon="avares://Leya/Assets/icon.ico" HasSystemDecorations="False" Opened="Window_Opened" KeyUp="Window_KeyUp" Width="1000" Height="800" MinWidth="1024" MinHeight="768" PositionChanged="Window_PositionChanged">
   <Window.Resources>
     <converters:NumberToColorConverter x:Key="NumberToColorConverter"/>
     <converters:NullImageConverter x:Key="NullImageConverter"/>
@@ -22,7 +22,7 @@
     </ia:EventTriggerBehavior>
   </i:Interaction.Behaviors>
   <Grid Background="#222">
-    <Image Source="{Binding BackgroundImagePath, Converter={StaticResource NullImageConverter}}" IsVisible="False" Margin="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="NaN" Height="NaN" Stretch="UniformToFill"/>
+    <Image Source="{Binding BackgroundImagePath, Converter={StaticResource NullImageConverter}}" IsVisible="True" Margin="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="NaN" Height="NaN" Stretch="UniformToFill"/>
     <Grid Margin="0,0,0,60" Height="190" VerticalAlignment="Bottom" x:Name="grdMainMenu" IsVisible="{Binding IsMainMenuVisible}">
       <Grid.RowDefinitions>
         <RowDefinition Height="30"/>
@@ -63,9 +63,7 @@
             </ia:EventTriggerBehavior>
           </i:Interaction.Behaviors>
         </Label>
-        <Label Content="UNWATCHED" Foreground="{DynamicResource WindowForeColor}" Cursor="Hand" FontStyle="Italic" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="20" Padding="0" HorizontalAlignment="Left" Width="145" Margin="295,0,0,0" Opacity="0.7"/>
-        <Label Content="RECENTLY ADDED" Foreground="{DynamicResource WindowForeColor}" Cursor="Hand" FontStyle="Italic" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="20" Padding="0" HorizontalAlignment="Left" Width="189" Margin="482,0,0,0" Opacity="0.7"/>
-        <Label Content="GENRES" Foreground="{DynamicResource WindowForeColor}" Cursor="Hand" FontStyle="Italic" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="20" Padding="0" HorizontalAlignment="Left" Width="157" Margin="679,0,0,0" Opacity="0.7"/>
+        <Label Content="UNWATCHED" Foreground="{DynamicResource WindowForeColor}" Cursor="Hand" FontStyle="Italic" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="20" Padding="0" HorizontalAlignment="Left" Width="145" Margin="295,0,0,0" Opacity="0.7" PointerReleased="BrowseUnwatched_PointerReleased"/>
         <Label Content="QUICK SEARCH" Foreground="{DynamicResource WindowForeColor}" FontStyle="Italic" HorizontalContentAlignment="Center" FontWeight="Bold" FontSize="20" Padding="0" HorizontalAlignment="Left" Width="155" Margin="841,0,0,0" Opacity="0.7"/>
         <AutoCompleteBox Items="{Binding SourceQuickSearch}" x:Name="acbSearchMediaLibrary" ValueMemberBinding="{Binding ChildTitle}" SelectedItem="{Binding QuickSearchSelectedItem, Mode=TwoWay}" Classes="autoCompleteBox" FilterMode="Custom" IsTextCompletionEnabled="True" Margin="1010,4,10,4" FontSize="14" FontWeight="Bold" MinimumPrefixLength="0" MaxDropDownHeight="500" Opacity="1">
           <AutoCompleteBox.ItemTemplate>
@@ -91,62 +89,270 @@
         </AutoCompleteBox>
       </Grid>
     </Grid>
-    <Grid x:Name="grdMedia" IsVisible="{Binding IsMediaContainerVisible}" >
+    <Grid IsVisible="{Binding IsMediaContainerVisible}" >
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="40*"/>
         <ColumnDefinition Width="30*"/>
         <ColumnDefinition Width="30*"/>
       </Grid.ColumnDefinitions>
-      <ListBox Items="{Binding SourceMedia}" SelectedItem="{Binding SourceMediaSelectedItem, Mode=TwoWay}" x:Name="lstMedia" Margin="9,10,10,60" Grid.Column="0" Background="{DynamicResource contentBackground}" Classes="ListBox" VirtualizationMode="Simple" Foreground="Black" BorderThickness="0" Opacity="0.9">
-        <i:Interaction.Behaviors>
-          <iac:NthChildBehavior />
-        </i:Interaction.Behaviors>
-        <ListBox.ItemsPanel>
-          <ItemsPanelTemplate>
-            <VirtualizingStackPanel/>
-          </ItemsPanelTemplate>
-        </ListBox.ItemsPanel>
-        <ListBox.ItemTemplate>
-          <DataTemplate>
-            <Grid Margin="0,2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*" />
-                <ColumnDefinition Width="7*" />
-                <ColumnDefinition Width="74*" />
-                <ColumnDefinition Width="7*" />
-                <ColumnDefinition Width="5*" />
-                <ColumnDefinition Width="5*" />
-              </Grid.ColumnDefinitions>
-              <Label Content="{Binding Index, Mode=OneWay}" Foreground="{DynamicResource ListTextHighlighted}" FontSize="16" BorderThickness="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Right" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="0" Tag="{Binding}" DoubleTapped="MediaItem_DoubleTapped" PointerReleased="MediaItem_PointerReleased"/>
-              <Label Content="{Binding Year, Mode=OneWay}" Foreground="#74BCFF" FontStyle="Italic" FontSize="16" BorderThickness="0" MinWidth="50" VerticalContentAlignment="Center" HorizontalContentAlignment="Right" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="1" Tag="{Binding}" DoubleTapped="MediaItem_DoubleTapped" PointerReleased="MediaItem_PointerReleased"/>
-              <Label Content="{Binding MediaName, Mode=OneWay}" Background="#01000000" ToolTip.Tip="{Binding MediaName}" Foreground="{DynamicResource ListTextNormal}" FontWeight="Bold" FontSize="20" Cursor="Hand" BorderThickness="0" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="2" Tag="{Binding}" DoubleTapped="MediaItem_DoubleTapped" PointerReleased="MediaItem_PointerReleased"/>
-              <Label Content="{Binding Rating, Mode=OneWay, StringFormat='{}{0:#,##0.00}'}" ToolTip.Tip="{Binding CommonRating}" Foreground="{Binding Rating, Converter={StaticResource NumberToColorConverter}}" FontSize="18" BorderThickness="0" Margin="6,0" VerticalContentAlignment="Center" HorizontalContentAlignment="Right" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="3" Tag="{Binding}" DoubleTapped="MediaItem_DoubleTapped" PointerReleased="MediaItem_PointerReleased"/>
-              <CheckBox IsChecked="{Binding IsFavorite, Mode=TwoWay}" Classes="favorite" Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SetIsFavoriteStatusAsync_Command}" CommandParameter="{Binding Content, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}}" ToolTip.Tip="Favorite" VerticalAlignment="Center" HorizontalAlignment="Center" Height="20" Width="20" Cursor="Hand" Grid.Column="4"/>
-              <CheckBox IsChecked="{Binding IsWatched, Mode=TwoWay}" Classes="checkBox" Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SetIsWatchedStatusAsync_Command}" CommandParameter="{Binding Content, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}}" ToolTip.Tip="Watched" VerticalAlignment="Center" HorizontalAlignment="Center" Height="20" Width="20" Cursor="Hand" Grid.Column="5"/>
-            </Grid>
-          </DataTemplate>
-        </ListBox.ItemTemplate>
-        <ListBox.ContextMenu>
-          <ContextMenu x:Name="cntMedia" DataContext="{Binding RelativeSource={RelativeSource Self}, Path=PlacementTarget.DataContext}">
-            <MenuItem Header="Play all" Command="{Binding PlayAllMediaAsync_Command}"/>
-          </ContextMenu>
-        </ListBox.ContextMenu>
-      </ListBox>
-      <AutoCompleteBox Items="{Binding SourceFilter}" Text="{Binding FilterText, Mode=TwoWay}" Classes="autoCompleteBox" IsTextCompletionEnabled="True" Margin="10,0,10,33" FontSize="14" FontWeight="Bold" MinimumPrefixLength="0" MaxDropDownHeight="500" Opacity="1" VerticalAlignment="Bottom">
-        <AutoCompleteBox.ItemTemplate>
-          <DataTemplate>
-            <TextBlock Text="{Binding}"/>
-          </DataTemplate>
-        </AutoCompleteBox.ItemTemplate>
-        <AutoCompleteBox.KeyBindings>
-          <KeyBinding Gesture="Enter" Command="{Binding FilterLibrary_Command}" />
-        </AutoCompleteBox.KeyBindings>
-        <i:Interaction.Behaviors>
-          <ia:EventTriggerBehavior EventName="DropDownClosing">
-            <ia:InvokeCommandAction Command="{Binding FilterLibrary_Command}"/>
-          </ia:EventTriggerBehavior>
-        </i:Interaction.Behaviors>
-      </AutoCompleteBox>
+      <Grid Column="0" x:Name="grdMedia">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="80"/>
+          <RowDefinition Height="*"/>
+          <RowDefinition Height="60"/>
+        </Grid.RowDefinitions>
+        <Grid x:Name="grdMediaPlayer" Grid.Row="0" Margin="9,0,10,0">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="35"/>
+            <RowDefinition Height="20"/>
+          </Grid.RowDefinitions>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="91*"/>
+            <ColumnDefinition Width="91*"/>
+            <ColumnDefinition Width="91*"/>
+            <ColumnDefinition Width="91*"/>
+            <ColumnDefinition Width="91*"/>
+            <ColumnDefinition Width="91*"/>
+            <ColumnDefinition Width="91*"/>
+            <ColumnDefinition Width="91*"/>
+            <ColumnDefinition Width="91*"/>
+          </Grid.ColumnDefinitions>
+          <Border Grid.ColumnSpan="9" Grid.Row="0" Grid.RowSpan="3" CornerRadius="25,25,0,0" Margin="5,10,5,0" Background="#88000000" BoxShadow="0 0 15 6 #88000000">
+            <Border.OpacityMask>
+              <LinearGradientBrush StartPoint="50%,0%" EndPoint="50%,100%">
+                <GradientStop Color="#00000000" Offset="0.0" />
+                <GradientStop Color="#66000000" Offset="0.4" />
+                <GradientStop Color="#99000000" Offset="0.7" />
+                <GradientStop Color="#FF000000" Offset="1.0" />
+              </LinearGradientBrush>
+            </Border.OpacityMask>
+          </Border>
+          <Slider MinWidth="{Binding $parent[0].Bounds.Width}" ToolTip.Tip="{Binding MediaLengthDisplay}" MinHeight="40" Minimum="0" Maximum="{Binding MediaLength}" Value="{Binding CurrentPlaybackPosition, Mode=TwoWay}" Cursor="Hand" Grid.Column="0" Grid.ColumnSpan="9" Grid.Row="0" Margin="0, -15,0,0"/>
+          <Button Command="{Binding PlayPreviousMediaAsync_Command}" Grid.Column="0" Grid.Row="1" Cursor="Hand" Background="Transparent" Height="30" Padding="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0" Click="MediaPlayerStart_Click">
+            <Image Source="avares://Leya/Assets/Crystal_Project_Player-start.png" ToolTip.Tip="Jump to previous media" Margin="0" Width="NaN" Height="NaN" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+          </Button>
+          <Button Command="{Binding GoToPreviousMediaChapterAsync_Command}" Grid.Column="1" Grid.Row="1" Cursor="Hand" Background="Transparent" Height="30" Padding="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0">
+            <Image Source="avares://Leya/Assets/Crystal_Project_Player_rew.png" ToolTip.Tip="Jump to previous chapter" Margin="0" Width="NaN" Height="NaN" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+          </Button>
+          <Button Command="{Binding StopMediaPlaybackAsync_Command}" Grid.Column="2" Grid.Row="1" Cursor="Hand" Background="Transparent" Height="30" Padding="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0">
+            <Image Source="avares://Leya/Assets/Crystal_Project_Player_stop.png" ToolTip.Tip="Stop media" Margin="0" Width="NaN" Height="NaN" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+          </Button>
+          <Button Command="{Binding ToggleMediaPlaybackAsync_Command}" Grid.Column="3" Grid.Row="1" Cursor="Hand" Background="Transparent" Height="30" Padding="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0">
+            <Image Source="avares://Leya/Assets/Crystal_Project_Player_play.png" ToolTip.Tip="Toggle playback" Margin="0" Width="NaN" Height="NaN" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+          </Button>
+          <Button Command="{Binding GoToNextMediaChapterAsync_Command}" Grid.Column="4" Grid.Row="1" Cursor="Hand" Background="Transparent" Height="30" Padding="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0">
+            <Image Source="avares://Leya/Assets/Crystal_Project_Player_fwd.png" ToolTip.Tip="Jump to next chapter" Margin="0" Width="NaN" Height="NaN" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+          </Button>
+          <Button Command="{Binding PlayNextMediaAsync_Command}" Grid.Column="5" Grid.Row="1" Cursor="Hand" Background="Transparent" Height="30" Padding=" 0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0">
+            <Image Source="avares://Leya/Assets/Crystal_Project_Player-end.png" ToolTip.Tip="Jump to next media" Margin="0" Width="NaN" Height="NaN" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+          </Button>
+          <Button Command="{Binding ShowMediaInfoAsync_Command}" Grid.Column="6" Grid.Row="1" Cursor="Hand" Background="Transparent" Height="30" Padding="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0">
+            <Image Source="avares://Leya/Assets/Crystal_Project_Player_info.png" ToolTip.Tip="Display media information" Margin="0" Width="NaN" Height="NaN" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+          </Button>
+          <Button Command="{Binding QuitMediaPlayerAsync_Command}" Grid.Column="7" Grid.Row="1" Cursor="Hand" Background="Transparent" Height="30" Padding="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0">
+            <Image Source="avares://Leya/Assets/Crystal_Project_Player_shutdown.png" ToolTip.Tip="Close VLC" Margin="0" Width="NaN" Height="NaN" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+          </Button>
+          <Button Grid.Column="8" Grid.Row="1" Cursor="Hand" Background="Transparent" Height="30" Padding="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0">
+            <Image Source="avares://Leya/Assets/Crystal_Project_downarrow.png" ToolTip.Tip="Increase media volume" Margin="0" Width="NaN" Height="NaN" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+          </Button>
+          <Image Source="avares://Leya/Assets/Crystal_Project_Player-start.png" Grid.Column="0" Grid.Row="2" Margin="0" Width="NaN" Height="30" VerticalAlignment="Top" HorizontalAlignment="Stretch" >
+            <Image.RenderTransform>
+              <TransformGroup>
+                <ScaleTransform ScaleY="-0.9" />
+                <ScaleTransform ScaleX="1.1" />
+              </TransformGroup>
+            </Image.RenderTransform>
+            <Image.OpacityMask>
+              <LinearGradientBrush StartPoint="50%,0%" EndPoint="50%,100%">
+                <GradientStop Color="#00000000" Offset="0.0" />
+                <GradientStop Color="#00000000" Offset="0.4" />
+                <GradientStop Color="#11000000" Offset="0.7" />
+                <GradientStop Color="#66000000" Offset="1.0" />
+              </LinearGradientBrush>
+            </Image.OpacityMask>
+          </Image>
+          <Image Source="avares://Leya/Assets/Crystal_Project_Player_rew.png" Grid.Column="1" Grid.Row="2" Margin="0" Width="NaN" Height="30" VerticalAlignment="Top" HorizontalAlignment="Stretch" >
+            <Image.RenderTransform>
+              <TransformGroup>
+                <ScaleTransform ScaleY="-0.9" />
+                <ScaleTransform ScaleX="1.1" />
+              </TransformGroup>
+            </Image.RenderTransform>
+            <Image.OpacityMask>
+              <LinearGradientBrush StartPoint="50%,0%" EndPoint="50%,100%">
+                <GradientStop Color="#00000000" Offset="0.0" />
+                <GradientStop Color="#00000000" Offset="0.4" />
+                <GradientStop Color="#11000000" Offset="0.7" />
+                <GradientStop Color="#66000000" Offset="1.0" />
+              </LinearGradientBrush>
+            </Image.OpacityMask>
+          </Image>
+          <Image Source="avares://Leya/Assets/Crystal_Project_Player_stop.png" Grid.Column="2" Grid.Row="2" Margin="0" Width="NaN" Height="30" VerticalAlignment="Top" HorizontalAlignment="Stretch" >
+            <Image.RenderTransform>
+              <TransformGroup>
+                <ScaleTransform ScaleY="-0.9" />
+                <ScaleTransform ScaleX="1.1" />
+              </TransformGroup>
+            </Image.RenderTransform>
+            <Image.OpacityMask>
+              <LinearGradientBrush StartPoint="50%,0%" EndPoint="50%,100%">
+                <GradientStop Color="#00000000" Offset="0.0" />
+                <GradientStop Color="#00000000" Offset="0.4" />
+                <GradientStop Color="#11000000" Offset="0.7" />
+                <GradientStop Color="#66000000" Offset="1.0" />
+              </LinearGradientBrush>
+            </Image.OpacityMask>
+          </Image>
+          <Image Source="avares://Leya/Assets/Crystal_Project_Player_play.png" Grid.Column="3" Grid.Row="2" Margin="0" Width="NaN" Height="30" VerticalAlignment="Top" HorizontalAlignment="Stretch" >
+            <Image.RenderTransform>
+              <TransformGroup>
+                <ScaleTransform ScaleY="-0.9" />
+                <ScaleTransform ScaleX="1.1" />
+              </TransformGroup>
+            </Image.RenderTransform>
+            <Image.OpacityMask>
+              <LinearGradientBrush StartPoint="50%,0%" EndPoint="50%,100%">
+                <GradientStop Color="#00000000" Offset="0.0" />
+                <GradientStop Color="#00000000" Offset="0.4" />
+                <GradientStop Color="#11000000" Offset="0.7" />
+                <GradientStop Color="#66000000" Offset="1.0" />
+              </LinearGradientBrush>
+            </Image.OpacityMask>
+          </Image>
+          <Image Source="avares://Leya/Assets/Crystal_Project_Player_fwd.png" Grid.Column="4" Grid.Row="2" Margin="0" Width="NaN" Height="30" VerticalAlignment="Top" HorizontalAlignment="Stretch" >
+            <Image.RenderTransform>
+              <TransformGroup>
+                <ScaleTransform ScaleY="-0.9" />
+                <ScaleTransform ScaleX="1.1" />
+              </TransformGroup>
+            </Image.RenderTransform>
+            <Image.OpacityMask>
+              <LinearGradientBrush StartPoint="50%,0%" EndPoint="50%,100%">
+                <GradientStop Color="#00000000" Offset="0.0" />
+                <GradientStop Color="#00000000" Offset="0.4" />
+                <GradientStop Color="#11000000" Offset="0.7" />
+                <GradientStop Color="#66000000" Offset="1.0" />
+              </LinearGradientBrush>
+            </Image.OpacityMask>
+          </Image>
+          <Image Source="avares://Leya/Assets/Crystal_Project_Player-end.png" Grid.Column="5" Grid.Row="2" Margin="0" Width="NaN" Height="30" VerticalAlignment="Top" HorizontalAlignment="Stretch" >
+            <Image.RenderTransform>
+              <TransformGroup>
+                <ScaleTransform ScaleY="-0.9" />
+                <ScaleTransform ScaleX="1.1" />
+              </TransformGroup>
+            </Image.RenderTransform>
+            <Image.OpacityMask>
+              <LinearGradientBrush StartPoint="50%,0%" EndPoint="50%,100%">
+                <GradientStop Color="#00000000" Offset="0.0" />
+                <GradientStop Color="#00000000" Offset="0.4" />
+                <GradientStop Color="#11000000" Offset="0.7" />
+                <GradientStop Color="#66000000" Offset="1.0" />
+              </LinearGradientBrush>
+            </Image.OpacityMask>
+          </Image>
+          <Image Source="avares://Leya/Assets/Crystal_Project_Player_info.png" Grid.Column="6" Grid.Row="2" Margin="0" Width="NaN" Height="30" VerticalAlignment="Top" HorizontalAlignment="Stretch" >
+            <Image.RenderTransform>
+              <TransformGroup>
+                <ScaleTransform ScaleY="-0.9" />
+                <ScaleTransform ScaleX="1.1" />
+              </TransformGroup>
+            </Image.RenderTransform>
+            <Image.OpacityMask>
+              <LinearGradientBrush StartPoint="50%,0%" EndPoint="50%,100%">
+                <GradientStop Color="#00000000" Offset="0.0" />
+                <GradientStop Color="#00000000" Offset="0.4" />
+                <GradientStop Color="#11000000" Offset="0.7" />
+                <GradientStop Color="#66000000" Offset="1.0" />
+              </LinearGradientBrush>
+            </Image.OpacityMask>
+          </Image>
+          <Image Source="avares://Leya/Assets/Crystal_Project_Player_shutdown.png" Grid.Column="7" Grid.Row="2" Margin="0" Width="NaN" Height="30" VerticalAlignment="Top" HorizontalAlignment="Stretch" >
+            <Image.RenderTransform>
+              <TransformGroup>
+                <ScaleTransform ScaleY="-0.9" />
+                <ScaleTransform ScaleX="1.1" />
+              </TransformGroup>
+            </Image.RenderTransform>
+            <Image.OpacityMask>
+              <LinearGradientBrush StartPoint="50%,0%" EndPoint="50%,100%">
+                <GradientStop Color="#00000000" Offset="0.0" />
+                <GradientStop Color="#00000000" Offset="0.4" />
+                <GradientStop Color="#11000000" Offset="0.7" />
+                <GradientStop Color="#66000000" Offset="1.0" />
+              </LinearGradientBrush>
+            </Image.OpacityMask>
+          </Image>
+          <Image Source="avares://Leya/Assets/Crystal_Project_downarrow.png" Grid.Column="8" Grid.Row="2" Margin="0" Width="NaN" Height="30" VerticalAlignment="Top" HorizontalAlignment="Stretch" >
+            <Image.RenderTransform>
+              <TransformGroup>
+                <ScaleTransform ScaleY="-0.9" />
+                <ScaleTransform ScaleX="1.1" />
+              </TransformGroup>
+            </Image.RenderTransform>
+            <Image.OpacityMask>
+              <LinearGradientBrush StartPoint="50%,0%" EndPoint="50%,100%">
+                <GradientStop Color="#00000000" Offset="0.0" />
+                <GradientStop Color="#00000000" Offset="0.4" />
+                <GradientStop Color="#11000000" Offset="0.7" />
+                <GradientStop Color="#66000000" Offset="1.0" />
+              </LinearGradientBrush>
+            </Image.OpacityMask>
+          </Image>
+        </Grid>
+        <ListBox Items="{Binding SourceMedia}" SelectedItem="{Binding SourceMediaSelectedItem, Mode=TwoWay}" x:Name="lstMedia" VerticalAlignment="Stretch" Margin="9,0,10,0" Grid.Row="1" Background="{DynamicResource contentBackground}" Classes="ListBox" VirtualizationMode="Simple" Foreground="Black" BorderThickness="0" Opacity="0.9">
+          <i:Interaction.Behaviors>
+            <iac:NthChildBehavior />
+          </i:Interaction.Behaviors>
+          <ListBox.ItemsPanel>
+            <ItemsPanelTemplate>
+              <VirtualizingStackPanel/>
+            </ItemsPanelTemplate>
+          </ListBox.ItemsPanel>
+          <ListBox.ItemTemplate>
+            <DataTemplate>
+              <Grid Margin="0,2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="2*" />
+                  <ColumnDefinition Width="7*" />
+                  <ColumnDefinition Width="74*" />
+                  <ColumnDefinition Width="7*" />
+                  <ColumnDefinition Width="5*" />
+                  <ColumnDefinition Width="5*" />
+                </Grid.ColumnDefinitions>
+                <Label Content="{Binding Index, Mode=OneWay}" Foreground="{DynamicResource ListTextHighlighted}" FontSize="16" BorderThickness="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Right" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="0" Tag="{Binding}" DoubleTapped="MediaItem_DoubleTapped" PointerReleased="MediaItem_PointerReleased"/>
+                <Label Content="{Binding Year, Mode=OneWay}" Foreground="#74BCFF" FontStyle="Italic" FontSize="16" BorderThickness="0" MinWidth="50" VerticalContentAlignment="Center" HorizontalContentAlignment="Right" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="1" Tag="{Binding}" DoubleTapped="MediaItem_DoubleTapped" PointerReleased="MediaItem_PointerReleased"/>
+                <Label Content="{Binding MediaName, Mode=OneWay}" Background="#01000000" ToolTip.Tip="{Binding MediaName}" Foreground="{DynamicResource ListTextNormal}" FontWeight="Bold" FontSize="20" Cursor="Hand" BorderThickness="0" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" Grid.Column="2" Tag="{Binding}" DoubleTapped="MediaItem_DoubleTapped" PointerReleased="MediaItem_PointerReleased"/>
+                <Label Content="{Binding Rating, Mode=OneWay, StringFormat='{}{0:#,##0.00}'}" ToolTip.Tip="{Binding CommonRating}" Foreground="{Binding Rating, Converter={StaticResource NumberToColorConverter}}" FontSize="18" BorderThickness="0" Margin="6,0" VerticalContentAlignment="Center" HorizontalContentAlignment="Right" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="3" Tag="{Binding}" DoubleTapped="MediaItem_DoubleTapped" PointerReleased="MediaItem_PointerReleased"/>
+                <CheckBox IsChecked="{Binding IsFavorite, Mode=TwoWay}" Classes="favorite" Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SetIsFavoriteStatusAsync_Command}" CommandParameter="{Binding Content, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}}" ToolTip.Tip="Favorite" VerticalAlignment="Center" HorizontalAlignment="Center" Height="20" Width="20" Cursor="Hand" Grid.Column="4"/>
+                <CheckBox IsChecked="{Binding IsWatched, Mode=TwoWay}" Classes="checkBox" Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.SetIsWatchedStatusAsync_Command}" CommandParameter="{Binding Content, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}}" ToolTip.Tip="Watched" VerticalAlignment="Center" HorizontalAlignment="Center" Height="20" Width="20" Cursor="Hand" Grid.Column="5"/>
+              </Grid>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+          <ListBox.ContextMenu>
+            <ContextMenu Classes="ContextMenu">
+              <MenuItem Header="Play" Command="{Binding PlayAllMediaAsync_Command}" Classes="MenuItem"/>
+              <MenuItem Header="Play random" Command="{Binding PlayAllMediaRandomAsync_Command}" Classes="MenuItem"/>
+            </ContextMenu>
+          </ListBox.ContextMenu>
+        </ListBox>
+        <AutoCompleteBox Items="{Binding SourceFilter}" Text="{Binding FilterText, Mode=TwoWay}" Classes="autoCompleteBox" IsTextCompletionEnabled="True" Grid.Row="2" Margin="10,0,10,33" FontSize="14" FontWeight="Bold" MinimumPrefixLength="0" MaxDropDownHeight="500" Opacity="1" VerticalAlignment="Bottom">
+          <AutoCompleteBox.ItemTemplate>
+            <DataTemplate>
+              <TextBlock Text="{Binding}"/>
+            </DataTemplate>
+          </AutoCompleteBox.ItemTemplate>
+          <AutoCompleteBox.KeyBindings>
+            <KeyBinding Gesture="Enter" Command="{Binding FilterLibrary_Command}" />
+          </AutoCompleteBox.KeyBindings>
+          <i:Interaction.Behaviors>
+            <ia:EventTriggerBehavior EventName="DropDownClosing">
+              <ia:InvokeCommandAction Command="{Binding FilterLibrary_Command}"/>
+            </ia:EventTriggerBehavior>
+          </i:Interaction.Behaviors>
+        </AutoCompleteBox>
+      </Grid>
       <Image Cursor="Hand" x:Name="imgNavigateUp" ToolTip.Tip="Up one level" Grid.Column="1" Margin="10,10,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Source="avares://Leya/Assets/Previous-icon.png" Height="20" Width="20" RenderTransformOrigin="0.5,0.5" PointerReleased="NavigateUp_PointerReleased">
         <Image.RenderTransform>
           <TransformGroup>
@@ -624,6 +830,58 @@
       <Button Classes="abortButton" Content="Back" Margin="30,0,30,15" FontSize="12" BorderThickness="0" Height="22" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="105" Click="DisplayMainMenu_Click"/>
     </Grid>
 
+    <Grid IsVisible="{Binding IsMediaCategorySelectionVisible}" Margin="150,100,150,100" Width="500" Height="200" Opacity="0.9">
+      <Grid Margin="11,11,11,11">
+        <Path Data="M 1,0 0.5,0 Q 0,0 0,0.5 L 0,1" Fill="Transparent" HorizontalAlignment="Left" Height="6" Margin="-5" Stretch="Fill" Stroke="{DynamicResource BorderLit}" StrokeThickness="4" VerticalAlignment="Top" Width="6"/>
+        <Path Data="M 0,1 0.5,1 Q 1,1 1,0.5 L 1,0" Fill="Transparent" HorizontalAlignment="Right" Height="6" Margin="-5" Stretch="Fill" Stroke="{DynamicResource BorderUnlit}" StrokeThickness="4" VerticalAlignment="Bottom" Width="6"/>
+        <Path Data="M 0,0 0.5,0 Q 1,0 1,0.5 L 1,1" Fill="Transparent" HorizontalAlignment="Right" Height="6" Margin="-5" Stretch="Fill" Stroke="{DynamicResource AngleShadow}" StrokeThickness="4" VerticalAlignment="Top" Width="6"/>
+        <Path Data="M 0,0 0,0.5 Q 0,1 0.5,1 L 1,1" Fill="Transparent" HorizontalAlignment="Left" Height="6" Margin="-5" Stretch="Fill" Stroke="{DynamicResource AngleShadow}" StrokeThickness="4" VerticalAlignment="Bottom" Width="6"/>
+        <Line StartPoint="0,0" EndPoint="1,0" Stroke="{DynamicResource BorderLit}" Stretch="Fill" Margin="0,-5" StrokeThickness="4" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+        <Line StartPoint="0,1" EndPoint="1,1" Stroke="{DynamicResource BorderUnlit}" Stretch="Fill" Margin="0,5,0,-5" StrokeThickness="4" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+        <Line StartPoint="0,0" EndPoint="0,1" Stroke="{DynamicResource BorderLit}" Stretch="Fill" Margin="-5,-1" StrokeThickness="4" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <Line StartPoint="1,0" EndPoint="1,1" Stroke="{DynamicResource BorderUnlit}" Stretch="Fill" Margin="5,-1,-5,-1" StrokeThickness="4" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+        <Line StartPoint="0,0" EndPoint="1,0" Stroke="{DynamicResource UpperHighlight}" Stretch="Fill" Margin="1,-5" StrokeThickness="4" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+      </Grid>
+      <Border Margin="0" Classes="contentBorder"/>
+       <ListBox Items="{Binding SourceMediaCategories}" SelectedItem="{Binding SourceFavoritesSelectedItem, Mode=TwoWay}" Background="{DynamicResource contentBackground}" Classes="ListBox" VirtualizationMode="Simple" Foreground="Black" Margin="20,30,20,50" BorderThickness="0">
+        <i:Interaction.Behaviors>
+          <iac:NthChildBehavior />
+        </i:Interaction.Behaviors>
+        <ListBox.ItemsPanel>
+          <ItemsPanelTemplate>
+            <VirtualizingStackPanel/>
+          </ItemsPanelTemplate>
+        </ListBox.ItemsPanel>
+        <ListBox.ItemTemplate>
+          <DataTemplate>
+            <Grid Margin="0,2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="150" />
+                <ColumnDefinition Width="50" />
+              </Grid.ColumnDefinitions>
+              <Label Content="{Binding MediaName}" Foreground="{DynamicResource ListTextHighlighted}" FontSize="20" Cursor="Hand" Background="Transparent" BorderThickness="0" Margin="6,0" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" Grid.Column="0" DoubleTapped="BrowseFavorites_Click">
+                <i:Interaction.Behaviors>
+                  <ia:EventTriggerBehavior EventName="DoubleTapped">
+                    <ia:InvokeCommandAction Command="{Binding DataContext.BrowseFavoritesAsync_Command, RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}}"/>
+                  </ia:EventTriggerBehavior>
+                </i:Interaction.Behaviors>
+              </Label>
+              <Label Content="{Binding MediaType}" Foreground="{DynamicResource ListTextNormal}" FontWeight="Bold" FontSize="20" Cursor="Hand" Background="Transparent" BorderThickness="0" Margin="-6,0" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch" Grid.Column="1" DoubleTapped="BrowseFavorites_Click">
+                <i:Interaction.Behaviors>
+                  <ia:EventTriggerBehavior EventName="DoubleTapped">
+                    <ia:InvokeCommandAction Command="{Binding DataContext.BrowseFavoritesAsync_Command, RelativeSource={RelativeSource AncestorType={x:Type Window}, Mode=FindAncestor}}"/>
+                  </ia:EventTriggerBehavior>
+                </i:Interaction.Behaviors>
+              </Label>
+            </Grid>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+      <Button Classes="abortButton" Content="Back" Margin="20,0,20,15" FontSize="12" BorderThickness="0" Height="22" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="105" Click="DisplayMainMenu_Click"/>
+      <Button Command="{Binding BrowseFavoritesAsync_Command}" Content="Browse" Classes="confirmButton" HorizontalAlignment="Right" Margin="20,0,20,15" Height="22" FontSize="12" VerticalAlignment="Bottom" Width="105" Click="BrowseFavorites_Click"/>
+    </Grid>
+ 
     <Label Content="{Binding Version}" Foreground="{DynamicResource MainMenuForeground}" FontSize="14" Height="39" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="156" Margin="15,0,0,0"/>
     <!--grid for fade in/fade out transitions-->
     <Grid Background="#000" x:Name="grdTransitionMask" Opacity="0" IsVisible="False"/>

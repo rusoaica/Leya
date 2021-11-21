@@ -7,7 +7,7 @@
         xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
         xmlns:iac="clr-namespace:Avalonia.Xaml.Interactions.Custom;assembly=Avalonia.Xaml.Interactions.Custom"
        x:Class="Leya.Views.Register.RegisterV"
-        Title="{Binding WindowTitle}" Classes="styledWindow" HasSystemDecorations="False" Height="305" Width="550" MinWidth="365" MinHeight="216" MaxHeight="750" MaxWidth="550" WindowStartupLocation="CenterScreen" KeyUp="Window_KeyUp" Opened="Window_Opened">
+        Title="{Binding WindowTitle}" Icon="avares://Leya/Assets/icon.ico" Classes="styledWindow" HasSystemDecorations="False" Height="305" Width="550" MinWidth="365" MinHeight="216" MaxHeight="750" MaxWidth="550" WindowStartupLocation="CenterScreen" KeyUp="Window_KeyUp" Opened="Window_Opened">
   <i:Interaction.Behaviors>
     <ia:EventTriggerBehavior EventName="Opened">
       <ia:InvokeCommandAction Command="{Binding ViewOpened_Command}"/>

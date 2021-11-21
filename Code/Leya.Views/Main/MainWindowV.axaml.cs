@@ -17,11 +17,14 @@ using System.Threading.Tasks;
 using Avalonia.Interactivity;
 using Leya.Infrastructure.Enums;
 using System.Collections.Generic;
+using Avalonia.Threading;
 using Leya.Infrastructure.Dialog;
 using Leya.Models.Common.Models.Media;
 using Leya.Infrastructure.Notification;
 using Leya.Models.Common.Models.Common;
 using Leya.Infrastructure.Configuration;
+using NLog.LayoutRenderers;
+using IDispatcher = Leya.ViewModels.Common.Dispatcher.IDispatcher;
 #endregion
 
 namespace Leya.Views.Main
@@ -29,13 +32,16 @@ namespace Leya.Views.Main
     public partial class MainWindowV : Window, IMainWindowView
     {
         #region ============================================================== FIELD MEMBERS ================================================================================
-        private Grid grdWindowDrag;
+        private Grid grdWindowDrag; // readonly?
+        private readonly Grid grdMedia;
         private readonly Image imgBanner;
         private readonly Grid grdDescription;
+        private readonly Grid grdMediaPlayer;
         private readonly Grid grdTransitionMask;
         private readonly AutoCompleteBox acbSearchMediaLibrary;
         private readonly IAppConfig appConfig;
         private readonly IFileBrowserService fileBrowserService;
+        private readonly IDispatcher dispatcher;
         private readonly INotificationService notificationService;
         private readonly IFolderBrowserService folderBrowserService;
         private Animation? opacityFadeInAnimation;
@@ -43,6 +49,8 @@ namespace Leya.Views.Main
         private readonly Clock animationPlaybackClock = new Clock();
         private bool isWindowLoaded;
         private bool isWindowDragged;
+        private bool isMediaPlaying;
+        private readonly DispatcherTimer MediaPlayerSlidingTimer = new() { Interval = TimeSpan.FromMilliseconds(10)};
         #endregion
 
         #region ================================================================== CTOR =====================================================================================
@@ -60,28 +68,32 @@ namespace Leya.Views.Main
         /// <param name="fileBrowserService">Injected file browser service</param>
         /// <param name="appConfig">Injected application's configuration service</param>
         /// <param name="notificationService">Injected notification service</param>
-        public MainWindowV(IFolderBrowserService folderBrowserService, IFileBrowserService fileBrowserService, IAppConfig appConfig, INotificationService notificationService)
+        public MainWindowV(IFolderBrowserService folderBrowserService, IFileBrowserService fileBrowserService, IDispatcher dispatcher, IAppConfig appConfig, INotificationService notificationService)
         {
             AvaloniaXamlLoader.Load(this);
 #if DEBUG
             this.AttachDevTools();
 #endif
             imgBanner = this.FindControl<Image>("imgBanner");
+            grdMedia = this.FindControl<Grid>("grdMedia");
             grdDescription = this.FindControl<Grid>("grdDescription");
+            grdMediaPlayer = this.FindControl<Grid>("grdMediaPlayer");
             grdTransitionMask = this.FindControl<Grid>("grdTransitionMask");
             acbSearchMediaLibrary = this.FindControl<AutoCompleteBox>("acbSearchMediaLibrary");
          
+            MediaPlayerSlidingTimer.Tick += MediaPlayerSlidingTimer_Tick;
             grdTransitionMask.Clock = animationPlaybackClock;
             CreateOpacityFadeInAnimation();
             CreateOpacityFadeOutAnimation();
             this.appConfig = appConfig;
+            this.dispatcher = dispatcher;
             this.fileBrowserService = fileBrowserService;
             this.notificationService = notificationService;
             this.folderBrowserService = folderBrowserService;
         }
         #endregion
 
-        #region ================================================================= METHODS =================================================================================== 
+        #region ================================================================= METHODS ===================================================================================
         /// <summary>
         /// Creates the animation used in the mask fade in
         /// </summary>
@@ -186,6 +198,7 @@ namespace Leya.Views.Main
         {
             // subscribe to the navigation event
             (DataContext as MainWindowVM).Navigated += MainWindowV_Navigated;
+            (DataContext as MainWindowVM).PlaybackChanged += MainWindowV_OnPlaybackChangedAsync;
             // set the size and position to the values saved in the application's configuration, if any
             if (appConfig.Settings.MainWindowPositionX != null)
                 Position = Position.WithX((int)appConfig.Settings.MainWindowPositionX);
@@ -199,6 +212,9 @@ namespace Leya.Views.Main
                 (DataContext as MainWindowVM).BackgroundImagePath = appConfig.Settings.BackgroundImagePath;
             isWindowLoaded = true;
             BoundsProperty.Changed.AddClassHandler<Window>((s, e) => Window_SizeChanged());
+
+            grdMediaPlayer.Opacity = 0;
+            grdMedia.RowDefinitions[0].Height = new GridLength(0, GridUnitType.Pixel);
 
             // Avalonia bug: for some reason, neither of these work for finding a child control inside a template
             //grdWindowDrag = this.FindControl<Grid>("grdWindowDrag");
@@ -217,6 +233,49 @@ namespace Leya.Views.Main
                 await notificationService.ShowAsync("Error getting the weather info from www.weather.com!\n" + ex.Message, "LEYA - Error", NotificationButton.OK, NotificationImage.Error);
             }
             acbSearchMediaLibrary.ItemFilter = new AutoCompleteFilterPredicate<object>(SearchMediaLibraryCustomFilter);
+        }
+
+        private void MediaPlayerSlidingTimer_Tick(object sender, EventArgs e)
+        {
+            if (isMediaPlaying)
+            {
+                if (grdMedia.RowDefinitions[0].Height.Value < 70)
+                    grdMedia.RowDefinitions[0].Height = new GridLength(grdMedia.RowDefinitions[0].Height.Value + 1, GridUnitType.Pixel);
+                else
+                    MediaPlayerSlidingTimer.Stop();
+            }
+            else
+            {
+                if (grdMedia.RowDefinitions[0].Height.Value > 0)
+                    grdMedia.RowDefinitions[0].Height = new GridLength(grdMedia.RowDefinitions[0].Height.Value - 1, GridUnitType.Pixel);
+                else
+                    MediaPlayerSlidingTimer.Stop();
+            }
+        }
+        
+        /// <summary>
+        /// Handles media player's PlaybackChanged event
+        /// </summary>
+        /// <param name="isPlaying">Indicates whether the media player is playing a media item or not</param>
+        private async Task MainWindowV_OnPlaybackChangedAsync(bool isPlaying)
+        {
+            // hide or show the controls for remote controlling Vlc
+            await dispatcher.DispatchAsync(async () =>
+            {
+                isMediaPlaying = isPlaying;
+                if (isPlaying)
+                {
+                    MediaPlayerSlidingTimer.Start();
+                    await Task.Delay(1000);
+                    await opacityFadeInAnimation.RunAsync(grdMediaPlayer, animationPlaybackClock);
+                }
+                else
+                {
+                    //grdMedia.RowDefinitions[0].Height = new GridLength(0, GridUnitType.Pixel);
+                    await opacityFadeOutAnimation.RunAsync(grdMediaPlayer, animationPlaybackClock);
+                    MediaPlayerSlidingTimer.Start();
+                }
+            });
         }
 
         /// <summary>
@@ -269,6 +328,14 @@ namespace Leya.Views.Main
         }
 
         /// <summary>
+        /// Handles the media source browse button's Click event
+        /// </summary>
+        private void MediaPlayerStart_Click(object sender, RoutedEventArgs e)
+        {
+            
+        }
+        
+        /// <summary>
         /// Handles MediaItem's DoubleTapped event
         /// </summary>
         private async void MediaItem_DoubleTapped(object? sender, RoutedEventArgs e)
@@ -276,6 +343,7 @@ namespace Leya.Views.Main
             NavigationLevel navigationLevel = (DataContext as MainWindowVM).CurrentNavigationLevel;
             // get the parent listbox item of the double tapped element
             IMediaEntity mediaEntity = (sender as Label).Tag as IMediaEntity;
+            // do not play the fade animation when playing an episode, movie or song (it's only for navigation)
             if (navigationLevel is not NavigationLevel.Episode and not NavigationLevel.Song and not NavigationLevel.Movie)
             {
                 // start the fade in animation of the black mask
@@ -390,6 +458,25 @@ namespace Leya.Views.Main
             await opacityFadeInAnimation.RunAsync(grdTransitionMask, animationPlaybackClock);
             (DataContext as MainWindowVM).BeginMainMenuNavigation(sender);
         }
+        
+        /// <summary>
+        /// Handles browse favorite items button's Click event
+        /// </summary>
+        private async void BrowseFavorites_Click(object sender, RoutedEventArgs e)
+        {
+            grdTransitionMask.IsVisible = true;
+            await opacityFadeInAnimation.RunAsync(grdTransitionMask, animationPlaybackClock);
+        }
+
+        /// <summary>
+        /// Handles browse favorite items button's Click event
+        /// </summary>
+        private async void BrowseUnwatched_PointerReleased(object? sender, PointerReleasedEventArgs e)
+        {
+            grdTransitionMask.IsVisible = true;
+            await opacityFadeInAnimation.RunAsync(grdTransitionMask, animationPlaybackClock);
+            (DataContext as MainWindowVM).BrowseUnwatchedItemsAsync();
+        }
 
         /// <summary>
         /// Handles main menu's items MouseEnter event
@@ -427,15 +514,7 @@ namespace Leya.Views.Main
             await (DataContext as MainWindowVM).NavigateMediaLibraryUpAsync();
         }
         #endregion
-
-        ///// <summary>
-        ///// Handles MainMenu RequestBringIntoView event
-        ///// </summary>
-        //private void MainMenu_RequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
-        //{
-        //    e.Handled = true;
-        //}
-
+        
         ///// <summary>
         ///// Handles MediaContextMenu ContextMenuOpening event
         ///// </summary>

@@ -39,6 +39,8 @@ namespace Leya.Models.Core.Navigation
         bool IsFanartVisible { get; set; }
         bool AreWritersVisible { get; set; }
         bool IsDirectorVisible { get; set; }
+        bool ShowsOnlyFavorites { get; set; }
+        bool ShowsOnlyUnwatched { get; set; }
         bool IsMediaCoverVisible { get; set; }
         bool IsHelpButtonVisible { get; set; }
         bool IsSystemOptionVisible { get; set; }
@@ -50,6 +52,7 @@ namespace Leya.Models.Core.Navigation
         bool IsMediaTypesOptionVisible { get; set; }
         bool AreNumberOfSeasonsVisible { get; set; }
         bool IsOptionsContainerVisible { get; set; }
+        bool IsMediaCategorySelectionVisible { get; set; }
         bool AreMediaTypeSourcesOptionVisible { get; set; }
         TimeSpan Runtime { get; set; }
         DateTime Added { get; set; }

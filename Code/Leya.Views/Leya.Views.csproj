@@ -6,6 +6,9 @@
     <RootNamespace>Leya.Views</RootNamespace>
     <AssemblyName>Leya</AssemblyName>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <Company>Yulia Danilova</Company>
+    <AssemblyVersion>4.0.0.1</AssemblyVersion>
+    <FileVersion>4.0.0.1</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <OutputPath>..\..\Build\Debug\</OutputPath>
@@ -24,6 +27,18 @@
   </Target>
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
+    <None Remove="Common\Styles\ProgressBar.xaml" />
+    <AvaloniaResource Include="Common\Styles\ProgressBar.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </AvaloniaResource>
+    <None Remove="Common\Styles\ContextMenu.xaml" />
+    <AvaloniaResource Include="Common\Styles\ContextMenu.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </AvaloniaResource>
+    <None Remove="Common\Styles\MenuItem.xaml" />
+    <AvaloniaResource Include="Common\Styles\MenuItem.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </AvaloniaResource>
   </ItemGroup>
   <ItemGroup>
     <AvaloniaXaml Remove="Common\Animation\**" />

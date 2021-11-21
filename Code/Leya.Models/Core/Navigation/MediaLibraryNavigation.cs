@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Leya.Models.Core.Player;
 using Leya.Infrastructure.Enums;
 using System.Collections.Generic;
+using System.IO;
 using Leya.Models.Core.MediaLibrary;
 using Leya.Models.Common.Broadcasting;
 using Leya.Models.Common.Models.Media;
@@ -26,7 +27,6 @@ namespace Leya.Models.Core.Navigation
         public event Action Navigated;
 
         private string currentMediaName;
-        private readonly IMediaPlayer mediaPlayer;
         #endregion
 
         #region ================================================================ PROPERTIES =================================================================================
@@ -240,6 +240,16 @@ namespace Leya.Models.Core.Navigation
             set { isOptionsContainerVisible = value; Notify(); }
         }
 
+        private bool isMediaCategorySelectionVisible;
+        public bool IsMediaCategorySelectionVisible
+        {
+            get { return isMediaCategorySelectionVisible; }
+            set { isMediaCategorySelectionVisible = value; Notify(); }
+        }
+
+        public bool ShowsOnlyFavorites { get; set; }
+        public bool ShowsOnlyUnwatched { get; set; }
+
         private TimeSpan runtime = TimeSpan.FromSeconds(0);
         public TimeSpan Runtime
         {
@@ -270,17 +280,6 @@ namespace Leya.Models.Core.Navigation
         }
         #endregion
 
-        #region ================================================================== CTOR =====================================================================================
-        /// <summary>
-        /// Overload C-tor
-        /// </summary>
-        /// <param name="mediaPlayer">The injected media player</param>
-        public MediaLibraryNavigation(IMediaPlayer mediaPlayer)
-        {
-            this.mediaPlayer = mediaPlayer;
-        }
-        #endregion
-
         #region ================================================================= METHODS ===================================================================================
         /// <summary>
         /// Navigates one level up in media library
@@ -297,6 +296,8 @@ namespace Leya.Models.Core.Navigation
                 {
                     // for tv shows, movies and artists, there is no higher level to navigate to
                     CurrentNavigationLevel = NavigationLevel.None;
+                    // also cancel favorites-only mode
+                    ShowsOnlyFavorites = false;
                     ExitMediaDisplay();
                     break;
                 }
@@ -357,15 +358,15 @@ namespace Leya.Models.Core.Navigation
         /// <param name="media">The element from which to navigate one level down</param>
         public async Task NavigateDownAsync(IMediaLibrary mediaLibrary, IMediaEntity media)
         {
-            // when current navigation level is episode or movie or song, this is not further navigation, so play the media item
-            if (CurrentNavigationLevel == NavigationLevel.Episode)
-                await mediaPlayer.PlayEpisodeAsync(mediaLibrary, media);
-            else if (CurrentNavigationLevel == NavigationLevel.Movie)
-                await mediaPlayer.PlayMovieAsync(mediaLibrary, media);
-            else if (CurrentNavigationLevel == NavigationLevel.Song)
-                await mediaPlayer.PlaySongAsync(mediaLibrary, media);
-            else
-            {
+            // // when current navigation level is episode or movie or song, this is not further navigation, so play the media item
+            // if (CurrentNavigationLevel == NavigationLevel.Episode)
+            //     await mediaPlayer.PlayEpisodeAsync(mediaLibrary, media);
+            // else if (CurrentNavigationLevel == NavigationLevel.Movie)
+            //     await mediaPlayer.PlayMovieAsync(mediaLibrary, media);
+            // else if (CurrentNavigationLevel == NavigationLevel.Song)
+            //     await mediaPlayer.PlaySongAsync(mediaLibrary, media);
+            // else
+            // {
                 // advance current level of navigation one level deeper
                 IsBackNavigationPossible = true;
                 switch (CurrentNavigationLevel)
@@ -399,7 +400,7 @@ namespace Leya.Models.Core.Navigation
                         break;
                     }
                 }
-            }
+            //}
             Navigated?.Invoke();
         }
 
@@ -415,7 +416,10 @@ namespace Leya.Models.Core.Navigation
             else if (menu.MediaName == "SEARCH")
                 CurrentNavigationLevel = NavigationLevel.Search;
             else if (menu.MediaName == "FAVORITES")
+            {
                 CurrentNavigationLevel = NavigationLevel.Favorite;
+                ShowsOnlyFavorites = true;
+            }
             else
             {
                 if (menu.MediaType == "TV SHOW")
@@ -479,9 +483,9 @@ namespace Leya.Models.Core.Navigation
                                                                           .Where(mts => mts.Id == tvShow.MediaTypeSourceId)
                                                                           .FirstOrDefault();
             // get the poster art for the tv show
-            Poster = LogoHelpers.GetPossibleImagePath(source.MediaSourcePath + @"\poster");
-            Fanart = LogoHelpers.GetPossibleImagePath(source.MediaSourcePath + @"\fanart");
-            Banner = LogoHelpers.GetPossibleImagePath(source.MediaSourcePath + @"\banner");
+            Poster = LogoHelpers.GetPossibleImagePath(source.MediaSourcePath + Path.DirectorySeparatorChar + "poster");
+            Fanart = LogoHelpers.GetPossibleImagePath(source.MediaSourcePath + Path.DirectorySeparatorChar + "fanart");
+            Banner = LogoHelpers.GetPossibleImagePath(source.MediaSourcePath + Path.DirectorySeparatorChar + "banner");
             // assign the rest of the tv show info
             MPAA = tvShow.MPAA;
             Added = tvShow.Created;
@@ -523,12 +527,12 @@ namespace Leya.Models.Core.Navigation
             SeasonEntity season = tvShow.Seasons.Where(s => s.Id == seasonId && s.TvShowId == tvShowId)
                                                 .First();
             // get the poster art for the season
-            Poster = LogoHelpers.GetPossibleImagePath(source.MediaSourcePath + @"\" + season.Title);
+            Poster = LogoHelpers.GetPossibleImagePath(source.MediaSourcePath + Path.DirectorySeparatorChar + season.Title);
             // assign the rest of the tv show season info
             MPAA = string.Empty;
             Synopsis = season.Synopsis;
             Premiered = season.Premiered;
-            LocalPath = source.MediaSourcePath + @"\" + season.Title;
+            LocalPath = source.MediaSourcePath + Path.DirectorySeparatorChar + season.Title;
             NumberOfEpisodes = mediaLibrary.Library.TvShows.SelectMany(t => t.Seasons)
                                                            .SelectMany(s => s.Episodes)
                                                            .Where(e => e.SeasonId == seasonId && e.TvShowId == tvShowId)
@@ -566,9 +570,9 @@ namespace Leya.Models.Core.Navigation
                                                                 .Where(e => e.TvShowId == tvShowId && e.SeasonId == seasonId && e.Title == episodeTitle)
                                                                 .FirstOrDefault();
             // get the poster art for the episode
-            string fanart = source.MediaSourcePath + @"\" + mediaLibrary.Library.TvShows.SelectMany(t => t.Seasons)
+            string fanart = source.MediaSourcePath + Path.DirectorySeparatorChar + mediaLibrary.Library.TvShows.SelectMany(t => t.Seasons)
                                                                                         .Where(s => s.Id == episode.SeasonId)
-                                                                                        .First().Title + @"\" + episode.NamedTitle.Substring(0, episode.NamedTitle.LastIndexOf("."));
+                                                                                        .First().Title + Path.DirectorySeparatorChar + episode.NamedTitle.Substring(0, episode.NamedTitle.LastIndexOf("."));
             Fanart = LogoHelpers.GetPossibleImagePath(fanart);
             // assign the rest of the tv show episode info
             MPAA = episode.MPAA;
@@ -600,9 +604,9 @@ namespace Leya.Models.Core.Navigation
                                                                           .Where(mts => mts.Id == movie.MediaTypeSourceId)
                                                                           .FirstOrDefault();
             // get the poster art for the movie
-            Poster = LogoHelpers.GetPossibleImagePath(source.MediaSourcePath + @"\poster");
-            Fanart = LogoHelpers.GetPossibleImagePath(source.MediaSourcePath + @"\fanart");
-            Banner = LogoHelpers.GetPossibleImagePath(source.MediaSourcePath + @"\banner");
+            Poster = LogoHelpers.GetPossibleImagePath(source.MediaSourcePath + Path.DirectorySeparatorChar + "poster");
+            Fanart = LogoHelpers.GetPossibleImagePath(source.MediaSourcePath + Path.DirectorySeparatorChar + "fanart");
+            Banner = LogoHelpers.GetPossibleImagePath(source.MediaSourcePath + Path.DirectorySeparatorChar + "banner");
             // assign the rest of the movie info
             MPAA = movie.MPAA;
             Added = movie.Created;
@@ -634,9 +638,9 @@ namespace Leya.Models.Core.Navigation
                                                                           .Where(mts => mts.Id == artist.MediaTypeSourceId)
                                                                           .FirstOrDefault();
             // get the poster art for the artist
-            Poster = LogoHelpers.GetPossibleImagePath(source.MediaSourcePath + @"\poster");
-            Fanart = LogoHelpers.GetPossibleImagePath(source.MediaSourcePath + @"\fanart");
-            Banner = LogoHelpers.GetPossibleImagePath(source.MediaSourcePath + @"\banner");
+            Poster = LogoHelpers.GetPossibleImagePath(source.MediaSourcePath + Path.DirectorySeparatorChar + "poster");
+            Fanart = LogoHelpers.GetPossibleImagePath(source.MediaSourcePath + Path.DirectorySeparatorChar + "fanart");
+            Banner = LogoHelpers.GetPossibleImagePath(source.MediaSourcePath + Path.DirectorySeparatorChar + "banner");
             // assign the rest of the artist info
             Added = artist.Created;
             Premiered = artist.Formed;
@@ -679,12 +683,12 @@ namespace Leya.Models.Core.Navigation
             AlbumEntity season = artist.Albums.Where(a => a.Id == albumId && a.ArtistId == artistId)
                                               .First();
             // get the poster art for the album
-            Poster = LogoHelpers.GetPossibleImagePath(source.MediaSourcePath + @"\" + season.Title);
+            Poster = LogoHelpers.GetPossibleImagePath(source.MediaSourcePath + Path.DirectorySeparatorChar + season.Title);
             // assign the rest of the album info
             MPAA = string.Empty;
             Synopsis = season.Description;
             Premiered = new DateTime(season.Year, 0, 0);
-            LocalPath = source.MediaSourcePath + @"\" + season.Title;
+            LocalPath = source.MediaSourcePath + Path.DirectorySeparatorChar + season.Title;
             NumberOfEpisodes = mediaLibrary.Library.Artists.SelectMany(a => a.Albums)
                                                            .SelectMany(a => a.Songs)
                                                            .Where(s => s.AlbumId == albumId && s.ArtistId == artistId)
@@ -722,9 +726,9 @@ namespace Leya.Models.Core.Navigation
                                                           .Where(s => s.ArtistId == artistId && s.AlbumId == albumId && s.Title == songTitle)
                                                           .FirstOrDefault();
             // get the poster art for the song
-            string fanart = source.MediaSourcePath + @"\" + mediaLibrary.Library.Artists.SelectMany(a => a.Albums)
+            string fanart = source.MediaSourcePath + Path.DirectorySeparatorChar + mediaLibrary.Library.Artists.SelectMany(a => a.Albums)
                                                                                         .Where(a => a.Id == song.AlbumId)
-                                                                                        .First().NamedTitle + @"\" + song.NamedTitle.Substring(0, song.NamedTitle.LastIndexOf("."));
+                                                                                        .First().NamedTitle + Path.DirectorySeparatorChar + song.NamedTitle.Substring(0, song.NamedTitle.LastIndexOf("."));
             Fanart = LogoHelpers.GetPossibleImagePath(fanart);
             // assign the rest of the song info
             Runtime = TimeSpan.FromSeconds(song.Length);
@@ -739,6 +743,7 @@ namespace Leya.Models.Core.Navigation
         /// Gets the list of tv shows to be displayed in the navigation list
         /// </summary>
         /// <param name="mediaLibrary">The library from which to take the tv shows to be displayed</param>
+        /// <param name="mediaFactory">The factory used to create the yielded items</param>
         public IEnumerable<IMediaEntity> GetTvShowsNavigationList(IMediaLibrary mediaLibrary, Func<IMediaEntity> mediaFactory, string mediaName = null)
         {
             int mediaTypeId = mediaLibrary.Library.MediaTypes.Where(mt => mt.MediaName == (mediaName ?? currentMediaName)).First().Id;
@@ -766,7 +771,8 @@ namespace Leya.Models.Core.Navigation
         public IEnumerable<IMediaEntity> GetSeasonsNavigationListFromEpisode(IMediaLibrary mediaLibrary, IMediaEntity fromEpisode, Func<IMediaEntity> mediaFactory)
         {
             int count = 0;
-            foreach (SeasonEntity season in mediaLibrary.Library.TvShows.SelectMany(t => t.Seasons).Where(s => s.TvShowId == fromEpisode.Id))
+            foreach (SeasonEntity season in mediaLibrary.Library.TvShows.SelectMany(t => t.Seasons)
+                                                                        .Where(s => s.TvShowId == fromEpisode.Id))
             {
                 IMediaEntity media = mediaFactory.Invoke();
                 media.Id = season.TvShowId;

@@ -121,7 +121,7 @@ namespace Leya.Models.Core.Options
                         foreach (string directory in Directory.EnumerateDirectories(path, "*.*", SearchOption.TopDirectoryOnly))
                             allPaths.Add(directory);
                 foreach (string mediaSource in allPaths)
-                    yield return mediaSource.ToUpper();
+                    yield return mediaSource;
             }
             else
                 throw new IOException("The directory does not exist!");

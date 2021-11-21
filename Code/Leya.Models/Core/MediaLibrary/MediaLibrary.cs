@@ -81,7 +81,6 @@ namespace Leya.Models.Core.MediaLibrary
                               from episode in season.Episodes
                               select new FilterEntity()
                               {
-                                  
                                   ChildTitle = episode.Title,
                                   ParentTitle = tv.Title,
                                   Roles = episode.Actors?.Select(e => e.Role).ToArray(),

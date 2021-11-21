@@ -4,6 +4,7 @@
 #region ========================================================================= USING =====================================================================================
 using NLog;
 using System;
+using System.IO;
 using NLog.Config;
 using NLog.Targets;
 #endregion
@@ -36,7 +37,7 @@ namespace Leya.Infrastructure.Logging
             LoggingConfiguration _config = new LoggingConfiguration();
             FileTarget _file_target = new FileTarget("target2")
             {
-                FileName = (AppDomain.CurrentDomain.BaseDirectory + @"Logs\" + DateTime.Now.ToString("yyMMdd") + ".log").Replace("\\", "/"),
+                FileName = (AppDomain.CurrentDomain.BaseDirectory + @"Logs" + Path.PathSeparator + DateTime.Now.ToString("yyMMdd") + ".log"),//.Replace("\\", "/"),
                 Layout = "${longdate} ${level} ${message}  ${exception}"
             };
             _config.LoggingRules.Add(new LoggingRule("*", LogLevel.Debug, _file_target));

@@ -48,7 +48,7 @@
                     <LineGeometry StartPoint="0,1" EndPoint="30,28"/>
                   </Path.Data>
                 </Path>
-                <TextBlock DockPanel.Dock="Left" TextAlignment="Center" Text="{Binding WindowTitle}" Margin="0" FontSize="{Binding TitleFontSize}" Foreground="{DynamicResource WindowForeColor}" FontWeight="DemiBold" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+                <Label VerticalContentAlignment="Top" HorizontalContentAlignment="Center" Content="{Binding WindowTitle}" Margin="0" FontSize="{Binding TitleFontSize}" Foreground="{DynamicResource WindowForeColor}" FontWeight="DemiBold" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
                 <Path StrokeThickness="3" Stroke="{DynamicResource titleSlantGradient}">
                   <Path.Data>
                     <LineGeometry StartPoint="360,1" EndPoint="330,28"/>

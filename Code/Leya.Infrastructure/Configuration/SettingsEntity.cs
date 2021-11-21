@@ -40,6 +40,7 @@ namespace Leya.Infrastructure.Configuration
         public bool ShufflesPlaylistArgument { get; set; }
         public bool UsesFullScreenArgument { get; set; } = true;
         public bool IsSingleInstanceArgument { get; set; } = true;
+        public bool ContinuousPlaybackForEpisodes { get; set; } = true;
         public bool EnquesFilesInSingleInstanceModeArgument { get; set; }
         public bool ResumesFromLastTimeIndexArgument { get; set; } = true;
         public List<string> FavoritePaths { get; set; }

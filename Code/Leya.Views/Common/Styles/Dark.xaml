@@ -2,7 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:sys="clr-namespace:System;assembly=netstandard">
 
-    <StyleInclude Source="avares://Leya/Common/Styles/ApplicationSpecificDark.xaml"/>
+    <StyleInclude Source="avares://Leya/Common/Styles/ApplicationSpecificDark.xaml" />
     <Style>
         <Style.Resources>
             <Color x:Key="AbortBorderLeftColor">#099</Color>
@@ -35,7 +35,8 @@
                 <GradientStop Color="#000000" Offset="0.0" />
                 <GradientStop Color="#363636" Offset="1.0" />
             </LinearGradientBrush>
-            <LinearGradientBrush x:Key="RadioButtonInnerEllipseGradientBackground" StartPoint="0%,0%" EndPoint="100%,100%">
+            <LinearGradientBrush x:Key="RadioButtonInnerEllipseGradientBackground" StartPoint="0%,0%"
+                                 EndPoint="100%,100%">
                 <GradientStop Color="#BB000000" Offset="0.0" />
                 <GradientStop Color="#00000000" Offset="1.0" />
             </LinearGradientBrush>
@@ -44,18 +45,18 @@
                 <GradientStop Color="#3399FF" Offset="0.5" />
                 <GradientStop Color="#2774C2" Offset="1" />
             </LinearGradientBrush>
-            
-          <LinearGradientBrush x:Key="SelectedListItemBackground" StartPoint="50%,0%" EndPoint="50%,100%">
-            <GradientStop Color="#505050" Offset="0.0" />
-            <GradientStop Color="#464646" Offset="0.35" />
-            <GradientStop Color="#404040" Offset="0.55" />
-            <GradientStop Color="#363636" Offset="1.0" />
-          </LinearGradientBrush>
 
-          <RadialGradientBrush x:Key="GlowBackGround">
-                <GradientStop Color="#555" Offset="0.438"/>
-                <GradientStop Color="#222" Offset="0.861"/>
-                <GradientStop Color="#000" Offset="1"/>
+            <LinearGradientBrush x:Key="SelectedListItemBackground" StartPoint="50%,0%" EndPoint="50%,100%">
+                <GradientStop Color="#505050" Offset="0.0" />
+                <GradientStop Color="#464646" Offset="0.35" />
+                <GradientStop Color="#404040" Offset="0.55" />
+                <GradientStop Color="#363636" Offset="1.0" />
+            </LinearGradientBrush>
+
+            <RadialGradientBrush x:Key="GlowBackGround">
+                <GradientStop Color="#555" Offset="0.438" />
+                <GradientStop Color="#222" Offset="0.861" />
+                <GradientStop Color="#000" Offset="1" />
             </RadialGradientBrush>
 
             <LinearGradientBrush x:Key="upGradient">
@@ -63,13 +64,13 @@
                 <GradientStop Color="#FF2B81D7" Offset="0.8" />
                 <GradientStop Color="#FF2B81D7" Offset="1.0" />
             </LinearGradientBrush>
-            
+
             <LinearGradientBrush x:Key="downGradient">
                 <GradientStop Color="#FF2B81D7" Offset="0.0" />
                 <GradientStop Color="#FF2B81D7" Offset="0.2" />
                 <GradientStop Color="#FF000000" Offset="1.0" />
             </LinearGradientBrush>
-            
+
             <LinearGradientBrush x:Key="textBoxBackgroundNotFocused" StartPoint="50%,0%" EndPoint="50%,100%">
                 <GradientStop Color="#6b7579" Offset="0.0" />
                 <GradientStop Color="#656f73" Offset="0.35" />
@@ -85,7 +86,7 @@
             </LinearGradientBrush>
 
             <LinearGradientBrush x:Key="titleBackgroundGradient" StartPoint="50%,0%" EndPoint="50%,100%">
-                <GradientStop Color="#111" Offset="0.0"/>
+                <GradientStop Color="#111" Offset="0.0" />
                 <GradientStop Color="#222" Offset="0.35" />
                 <GradientStop Color="#333" Offset="0.55" />
                 <GradientStop Color="#555" Offset="0.83" />
@@ -96,32 +97,32 @@
             </LinearGradientBrush>
 
             <LinearGradientBrush x:Key="titleSlantGradient" StartPoint="50%,0%" EndPoint="50%,100%">
-                <GradientStop Color="#020" Offset="0.0"/>
+                <GradientStop Color="#020" Offset="0.0" />
                 <GradientStop Color="#070" Offset="0.35" />
                 <GradientStop Color="#0a0" Offset="0.55" />
                 <GradientStop Color="#0d0" Offset="1.0" />
             </LinearGradientBrush>
 
             <LinearGradientBrush x:Key="WindowSeparatorHighlight" StartPoint="0%,50%" EndPoint="100%,50%">
-                <GradientStop Color="Transparent" Offset="0.18"/>
-                <GradientStop Color="#FFFFFFFF" Offset="0.48"/>
-                <GradientStop Color="Transparent" Offset="0.78"/>
+                <GradientStop Color="Transparent" Offset="0.18" />
+                <GradientStop Color="#FFFFFFFF" Offset="0.48" />
+                <GradientStop Color="Transparent" Offset="0.78" />
             </LinearGradientBrush>
 
             <LinearGradientBrush x:Key="windowMenuBarGradient" StartPoint="50%,0%" EndPoint="50%,100%">
-                <GradientStop Color="#878787" Offset="0.05"/>
-                <GradientStop Color="#5F5F5F" Offset="0.10"/>
-                <GradientStop Color="#515151" Offset="0.50"/>
-                <GradientStop Color="#434343" Offset="0.90"/>
-                <GradientStop Color="#313131" Offset="0.95"/>
-                <GradientStop Color="#191919" Offset="0.97"/>
+                <GradientStop Color="#878787" Offset="0.05" />
+                <GradientStop Color="#5F5F5F" Offset="0.10" />
+                <GradientStop Color="#515151" Offset="0.50" />
+                <GradientStop Color="#434343" Offset="0.90" />
+                <GradientStop Color="#313131" Offset="0.95" />
+                <GradientStop Color="#191919" Offset="0.97" />
             </LinearGradientBrush>
 
             <LinearGradientBrush x:Key="listboxHeaderBarGradient" StartPoint="50%,0%" EndPoint="50%,100%">
-                <GradientStop Color="#83B4FC" Offset="0.0"/>
-                <GradientStop Color="#6292E9" Offset="0.05"/>
-                <GradientStop Color="#4C7DCE" Offset="0.50"/>
-                <GradientStop Color="#3162AB" Offset="1.0"/>
+                <GradientStop Color="#83B4FC" Offset="0.0" />
+                <GradientStop Color="#6292E9" Offset="0.05" />
+                <GradientStop Color="#4C7DCE" Offset="0.50" />
+                <GradientStop Color="#3162AB" Offset="1.0" />
             </LinearGradientBrush>
 
             <LinearGradientBrush x:Key="listboxSelectedItemGradient" StartPoint="50%,0%" EndPoint="50%,100%">
@@ -140,28 +141,28 @@
                 <GradientStop Color="#0B0B0B" Offset="1.0" />
             </LinearGradientBrush>
 
-          <SolidColorBrush x:Key="ListviewLightBg" Color="#28292b"/>
-          <SolidColorBrush x:Key="ListviewDarkBg" Color="#191e21"/>
-          <SolidColorBrush x:Key="AbortBorderLeft" Color="{DynamicResource AbortBorderLeftColor}"></SolidColorBrush>
-            <SolidColorBrush x:Key="AbortBorderRight" Color="{DynamicResource AbortBorderRightColor}"></SolidColorBrush>
-            <SolidColorBrush x:Key="AbortBorderTop" Color="{DynamicResource AbortBorderTopColor}"></SolidColorBrush>
-            <SolidColorBrush x:Key="AbortBorderBottom" Color="{DynamicResource AbortBorderBottomColor}"></SolidColorBrush>
-            <SolidColorBrush x:Key="ConfirmBorderLeft" Color="{DynamicResource ConfirmBorderLeftColor}"></SolidColorBrush>
-            <SolidColorBrush x:Key="ConfirmBorderRight" Color="{DynamicResource ConfirmBorderRightColor}"></SolidColorBrush>
-            <SolidColorBrush x:Key="ConfirmBorderTop" Color="{DynamicResource ConfirmBorderTopColor}"></SolidColorBrush>
-            <SolidColorBrush x:Key="ConfirmBorderBottom" Color="{DynamicResource ConfirmBorderBottomColor}"></SolidColorBrush>
-            <SolidColorBrush x:Key="ButtonForeground" Color="{DynamicResource ButtonForegroundColor}"></SolidColorBrush>
-            <SolidColorBrush x:Key="AbortButtonBackground" Color="{DynamicResource AbortButtonBackgroundColor}"></SolidColorBrush>
-            <SolidColorBrush x:Key="ConfirmButtonBackground" Color="{DynamicResource ConfirmButtonBackgroundColor}"></SolidColorBrush>
-            <SolidColorBrush x:Key="ButtonBackgroundHover" Color="{DynamicResource ButtonBackgroundHoverColor}"></SolidColorBrush>
-            <SolidColorBrush x:Key="ButtonBackgroundDisabled" Color="{DynamicResource ButtonBackgroundDisabledColor}"></SolidColorBrush>
-            <SolidColorBrush x:Key="WindowSeparatorDark" Color="{DynamicResource WindowSeparatorDarkColor}"></SolidColorBrush>
-            <SolidColorBrush x:Key="WindowSeparatorMedium" Color="{DynamicResource WindowSeparatorMediumColor}"></SolidColorBrush>
-            <SolidColorBrush x:Key="ContainerBorderBackground" Color="{DynamicResource ContainerBorderBackgroundColor}"></SolidColorBrush>
-            <SolidColorBrush x:Key="ListboxBackground" Color="{DynamicResource ListboxBackgroundColor}"></SolidColorBrush>
-            <SolidColorBrush x:Key="ListviewItemTopBorder" Color="{DynamicResource ListviewItemTopBorderColor}"></SolidColorBrush>
-            <SolidColorBrush x:Key="ListviewItemBottomBorder" Color="{DynamicResource ListviewItemBottomBorderColor}"></SolidColorBrush>
-            <SolidColorBrush x:Key="FallingNotesBackground" Color="{DynamicResource FallingNotesBackgroundColor}"></SolidColorBrush>
+            <SolidColorBrush x:Key="ListviewLightBg" Color="#28292b" />
+            <SolidColorBrush x:Key="ListviewDarkBg" Color="#191e21" />
+            <SolidColorBrush x:Key="AbortBorderLeft" Color="{DynamicResource AbortBorderLeftColor}" />
+            <SolidColorBrush x:Key="AbortBorderRight" Color="{DynamicResource AbortBorderRightColor}" />
+            <SolidColorBrush x:Key="AbortBorderTop" Color="{DynamicResource AbortBorderTopColor}" />
+            <SolidColorBrush x:Key="AbortBorderBottom" Color="{DynamicResource AbortBorderBottomColor}" />
+            <SolidColorBrush x:Key="ConfirmBorderLeft" Color="{DynamicResource ConfirmBorderLeftColor}" />
+            <SolidColorBrush x:Key="ConfirmBorderRight" Color="{DynamicResource ConfirmBorderRightColor}" />
+            <SolidColorBrush x:Key="ConfirmBorderTop" Color="{DynamicResource ConfirmBorderTopColor}" />
+            <SolidColorBrush x:Key="ConfirmBorderBottom" Color="{DynamicResource ConfirmBorderBottomColor}" />
+            <SolidColorBrush x:Key="ButtonForeground" Color="{DynamicResource ButtonForegroundColor}" />
+            <SolidColorBrush x:Key="AbortButtonBackground" Color="{DynamicResource AbortButtonBackgroundColor}" />
+            <SolidColorBrush x:Key="ConfirmButtonBackground" Color="{DynamicResource ConfirmButtonBackgroundColor}" />
+            <SolidColorBrush x:Key="ButtonBackgroundHover" Color="{DynamicResource ButtonBackgroundHoverColor}" />
+            <SolidColorBrush x:Key="ButtonBackgroundDisabled" Color="{DynamicResource ButtonBackgroundDisabledColor}" />
+            <SolidColorBrush x:Key="WindowSeparatorDark" Color="{DynamicResource WindowSeparatorDarkColor}" />
+            <SolidColorBrush x:Key="WindowSeparatorMedium" Color="{DynamicResource WindowSeparatorMediumColor}" />
+            <SolidColorBrush x:Key="ContainerBorderBackground" Color="{DynamicResource ContainerBorderBackgroundColor}" />
+            <SolidColorBrush x:Key="ListboxBackground" Color="{DynamicResource ListboxBackgroundColor}" />
+            <SolidColorBrush x:Key="ListviewItemTopBorder" Color="{DynamicResource ListviewItemTopBorderColor}" />
+            <SolidColorBrush x:Key="ListviewItemBottomBorder" Color="{DynamicResource ListviewItemBottomBorderColor}" />
+            <SolidColorBrush x:Key="FallingNotesBackground" Color="{DynamicResource FallingNotesBackgroundColor}" />
         </Style.Resources>
     </Style>
-</Styles> 
+</Styles>

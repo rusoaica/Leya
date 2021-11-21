@@ -25,7 +25,7 @@ namespace Leya.Models.Core.Options
             set { playerPath = value; Notify(); }
         }
 
-        private string playerArguments;
+        private string playerArguments = string.Empty;
         public string PlayerArguments
         {
             get { return playerArguments; }

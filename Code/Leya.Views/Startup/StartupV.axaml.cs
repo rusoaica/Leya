@@ -3,6 +3,7 @@
 /// Purpose: Code behind for the StartupV view
 #region ========================================================================= USING =====================================================================================
 using System;
+using System.IO;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
@@ -42,13 +43,13 @@ namespace Leya.Views.Startup
             Instance = this;
 #if DEBUG
             this.AttachDevTools();
-            this.appConfig = appConfig;
 #endif
+            this.appConfig = appConfig;
             // set the application's theme from the application's configuration setting
             App.styles.SwitchThemeByIndex(appConfig.Settings.SelectedTheme == "Dark" ? 0 : 1);
         }
         #endregion
-
+ 
         #region ================================================================= METHODS ===================================================================================
         /// <summary>
         /// Shows the current window as a modal dialog

@@ -144,7 +144,7 @@ namespace Leya.ViewModels.Startup
         /// <summary>
         /// Performs the login
         /// </summary>
-        public async Task LoginAsync()
+        private async Task LoginAsync()
         {
             ShowProgressBar();
             try
